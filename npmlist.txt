@@ -1,0 +1,27 @@
+/Users/ELCHOCO/React Native/react-native-project-template
+├── babel-preset-expo@7.0.0
+├── expo@35.0.0
+├── react@16.8.3
+├── react-dom@16.8.3
+├── react-native@0.59.8
+└── react-native-web@0.11.7
+
+ELCHOCO@Tue Sep 24@23:05:57:react-native-project-template$ expo install react-native-gesture-handler react-native-reanimated
+success Saved 11 new dependencies.
+info Direct dependencies
+├─ react-native-gesture-handler@1.3.0
+├─ react-native-reanimated@1.2.0
+└─ react-navigation@4.0.9
+info All dependencies
+├─ @react-navigation/core@3.5.1
+├─ @react-navigation/native@3.6.2
+├─ path-to-regexp@1.7.0
+├─ query-string@6.8.3
+├─ react-native-gesture-handler@1.3.0
+├─ react-native-reanimated@1.2.0
+├─ react-native-safe-area-view@0.14.8
+├─ react-native-screens@1.0.0-alpha.23
+├─ react-navigation@4.0.9
+├─ split-on-first@1.1.0
+└─ strict-uri-encode@2.0.0
+✨  Done in 29.80s.

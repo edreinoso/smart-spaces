@@ -1,17 +1,16 @@
 import React, { Component } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
+import { generalStyle, text } from '../styles/index'
 
 class FirstScreen extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-    };
-  }
-
   render() {
     return (
-      <View>
-        <Text> FirstScreen </Text>
+      <View style={generalStyle.container}>
+        <Text style={[generalStyle.text, { fontSize: text.txt7, padding: 5 }]}> FirstScreen </Text>
+        <TouchableOpacity
+          onPress={() => this.props.navigation.navigate('Second')}>
+          <Text>Next</Text>
+        </TouchableOpacity>
       </View>
     );
   }

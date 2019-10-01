@@ -2,13 +2,13 @@ import React, { Component } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { generalStyle, text } from '../styles/index'
 
-class SecondScreen extends Component {
+class SixthScreen extends Component {
   render() {
     return (
       <View style={generalStyle.container}>
-        <Text style={[generalStyle.text, { fontSize: text.txt7, padding: 5 }]}> SecondScreen </Text>
+        <Text style={[generalStyle.text, { fontSize: text.txt7, padding: 5 }]}> SixthScreen </Text>
         <TouchableOpacity
-          onPress={() => this.props.navigation.navigate('Third')}>
+          onPress={() => this.props.navigation.navigate('First')}>
           <Text>Next</Text>
         </TouchableOpacity>
       </View>
@@ -16,4 +16,4 @@ class SecondScreen extends Component {
   }
 }
 
-export default SecondScreen;
+export default SixthScreen;

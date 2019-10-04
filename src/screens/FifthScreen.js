@@ -8,7 +8,7 @@ class FifthScreen extends Component {
       <View style={generalStyle.container}>
         <Text style={[generalStyle.text, { fontSize: text.txt7, padding: 5 }]}> FifthScreen </Text>
         <TouchableOpacity
-          onPress={() => this.props.navigation.navigate('First')}>
+          onPress={() => this.props.navigation.navigate('Sixth')}>
           <Text>Next</Text>
         </TouchableOpacity>
       </View>

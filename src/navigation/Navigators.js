@@ -1,34 +1,79 @@
+import React from 'react';
+import { View } from 'react-native';
+
+import Icon from 'react-native-vector-icons/Ionicons'
 import { createStackNavigator } from 'react-navigation-stack';
 import { createBottomTabNavigator } from 'react-navigation-tabs';
-// import { createAppContainer, createBottomTabNavigator } from 'react-navigation';
+import { createDrawerNavigator } from 'react-navigation-drawer';
 import { createAppContainer } from 'react-navigation';
 
-import FirstScreen from '../screens/FirstScreen';
-import SecondScreen from '../screens/SecondScreen';
-import ThirdScreen from '../screens/ThirdScreen';
-import FourthScreen from '../screens/FourthScreen';
-import FifthScreen from '../screens/FifthScreen';
-import SixthScreen from '../screens/SixthScreen';
+import { FirstScreen, SecondScreen, ThirdScreen, SettingsScreen } from '../screens/index'
 
+// Render tab bar icon
+const TabIcon = (iconName, color, iconSize) => {
+  return (
+    <View>
+      <Icon
+        name={iconName}
+        color={color}
+        size={iconSize}
+      />
+    </View>
+  )
+}
+
+// Components used for the tab bar
 const HomeNavigator = createStackNavigator({
   First: FirstScreen,
-  Second: SecondScreen,
-  Third: ThirdScreen
+}, {
+  headerMode: 'none'
 });
 const SearchNavigator = createStackNavigator({
-  Fourth: FourthScreen,
-  Fifth: FifthScreen,
+  Second: SecondScreen,
+}, {
+  headerMode: 'none'
 });
 const ProfileNavigator = createStackNavigator({
-  Sixth: SixthScreen,
+  Third: ThirdScreen,
+}, {
+  headerMode: 'none'
 });
 
-// const TabNavigator = createTabsNavigator({
+// Components used for the Drawer
 const TabNavigator = createBottomTabNavigator({
-  Home: HomeNavigator,
-  Search: SearchNavigator,
-  Profile: ProfileNavigator 
+  Home: {
+    screen: HomeNavigator,
+    navigationOptions: {
+      tabBarIcon: ({ tintColor }) => TabIcon("ios-home", tintColor, 24)
+    }
+  },
+  Search: {
+    screen: SearchNavigator,
+    navigationOptions: {
+      tabBarIcon: ({ tintColor }) => TabIcon("ios-search", tintColor, 24)
+    }
+  },
+  Profile: {
+    screen: ProfileNavigator,
+    navigationOptions: {
+      tabBarIcon: ({ tintColor }) => TabIcon("ios-person", tintColor, 24)
+    }
+  }
+})
+const SettingsNavigator = createStackNavigator({
+  Settings: SettingsScreen
 })
 
-export default createAppContainer(TabNavigator);
-// export default createAppContainer(HomeNavigator);
+const DrawerNavigator = createDrawerNavigator({
+  Main: {
+    screen: TabNavigator,
+    navigationOptions: {
+      title: 'Home'
+    }
+  },
+  Settings: {
+    screen: SettingsNavigator
+  }
+})
+
+export default createAppContainer(DrawerNavigator);

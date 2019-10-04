@@ -1,14 +1,12 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import * as Font from 'expo-font';
-import { AppLoading } from 'expo';
+import React from 'react';
 import { useScreens } from 'react-native-screens';
 
 import Navigators from './src/navigation/Navigators';
+import ScreenNavigators from './src/navigation/ScreenNavigators';
 
 useScreens();
 
 export default function App() {
-  return <Navigators/>
+  return <ScreenNavigators/>
   
 }

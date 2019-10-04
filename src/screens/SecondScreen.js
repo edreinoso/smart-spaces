@@ -8,7 +8,7 @@ class SecondScreen extends Component {
       <View style={generalStyle.container}>
         <Text style={[generalStyle.text, { fontSize: text.txt7, padding: 5 }]}> SecondScreen </Text>
         <TouchableOpacity
-          onPress={() => this.props.navigation.navigate('Third')}>
+          onPress={() => this.props.navigation.navigate('Fifth')}>
           <Text>Next</Text>
         </TouchableOpacity>
       </View>

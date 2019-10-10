@@ -33,7 +33,6 @@ class Button extends Component {
               fontSize: fontSize,
               color: textColor
             }}>{text}</Text>
-
           </View>
         </TouchableOpacity>
       </View>

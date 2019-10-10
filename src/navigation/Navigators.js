@@ -62,6 +62,8 @@ const TabNavigator = createBottomTabNavigator({
 })
 const SettingsNavigator = createStackNavigator({
   Settings: SettingsScreen
+}, {
+  headerMode: 'none'
 })
 
 const DrawerNavigator = createDrawerNavigator({

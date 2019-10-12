@@ -1,3 +1,4 @@
+import AuthScreen from './AuthScreen';
 import FirstScreen from './FirstScreen';
 import SecondScreen from './SecondScreen';
 import ThirdScreen from './ThirdScreen';
@@ -7,6 +8,7 @@ import SixthScreen from './SixthScreen';
 import SettingsScreen from './SettingsScreen';
 
 export {
+  AuthScreen,
   FirstScreen,
   SecondScreen,
   ThirdScreen,

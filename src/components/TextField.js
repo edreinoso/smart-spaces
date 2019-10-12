@@ -1,11 +1,15 @@
 import React, { Component } from 'react';
-import { View, TextInput } from 'react-native';
+import { View, Text, TextInput, StyleSheet } from 'react-native';
 
 class TextField extends Component {
   render() {
     const {
+      title,
       placeholder,
       placeholderTextColor,
+      borderColor,
+      borderWidth,
+      borderRadius,
       value,
       onChangeText,
       autoCorrect,
@@ -17,22 +21,35 @@ class TextField extends Component {
 
     return (
       <View>
+        <Text>{title}</Text>
         <TextInput
           placeholder={placeholder ? placeholder : "Text Input"}
           value={value}
           onChangeText={onChangeText}
           autoCapitalize={autoCapitalize}
           autoCorrect={autoCorrect}
-          style={{
+          style={[styles.paddingHorizontal,{
             height: height,
             width: width,
             color: color,
+            borderColor: borderColor,
+            borderWidth: borderWidth,
+            borderRadius: borderRadius,
             padding: 5,
-          }}
+          }]}
         />
       </View>
     );
   }
 }
+
+const styles = StyleSheet.create({
+  paddingHorizontal: {
+    paddingHorizontal: 10,
+  },
+  bottomPadding: {
+    paddingBottom: 2,
+  }
+});
 
 export default TextField;

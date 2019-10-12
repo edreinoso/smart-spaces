@@ -20,13 +20,21 @@ export const colors = {
   blue: 'blue'
 }
 
+export const cards = StyleSheet.create({
+  cardContainer: {
+    borderRadius: 5,
+    backgroundColor: '#fff',
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.27,
+    elevation: 6,
+  }
+})
+
 export const text = StyleSheet.create({
-  txt1: 8,
-  txt2: 10,
-  txt3: 12,
-  txt4: 14,
-  txt5: 16,
-  txt6: 18,
-  txt7: 20,
-  txt8: 22,
+  buttonText: 14,
+  titleText: 20,
 })

@@ -6,7 +6,7 @@ class ThirdScreen extends Component {
   render() {
     return (
       <View style={container.center}>
-        <Text style={{ fontSize: text.txt7, padding: 5, color: colors.black }}> ThirdScreen </Text>
+        <Text style={{ fontSize: text.titleText, padding: 5, color: colors.black }}> ThirdScreen </Text>
         <TouchableOpacity
           onPress={() => this.props.navigation.navigate('Sixth')}>
           <Text>Next</Text>

@@ -6,7 +6,7 @@ class FourthScreen extends Component {
   render() {
     return (
       <View style={container.center}>
-        <Text style={{ fontSize: text.txt7, padding: 5, color: colors.black }}> FourthScreen </Text>
+        <Text style={{ fontSize: text.titleText, padding: 5, color: colors.black }}> FourthScreen </Text>
         <TouchableOpacity
           onPress={() => this.props.navigation.navigate('Fifth')}>
           <Text>Next</Text>

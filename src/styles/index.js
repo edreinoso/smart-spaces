@@ -1,2 +1,2 @@
-import { container, text, colors, dimensions } from "./generalStyles";
-export { container, text, colors, dimensions };
+import { container, text, colors, dimensions, cards } from "./generalStyles";
+export { container, text, colors, dimensions, cards };

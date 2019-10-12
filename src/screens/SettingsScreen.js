@@ -6,7 +6,7 @@ class SettingsScreen extends Component {
   render() {
     return (
       <View style={container.center}>
-        <Text style={{ fontSize: text.txt7, padding: 5, color: colors.black }}> SettingsScreen </Text>
+        <Text style={{ fontSize: text.titleText, padding: 5, color: colors.black }}> SettingsScreen </Text>
       </View>
     );
   }

@@ -6,7 +6,7 @@ class SixthScreen extends Component {
   render() {
     return (
       <View style={container.center}>
-        <Text style={{ fontSize: text.txt7, padding: 5, color: colors.black }}> SixthScreen </Text>
+        <Text style={{ fontSize: text.titleText, padding: 5, color: colors.black }}> SixthScreen </Text>
       </View>
     );
   }

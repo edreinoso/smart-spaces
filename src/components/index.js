@@ -1,11 +1,11 @@
 import Button from './Button';
-// import Card from './Card';
+import Cards from './Cards';
 // import Header from './Header';
 import TextField from './TextField';
 
 export {
   Button,
-  // Card,
+  Cards,
   // Header,
   TextField
 }

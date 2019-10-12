@@ -25,17 +25,17 @@ const TabIcon = (iconName, color, iconSize) => {
 // Components used for the tab bar
 const HomeNavigator = createStackNavigator({
   First: FirstScreen,
-}, {
+},{
   headerMode: 'none'
 });
 const SearchNavigator = createStackNavigator({
   Second: SecondScreen,
-}, {
+},{
   headerMode: 'none'
 });
 const ProfileNavigator = createStackNavigator({
   Third: ThirdScreen,
-}, {
+},{
   headerMode: 'none'
 });
 

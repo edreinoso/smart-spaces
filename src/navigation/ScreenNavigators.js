@@ -11,6 +11,8 @@ const ScreenNavigators = createStackNavigator({
   Fourth: FourthScreen,
   Fifth: FifthScreen,
   Sixth: SixthScreen,
+}, {
+  headerMode: 'none'
 })
 
 export default createAppContainer(ScreenNavigators)

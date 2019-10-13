@@ -17,7 +17,8 @@ export const colors = {
   black: 'black',
   white: 'white',
   red: 'red',
-  blue: 'blue'
+  blue: 'blue',
+  grey: '#A3A3A3'
 }
 
 export const cards = StyleSheet.create({
@@ -34,7 +35,22 @@ export const cards = StyleSheet.create({
   }
 })
 
+export const header = StyleSheet.create({
+  headerOuterContainer: {
+    zIndex: 10,
+    height: 70,
+    padding:15,
+    borderBottomWidth:1,
+    borderColor: colors.grey,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    // alignItems: "center",
+    alignItems: "flex-end",
+  }
+})
+
 export const text = StyleSheet.create({
-  buttonText: 14,
   titleText: 20,
+  buttonText: 14,
+  headerText: 18
 })

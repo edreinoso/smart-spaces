@@ -46,7 +46,7 @@ export const header = StyleSheet.create({
     justifyContent: "space-between",
     // alignItems: "center",
     alignItems: "flex-end",
-  }
+  },
 })
 
 export const text = StyleSheet.create({

@@ -1,14 +1,36 @@
 import React, { Component } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { container, text, colors, dimensions } from '../styles/index';
-import { Button, TextField, Cards } from '../components/index';
+import { Button, TextField, Cards, Header } from '../components/index';
 
-class AuthScreen extends Component {
+class HomeScreen extends Component {
+  renderHeaderCenter() {
+    return (
+      <View>
+        <Text style={text.headerText}>
+          SmartSpaces
+        </Text>
+      </View>
+    )
+  }
+
   render() {
     return (
       // this flex is necessary for persistency
       <View style={{ flex: 1 }}>
-        
+        {/* <Header
+          headerCenter={this.renderHeaderCenter()}
+        /> */}
+        <View style={styles.customHeader}>
+          <View style={styles.titleHeader}>
+            <Text style={{fontSize: text.headerText}}>Title</Text>
+          </View>
+          <View style={styles.tabsHeader}>
+            <Text>Floor 1</Text>
+            <Text>Floor 2</Text>
+            <Text>Floor 3</Text>
+          </View>
+        </View>
         <View style={container.center}>
           <Text style={{ fontSize: text.titleText, padding: 5, color: colors.black }}> AuthScreen </Text>
           <TextField
@@ -46,4 +68,35 @@ class AuthScreen extends Component {
   }
 }
 
-export default AuthScreen;
+const styles = StyleSheet.create({
+  customHeader: {
+    height: 120,
+    // padding: 15,
+    justifyContent:'center',
+    // temporary
+    borderBottomWidth:1,
+    borderColor: colors.grey,
+    // temporary
+  },
+  titleHeader: {
+    flex: 0.3,
+    alignItems: 'center',
+    // temporary
+    borderColor: colors.red,
+    borderWidth: 1
+    // temporary
+  },
+  tabsHeader: {
+    flex:1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    // temporary
+    borderColor: colors.blue,
+    borderWidth: 1
+    // temporary
+  }
+
+});
+
+export default HomeScreen;

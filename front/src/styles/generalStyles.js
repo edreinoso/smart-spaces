@@ -50,7 +50,7 @@ export const header = StyleSheet.create({
 })
 
 export const text = StyleSheet.create({
-  titleText: 20,
-  buttonText: 14,
-  headerText: 18
+  titleText: 22,
+  headerText: 18,
+  buttonText: 15,
 })

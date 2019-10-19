@@ -84,7 +84,6 @@ class Header extends Component {
 
     return (
       <View style={header.headerOuterContainer}>
-        {/* <Text style={text.headerText}> {text} </Text> */}
         { propChildren }
       </View>
     );

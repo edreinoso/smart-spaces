@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { container, text, colors, dimensions } from '../styles/index';
-import { Button } from '../components/index';
+import { Picture } from '../components/index';
 import { LinearGradient } from 'expo-linear-gradient';
 
 class HomeScreen extends Component {
@@ -40,7 +40,16 @@ class HomeScreen extends Component {
         {/* header */}
         <View style={styles.customHeader}>
           <View style={styles.titleHeader}>
-            <Text style={{ fontSize: text.headerText }}>SmartSpaces</Text>
+            <View style={styles.titleStyle}>
+              <Text style={{ fontSize: text.headerText, paddingLeft: 60, }}>SmartSpaces</Text>
+            </View>
+            <View style={styles.pictureStyle}>
+              <Picture
+                image={{ uri: 'https://s3.amazonaws.com/visualization-images/ProfileImages/S3-avatar.JPG' }}
+                widthHeight={30}
+                radius={12}
+              />
+            </View>
           </View>
           <View style={styles.tabsHeader}>
             <TouchableOpacity onPress={() => this.onValueChange('floor1')}>
@@ -130,15 +139,36 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     elevation: 5,
   },
+  // Header A: - title and picture
   titleHeader: {
     flex: .8,
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: 'row',
+    // alignItems: 'center',
+    // justifyContent: 'center',
     // temporary
-    // borderColor: colors.red,
+    // borderColor: colors.pink,
     // borderWidth: 1
     // temporary
   },
+  titleStyle: {
+    flex:.8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    // temporary
+    // borderColor: colors.green,
+    // borderWidth: 1
+    // temporary
+  },
+  pictureStyle: {
+    flex:.2,
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    // temporary
+    // borderColor: colors.purple,
+    // borderWidth: 1
+    // temporary
+  },
+  // Header B: - buttons and tabs
   tabsHeader: {
     flex: 1,
     flexDirection: 'row',
@@ -161,7 +191,6 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontWeight: '600'
   }
-
 });
 
 export default HomeScreen;

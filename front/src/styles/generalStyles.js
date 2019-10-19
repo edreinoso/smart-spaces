@@ -18,6 +18,9 @@ export const colors = {
   white: 'white',
   red: 'red',
   blue: 'blue',
+  pink: 'pink',
+  green: 'green',
+  purple: 'purple',
   grey: '#A3A3A3'
 }
 

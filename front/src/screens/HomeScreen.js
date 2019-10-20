@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, ScrollView, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { container, text, colors, dimensions } from '../styles/index';
 import { Picture } from '../components/index';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -118,14 +118,59 @@ class HomeScreen extends Component {
           </View>
         </View>
         {/* body */}
-        <View style={container.center}>
-        </View>
-      </View>
+        {/* this might be the container.center */}
+        <ScrollView style={styles.bodyContainer}>
+          <View style={styles.bodySubContainer}>
+            {/* title available */}
+            <View style={styles.body3rdContainer}>
+              <View style={{ paddingLeft: 5 }}>
+                <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>
+                  Available
+              </Text>
+              </View>
+              {/* meeting room boxes */}
+              <View style={styles.roomContainer}>
+                <TouchableOpacity>
+                  <LinearGradient
+                    start={[0.1, 0.1]}
+                    end={[1, 1]}
+                    colors={['#6FA229', '#04F3E5']}
+                    style={{ borderRadius: 5 }}
+                  >
+                    <View style={styles.avRoomContainer}>
+                      <Text style={styles.avRoomText}>1G 11023</Text>
+                    </View>
+                  </LinearGradient>
+                </TouchableOpacity>
+              </View>
+            </View>
+            <View style={styles.body3rdContainer}>
+              {/* title available */}
+              <View style={{ paddingLeft: 5 }}>
+                <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>
+                  Ocupied
+                </Text>
+              </View>
+              {/* meeting room boxes */}
+              <View style={styles.roomContainer}>
+                <TouchableOpacity>
+                  <View style={styles.ocRoomContainer}>
+                    <Text style={styles.ocRoomText}>
+                      1O 19402
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </ScrollView>
+      </View >
     );
   }
 }
 
 const styles = StyleSheet.create({
+  // HEADER
   customHeader: {
     height: 120,
     paddingHorizontal: 20,
@@ -151,7 +196,7 @@ const styles = StyleSheet.create({
     // temporary
   },
   titleStyle: {
-    flex:.8,
+    flex: .8,
     alignItems: 'center',
     justifyContent: 'center',
     // temporary
@@ -160,7 +205,7 @@ const styles = StyleSheet.create({
     // temporary
   },
   pictureStyle: {
-    flex:.2,
+    flex: .2,
     alignItems: 'flex-start',
     justifyContent: 'center',
     // temporary
@@ -190,6 +235,61 @@ const styles = StyleSheet.create({
     fontSize: text.buttonText,
     color: colors.white,
     fontWeight: '600'
+  },
+  // BODY
+  // containers
+  bodyContainer: {
+    flex: 1,
+    // this would make the whole thing be in the middle
+    // alignItems: 'center',
+    // justifyContent: 'center',
+
+    // temporary
+    // borderColor: colors.red,
+    // borderWidth: 1
+    // temporary
+  },
+  bodySubContainer: {
+    paddingHorizontal: 40,
+    paddingVertical: 5,
+    // temporary
+    // borderColor: colors.blue,
+    // borderWidth: 1
+    // temporary
+  },
+  body3rdContainer: {
+    paddingVertical: 20,
+  },
+  roomContainer: {
+    marginVertical: 10
+    // temporary
+    // borderColor: colors.red,
+    // borderWidth: 1
+    // temporary
+  },
+  avRoomContainer: {
+    margin: 2,
+    backgroundColor: colors.white,
+    borderRadius: 5
+  },
+  avRoomText: {
+    margin: 15,
+    paddingHorizontal: 6,
+    backgroundColor: colors.white,
+    color: colors.black,
+    fontSize: text.normalText
+  },
+  ocRoomContainer: {
+    backgroundColor: colors.occupied,
+    borderColor: colors.occupiedBorders,
+    borderWidth: 1,
+    borderRadius: 5
+  },
+  ocRoomText: {
+    margin: 15,
+    paddingHorizontal: 6,
+    color: colors.black,
+    fontSize: text.normalText
   }
 });
 

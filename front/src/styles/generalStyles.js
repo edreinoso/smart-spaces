@@ -21,7 +21,9 @@ export const colors = {
   pink: 'pink',
   green: 'green',
   purple: 'purple',
-  grey: '#A3A3A3'
+  grey: '#A3A3A3',
+  occupied: '#F0F0F0',
+  occupiedBorders: '#DADADA'
 }
 
 export const cards = StyleSheet.create({
@@ -38,7 +40,7 @@ export const cards = StyleSheet.create({
   }
 })
 
-export const header = StyleSheet.create({
+export const headerGeneral = StyleSheet.create({
   headerOuterContainer: {
     zIndex: 10,
     height: 70,
@@ -55,5 +57,7 @@ export const header = StyleSheet.create({
 export const text = StyleSheet.create({
   titleText: 22,
   headerText: 18,
+  subheaderText: 17,
+  normalText: 15,
   buttonText: 15,
 })

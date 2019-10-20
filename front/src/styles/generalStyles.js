@@ -1,11 +1,28 @@
 import { StyleSheet, Dimensions } from "react-native";
 
 export const container = StyleSheet.create({
-  center: {
+  bodyContainer: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center'
+    // this would make the whole thing be in the middle
+    // alignItems: 'center',
+    // justifyContent: 'center',
+
+    // temporary
+    // borderColor: colors.red,
+    // borderWidth: 1
+    // temporary
   },
+  bodySubContainer: {
+    paddingHorizontal: 40,
+    paddingVertical: 5,
+    // temporary
+    // borderColor: colors.blue,
+    // borderWidth: 1
+    // temporary
+  },
+  contentContainer: {
+    paddingVertical: 20,
+  }
 })
 
 export const dimensions = { 
@@ -26,31 +43,57 @@ export const colors = {
   occupiedBorders: '#DADADA'
 }
 
-export const cards = StyleSheet.create({
-  cardContainer: {
-    borderRadius: 5,
-    backgroundColor: '#fff',
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.27,
-    elevation: 6,
-  }
-})
-
-export const headerGeneral = StyleSheet.create({
-  headerOuterContainer: {
-    zIndex: 10,
-    height: 70,
-    padding:15,
-    borderBottomWidth:1,
-    borderColor: colors.grey,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    // alignItems: "center",
-    alignItems: "flex-end",
+export const header = StyleSheet.create({
+  customHeader: {
+    height: 120,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 5,
+    justifyContent: 'center',
+    borderBottomWidth: 0,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    elevation: 5,
+  },
+  // Header A: - title and picture
+  titleHeader: {
+    flex: .8,
+    flexDirection: 'row',
+    // alignItems: 'center',
+    // justifyContent: 'center',
+    // temporary
+    // borderColor: colors.pink,
+    // borderWidth: 1
+    // temporary
+  },
+  titleStyle: {
+    flex: .8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    // temporary
+    // borderColor: colors.green,
+    // borderWidth: 1
+    // temporary
+  },
+  pictureStyle: {
+    flex: .2,
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    // temporary
+    // borderColor: colors.purple,
+    // borderWidth: 1
+    // temporary
+  },
+  // Header B: - buttons and tabs
+  tabsHeader: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    // temporary
+    // borderColor: colors.blue,
+    // borderWidth: 1
+    // temporary
   },
 })
 

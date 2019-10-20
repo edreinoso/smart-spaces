@@ -1,50 +1,55 @@
 import React, { Component } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { text, colors, dimensions } from '../styles/index';
+import { LinearGradient } from 'expo-linear-gradient';
 
 class Button extends Component {
   render() {
     const {
       text,
-      width,
-      height,
-      color,
-      textColor,
-      borderWidth,
-      borderColor,
-      borderRadius,
-      fontSize,
       onButtonPress,
-      padding
+      value, // this would be the boolean value that is used in the home screen
     } = this.props;
 
     return (
-      <View>
-        <TouchableOpacity onPress={onButtonPress}>
-          <View style={[styles.container, {
-            width: width,
-            // height: height,
-            backgroundColor: color,
-            borderWidth: borderWidth,
-            borderColor: borderColor,
-            borderRadius: borderRadius,
-            padding: padding
-          }]}>
-            <Text style={{
-              fontSize: fontSize,
-              color: textColor
-            }}>{text}</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity onPress={onButtonPress}>
+        <View style={
+          value ? styles.buttonHeaderShadow : null
+        }>
+          <LinearGradient
+            colors={
+              value ? ['#6FA229', '#04F3E5'] : [colors.white, colors.white]
+            }
+            start={[.1, .1]}
+            end={[1, 1]}
+            style={{
+              padding: 10, alignItems: 'center', borderRadius: 15, width: dimensions.width / 5
+            }}>
+            <Text style={
+              value ? styles.buttonHeaderTextStyle : null
+            }>
+              {text}
+            </Text>
+          </LinearGradient>
+        </View>
+      </TouchableOpacity>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  container: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  }
+  buttonHeaderShadow: {
+    shadowColor: colors.grey,
+    shadowOffset: { width: 1, height: 3 },
+    shadowOpacity: .1,
+    elevation: 5,
+  },
+  buttonHeaderTextStyle: {
+    backgroundColor: 'transparent',
+    fontSize: text.buttonText,
+    color: colors.white,
+    fontWeight: '600'
+  },
 });
 
 export default Button;

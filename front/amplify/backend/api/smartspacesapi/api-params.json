@@ -1,0 +1,34 @@
+{
+    "paths": [
+        {
+            "name": "/sensor",
+            "lambdaFunction": "smartspacesfunction",
+            "privacy": {
+                "open": true
+            }
+        }
+    ],
+    "resourceName": "smartspacesapi",
+    "apiName": "smartspacesapi",
+    "functionArns": [
+        {
+            "lambdaFunction": "smartspacesfunction"
+        }
+    ],
+    "privacy": {
+        "auth": 0,
+        "unauth": 0,
+        "authRoleName": "amplify-smartspaces-dev-81603-authRole",
+        "unAuthRoleName": "amplify-smartspaces-dev-81603-unauthRole"
+    },
+    "dependsOn": [
+        {
+            "category": "function",
+            "resourceName": "smartspacesfunction",
+            "attributes": [
+                "Name",
+                "Arn"
+            ]
+        }
+    ]
+}

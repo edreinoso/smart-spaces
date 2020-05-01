@@ -1,0 +1,12 @@
+{
+    "permissions": {
+        "storage": {
+            "pirsensordata": [
+                "create",
+                "read",
+                "update",
+                "delete"
+            ]
+        }
+    }
+}

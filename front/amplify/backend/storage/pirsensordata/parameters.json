@@ -1,0 +1,5 @@
+{
+    "tableName": "pirsensordata",
+    "partitionKeyName": "id",
+    "partitionKeyType": "S"
+}

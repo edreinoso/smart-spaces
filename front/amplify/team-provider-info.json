@@ -1,0 +1,15 @@
+{
+    "dev": {
+        "awscloudformation": {
+            "AuthRoleName": "amplify-smartspaces-dev-81603-authRole",
+            "UnauthRoleArn": "arn:aws:iam::130193131803:role/amplify-smartspaces-dev-81603-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::130193131803:role/amplify-smartspaces-dev-81603-authRole",
+            "Region": "us-east-1",
+            "DeploymentBucketName": "amplify-smartspaces-dev-81603-deployment",
+            "UnauthRoleName": "amplify-smartspaces-dev-81603-unauthRole",
+            "StackName": "amplify-smartspaces-dev-81603",
+            "StackId": "arn:aws:cloudformation:us-east-1:130193131803:stack/amplify-smartspaces-dev-81603/890c2280-8ba5-11ea-a09b-1277bf9feb05",
+            "AmplifyAppId": "d2v62j2fa32zt3"
+        }
+    }
+}

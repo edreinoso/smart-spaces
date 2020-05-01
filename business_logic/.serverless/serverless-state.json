@@ -185,7 +185,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/motion-detection-service/dev/1587332556910-2020-04-19T21:42:36.910Z/motion-detection-service.zip"
+                "S3Key": "serverless/motion-detection-service/dev/1588074203423-2020-04-28T11:43:23.423Z/motion-detection-service.zip"
               },
               "FunctionName": "motion-detection-service-dev-pi",
               "Handler": "index.handler",
@@ -209,14 +209,14 @@
               "IamRoleLambdaExecution"
             ]
           },
-          "PiLambdaVersion64JtD7JgNBGDFOXbHehkBhD9QRHvT0Q9TN6BgPo6scs": {
+          "PiLambdaVersiongqLetUNfspOdJW2zF5BI3NwqG4rulvcfZz3Bbvi3s": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "PiLambdaFunction"
               },
-              "CodeSha256": "spQ8qpggicc/S4sxbWODpZQo4Y3C0Lr4FBqqRe2m+W8="
+              "CodeSha256": "XGfdLogS2Ci2HUvsRRe9ql/QcHRyUqeWTKKMfK/lCL8="
             }
           },
           "ApiGatewayRestApi": {
@@ -335,7 +335,7 @@
               "MethodResponses": []
             }
           },
-          "ApiGatewayDeployment1587332553340": {
+          "ApiGatewayDeployment1588074198668": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -417,7 +417,7 @@
           "PiLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "PiLambdaVersion64JtD7JgNBGDFOXbHehkBhD9QRHvT0Q9TN6BgPo6scs"
+              "Ref": "PiLambdaVersiongqLetUNfspOdJW2zF5BI3NwqG4rulvcfZz3Bbvi3s"
             }
           },
           "ServiceEndpoint": {
@@ -532,7 +532,7 @@
         "timeout": 6,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "PiLambdaVersion64JtD7JgNBGDFOXbHehkBhD9QRHvT0Q9TN6BgPo6scs"
+        "versionLogicalId": "PiLambdaVersiongqLetUNfspOdJW2zF5BI3NwqG4rulvcfZz3Bbvi3s"
       }
     },
     "resources": {
@@ -565,10 +565,10 @@
     "serviceFilename": "serverless.yml",
     "layers": {},
     "isDashboardMonitoringPreconfigured": false,
-    "artifact": "/Users/ELCHOCO/React Native/smart-spaces/back/.serverless/motion-detection-service.zip"
+    "artifact": "/Users/ELCHOCO/React Native/smart-spaces/business_logic/.serverless/motion-detection-service.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/motion-detection-service/dev/1587332556910-2020-04-19T21:42:36.910Z",
+    "artifactDirectoryName": "serverless/motion-detection-service/dev/1588074203423-2020-04-28T11:43:23.423Z",
     "artifact": "motion-detection-service.zip"
   }
 }

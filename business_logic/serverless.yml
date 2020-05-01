@@ -44,4 +44,7 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5
+        TimeToLiveSpecification:
+          AttributeName: timestamp
+          Enabled: true
         TableName: 'PIR-sensor'

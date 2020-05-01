@@ -30,7 +30,8 @@ def my_callback(channel):
     ddb_table.put_item(
         Item={
             'id': randomVariable,
-            'timestamp':  str(currentTime.strftime("%Y-%m-%d %H:%M:%S")),
+            # 'timestamp':  str(currentTime.strftime("%Y-%m-%d %H:%M:%S")),
+            'timestamp':  currentTime,
             'roomId': 1
             # 'object': # boolean
         }

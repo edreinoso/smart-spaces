@@ -8,6 +8,8 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "aws-amplify": "^1.2.4",
+    "aws-amplify-react-native": "^4.1.0",
     "expo": "^35.0.0",
     "expo-linear-gradient": "~7.0.0",
     "react": "16.8.3",

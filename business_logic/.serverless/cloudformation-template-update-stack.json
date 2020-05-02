@@ -163,7 +163,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/motion-detection-service/dev/1588074203423-2020-04-28T11:43:23.423Z/motion-detection-service.zip"
+          "S3Key": "serverless/motion-detection-service/dev/1588388108352-2020-05-02T02:55:08.352Z/motion-detection-service.zip"
         },
         "FunctionName": "motion-detection-service-dev-pi",
         "Handler": "index.handler",
@@ -178,7 +178,7 @@
         "Timeout": 6,
         "Environment": {
           "Variables": {
-            "USERS_TABLE": "ExpressServerlessTest"
+            "PIR_TABLE": "PIR-sensor"
           }
         }
       },
@@ -187,14 +187,14 @@
         "IamRoleLambdaExecution"
       ]
     },
-    "PiLambdaVersiongqLetUNfspOdJW2zF5BI3NwqG4rulvcfZz3Bbvi3s": {
+    "PiLambdaVersionf5qqYi3ClGk0LVnq3ycSMhXEFnv1a4Dnj2E6E3s7I": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "PiLambdaFunction"
         },
-        "CodeSha256": "XGfdLogS2Ci2HUvsRRe9ql/QcHRyUqeWTKKMfK/lCL8="
+        "CodeSha256": "4BscXUIre5oijHt4ESAMIULeq2eAZI0CzfuyzFz2Am0="
       }
     },
     "ApiGatewayRestApi": {
@@ -313,7 +313,7 @@
         "MethodResponses": []
       }
     },
-    "ApiGatewayDeployment1588074198668": {
+    "ApiGatewayDeployment1588388103813": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
@@ -382,6 +382,10 @@
           "ReadCapacityUnits": 5,
           "WriteCapacityUnits": 5
         },
+        "TimeToLiveSpecification": {
+          "Enabled": true,
+          "AttributeName": "ttl"
+        },
         "TableName": "PIR-sensor"
       }
     }
@@ -395,7 +399,7 @@
     "PiLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "PiLambdaVersiongqLetUNfspOdJW2zF5BI3NwqG4rulvcfZz3Bbvi3s"
+        "Ref": "PiLambdaVersionf5qqYi3ClGk0LVnq3ycSMhXEFnv1a4Dnj2E6E3s7I"
       }
     },
     "ServiceEndpoint": {

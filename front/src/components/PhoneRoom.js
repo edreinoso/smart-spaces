@@ -8,13 +8,15 @@ class PhoneRoom extends Component {
     const {
       available,
       occupied,
-      roomNumber
+      roomName,
+      onItemSelected,
+      index
     } = this.props;
 
     if (available) {
       return (
         <View style={styles.roomContainer}>
-          <TouchableOpacity>
+          <TouchableOpacity key={index}>
             <LinearGradient
               start={[0.1, 0.1]}
               end={[1, 1]}
@@ -23,7 +25,7 @@ class PhoneRoom extends Component {
             >
               <View style={styles.avRoomContainer}>
                 <Text style={styles.avRoomText}>
-                  {roomNumber}
+                  {roomName}
                 </Text>
               </View>
             </LinearGradient>
@@ -33,7 +35,7 @@ class PhoneRoom extends Component {
     } else if (occupied) {
       return (
         <View style={styles.roomContainer}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => onItemSelected()}>
             <View style={styles.ocRoomContainer}>
               <Text style={styles.ocRoomText}>
                 {roomNumber}

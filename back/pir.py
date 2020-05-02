@@ -3,12 +3,14 @@ import boto3
 import random
 import string
 import time
-import datetime
+from datetime import datetime
 
 client_ddb = boto3.resource('dynamodb')
-ddb_table = client_ddb.Table('PIR-sensor')
+ddb_table = client_ddb.Table('pirsensordata-dev')
 randomVariable = ""
 currentTime = ""
+now = ""
+ttl_number = 0
 
 SENSOR_PIN = 24
 
@@ -21,18 +23,17 @@ def my_callback(channel):
     print('Motion detected, sending data to AWS')
     # Generate a random string
     # with 10 characters.
-    randomVariable = ''.join([random.choice(string.ascii_letters
-                                            + string.digits) for n in range(10)])
-    currentTime = datetime.datetime.now()
-
-    print('values sent to dynamodb: id:' +
-          randomVariable + ' time: ' + str(currentTime))
+    randomVariable = ''.join([random.choice(string.ascii_letters + string.digits) for n in range(10)])
+    currentTime = datetime.now()
+    now = datetime.now()
+    ttl_number = int(now.strftime('%s'))
+    print('values sent to dynamodb: id:' + randomVariable + ' time: ' + str(currentTime) + ' ttl: ' + str(ttl_number))
     ddb_table.put_item(
         Item={
             'id': randomVariable,
-            # 'timestamp':  str(currentTime.strftime("%Y-%m-%d %H:%M:%S")),
-            'timestamp':  currentTime,
-            'roomId': 1
+            'timestamp':  str(currentTime.strftime("%Y-%m-%d %H:%M:%S")),
+            'roomId': 1,
+            'ttl': ttl_number,
             # 'object': # boolean
         }
     )
@@ -44,3 +45,4 @@ try:
 except KeyboardInterrupt:
     print "Finish..."
 GPIO.cleanup()
+

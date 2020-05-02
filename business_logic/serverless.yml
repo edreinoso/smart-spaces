@@ -19,7 +19,7 @@ provider:
       Resource:
         - { "Fn::GetAtt": ["PIRSensor", "Arn"] }
   environment:
-    USERS_TABLE: "ExpressServerlessTest"
+    PIR_TABLE: "PIR-sensor"
 
 functions:
   pi:
@@ -45,6 +45,6 @@ resources:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5
         TimeToLiveSpecification:
-          AttributeName: timestamp
           Enabled: true
+          AttributeName: ttl
         TableName: 'PIR-sensor'

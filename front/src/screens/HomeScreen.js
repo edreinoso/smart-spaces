@@ -1,12 +1,9 @@
 import React, { Component } from 'react';
-import { View, ScrollView, Text, StyleSheet } from 'react-native';
+import { View, ScrollView, Text, StyleSheet, FlatList } from 'react-native';
 import { container, text, colors, header } from '../styles/index';
 import { Picture, Button, PhoneRoom } from '../components/index';
 import axios from 'axios';
-// import Amplify, { API } from 'aws-amplify';
-// import awsmobile from '../../aws-exports';
-// Amplify.configure(awsmobile);
-
+import { phoneRoomMockData, simplerData } from "../store/mockdata";
 
 class HomeScreen extends Component {
   state = {
@@ -19,10 +16,6 @@ class HomeScreen extends Component {
 
   componentWillMount() {
     this.fetchDataFromDDB()
-    // try {
-    //   const api = await
-    // } catch (e) {
-    // }
   }
 
   onValueChange(key) {
@@ -50,64 +43,27 @@ class HomeScreen extends Component {
   fetchDataFromDDB = async () => {
     axios.get("https://hqpgo0kmqi.execute-api.us-east-1.amazonaws.com/dev/sensor/")
       .then(response => {
-        // console.log('getting data from axios', response);
         this.setState({ phoneRoom: response.data.Items })
-        // this.setState({ phoneRoom: response.data })
-        // console.log(this.state.phoneRoom)
       })
       .catch(error => {
         console.log(error);
       });
   }
 
-  renderPhoneRooms() {
-    // Object.keys(this.state.phoneRoom).forEach((key, index) => {})
-    const phoneRoomList = this.state.phoneRoom.map((item, index) =>  <PhoneRoom index={item.id} roomName={item.roomName} available />)
-    // this.state.phoneRoom.map((item, index) => {
-    // console.log(item.roomName)
-    // return (
-    //   <View>
-    //     <PhoneRoom
-    //       roomName={item.roomName}
-    //       available
-    //     />
-    //   </View>
-    // )
-    // })
+  renderPhoneRooms = ({ item }) => {
+    // console.log(item)
+    console.log(item.roomName)
     return (
-      <View>
-        { phoneRoomList }
-      </View>
+      <PhoneRoom
+        index={item.id}
+        roomName={item.roomName}
+        available
+      />
     )
-    // return (
-    //   <View>
-    //     {/* <PhoneRoom
-    //       data={}
-    //       roomName={'no name assigned to this room'}
-    //       available
-    //     /> */}
-    //     <Text>Hello World</Text>
-    //   </View>
-    // )
   }
 
   render() {
-    // console.log(this.state.phoneRoom)
-    // console.log(typeof(this.state.phoneRoom))
-    // this.state.phoneRoom.map((vnz, index) => {
-    //   // console.log(item)
-    //   // Object.values(item).forEach((value) => {
-    //   //   console.log('value is: ', value)
-    //   // })
-
-    //   Object.keys(vnz).forEach((key, index) => {
-    //     // console.log('key: ', key, '\tindex: ', index)
-    //     // console.log('key: ', key, '\t\tvalue: ', vnz[key])
-    //     // key == "roomName" ? console.log(vnz[key]) : 'no name assigned to this room'
-    //     // if (key == "roomName") console.log('HelloWorld')
-    //   })
-    //   console.log('\n')
-    // })
+    // console.log(phoneRoomMockData)
     return (
       // this flex is necessary for persistency
       <View style={{ flex: 1 }}>
@@ -154,7 +110,13 @@ class HomeScreen extends Component {
               </Text>
               </View>
               {/* meeting room boxes */}
-              {this.renderPhoneRooms()}
+              <View>
+                <FlatList
+                  data={this.state.phoneRoom}
+                  keyExtractor={item => item.id}
+                  renderItem={this.renderPhoneRooms}
+                />
+              </View>
             </View>
           </View>
         </ScrollView>

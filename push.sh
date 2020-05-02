@@ -7,5 +7,5 @@ git commit -m "$message"
 read -p "Do you want to push? " gitpush
 if [ $gitpush == "y" ]; then
   # git push origin dev
-  git push origin dev
+  git push
 fi

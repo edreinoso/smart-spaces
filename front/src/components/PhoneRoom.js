@@ -15,7 +15,7 @@ class PhoneRoom extends Component {
 
     if (available) {
       return (
-        <View style={styles.roomContainer}>
+        <View style={styles.roomContainer} onPress={() => onItemSelected()}>
           <TouchableOpacity key={index}>
             <LinearGradient
               start={[0.1, 0.1]}
@@ -35,7 +35,7 @@ class PhoneRoom extends Component {
     } else if (occupied) {
       return (
         <View style={styles.roomContainer}>
-          <TouchableOpacity onPress={() => onItemSelected()}>
+          <TouchableOpacity key={index} onPress={() => onItemSelected()}>
             <View style={styles.ocRoomContainer}>
               <Text style={styles.ocRoomText}>
                 {roomNumber}

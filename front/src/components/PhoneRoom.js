@@ -6,45 +6,30 @@ import { LinearGradient } from 'expo-linear-gradient';
 class PhoneRoom extends Component {
   render() {
     const {
-      available,
-      occupied,
       roomName,
       onItemSelected,
+      peopleInRoom,
       index
     } = this.props;
 
-    if (available) {
-      return (
-        <View style={styles.roomContainer} onPress={() => onItemSelected()}>
-          <TouchableOpacity key={index}>
-            <LinearGradient
-              start={[0.1, 0.1]}
-              end={[1, 1]}
-              colors={['#6FA229', '#04F3E5']}
-              style={{ borderRadius: 5 }}
-            >
-              <View style={styles.avRoomContainer}>
-                <Text style={styles.avRoomText}>
-                  {roomName}
-                </Text>
-              </View>
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
-      );
-    } else if (occupied) {
-      return (
-        <View style={styles.roomContainer}>
-          <TouchableOpacity key={index} onPress={() => onItemSelected()}>
-            <View style={styles.ocRoomContainer}>
-              <Text style={styles.ocRoomText}>
-                {roomNumber}
+    return (
+      <View style={styles.roomContainer}>
+        <TouchableOpacity key={index}>
+          <LinearGradient
+            start={[0.1, 0.1]}
+            end={[1, 1]}
+            colors={peopleInRoom ? ['#6FA229', '#04F3E5'] : ['#DADADA', '#DADADA']}
+            style={{ borderRadius: 5 }}
+          >
+            <View style={peopleInRoom ? styles.avRoomContainer : styles.ocRoomContainer}>
+              <Text style={peopleInRoom ? styles.avRoomText : styles.ocRoomText}>
+                {roomName}
               </Text>
             </View>
-          </TouchableOpacity>
-        </View>
-      );
-    }
+          </LinearGradient>
+        </TouchableOpacity>
+      </View>
+    );
   }
 }
 

@@ -3,7 +3,7 @@ import { View, ScrollView, Text, StyleSheet, FlatList } from 'react-native';
 import { container, text, colors, header } from '../styles/index';
 import { Picture, Button, PhoneRoom } from '../components/index';
 import axios from 'axios';
-import { phoneRoomMockData, simplerData } from "../store/mockdata";
+import { phoneRoomMockData } from "../store/mockdata";
 
 class HomeScreen extends Component {
   state = {
@@ -11,11 +11,16 @@ class HomeScreen extends Component {
     floor2: false,
     floor3: false,
 
-    phoneRoom: []
+    phoneRoom: [],
+
+    // sensor data variables
+    today: null,
+    todayMinus5: null,
+    sensorDate: null
   }
 
   componentWillMount() {
-    this.fetchDataFromDDB()
+    // this.fetchDataFromDDB()
   }
 
   onValueChange(key) {
@@ -51,13 +56,21 @@ class HomeScreen extends Component {
   }
 
   renderPhoneRooms = ({ item }) => {
-    // console.log(item)
-    console.log(item.roomName)
+    let active = false
+    let today = new Date()
+    let todayMinus5 = new Date()
+    todayMinus5.setMinutes(today.getMinutes()-5)
+    let sensorData = new Date(item.timestamp)
+    console.log(today, todayMinus5, sensorData)
+    if(sensorData > todayMinus5) active = true
+    console.log(active)
+    // console.log(today, todayMinus5, item.timestamp)
+    // console.log(today, todayMinus5, typeof(item.timestamp))
     return (
       <PhoneRoom
         index={item.id}
         roomName={item.roomName}
-        available
+        peopleInRoom={active}
       />
     )
   }
@@ -112,7 +125,7 @@ class HomeScreen extends Component {
               {/* meeting room boxes */}
               <View>
                 <FlatList
-                  data={this.state.phoneRoom}
+                  data={phoneRoomMockData}
                   keyExtractor={item => item.id}
                   renderItem={this.renderPhoneRooms}
                 />

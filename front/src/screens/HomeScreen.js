@@ -4,6 +4,7 @@ import { container, text, colors, header } from '../styles/index';
 import { Picture, Button, PhoneRoom } from '../components/index';
 import axios from 'axios';
 import { phoneRoomMockData } from "../store/mockdata";
+const api = "https://hqpgo0kmqi.execute-api.us-east-1.amazonaws.com/dev/sensor"
 
 class HomeScreen extends Component {
   state = {
@@ -46,7 +47,7 @@ class HomeScreen extends Component {
   }
 
   fetchDataFromDDB = async () => {
-    axios.get("https://hqpgo0kmqi.execute-api.us-east-1.amazonaws.com/dev/sensor/")
+    axios.get(api)
       .then(response => {
         this.setState({ phoneRoom: response.data.Items })
       })

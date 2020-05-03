@@ -62,6 +62,18 @@
         "LogGroupName": "/aws/lambda/motion-detection-service-dev-pi"
       }
     },
+    "GetOneSensorDataLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/motion-detection-service-dev-getOneSensorData"
+      }
+    },
+    "GetAllSensorDataLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/motion-detection-service-dev-getAllSensorData"
+      }
+    },
     "IamRoleLambdaExecution": {
       "Type": "AWS::IAM::Role",
       "Properties": {
@@ -163,7 +175,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/motion-detection-service/dev/1588388108352-2020-05-02T02:55:08.352Z/motion-detection-service.zip"
+          "S3Key": "serverless/motion-detection-service/dev/1588464822133-2020-05-03T00:13:42.133Z/motion-detection-service.zip"
         },
         "FunctionName": "motion-detection-service-dev-pi",
         "Handler": "index.handler",
@@ -197,6 +209,88 @@
         "CodeSha256": "4BscXUIre5oijHt4ESAMIULeq2eAZI0CzfuyzFz2Am0="
       }
     },
+    "GetOneSensorDataLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/motion-detection-service/dev/1588464822133-2020-05-03T00:13:42.133Z/motion-detection-service.zip"
+        },
+        "FunctionName": "motion-detection-service-dev-getOneSensorData",
+        "Handler": "index.handler",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs12.x",
+        "Timeout": 6,
+        "Environment": {
+          "Variables": {
+            "PIR_TABLE": "PIR-sensor"
+          }
+        }
+      },
+      "DependsOn": [
+        "GetOneSensorDataLogGroup",
+        "IamRoleLambdaExecution"
+      ]
+    },
+    "GetOneSensorDataLambdaVersionbO2nrWrk6emOZoASSNvQ1v0MEJVEylgniwPOz2qSo": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "GetOneSensorDataLambdaFunction"
+        },
+        "CodeSha256": "4BscXUIre5oijHt4ESAMIULeq2eAZI0CzfuyzFz2Am0="
+      }
+    },
+    "GetAllSensorDataLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/motion-detection-service/dev/1588464822133-2020-05-03T00:13:42.133Z/motion-detection-service.zip"
+        },
+        "FunctionName": "motion-detection-service-dev-getAllSensorData",
+        "Handler": "index.handler",
+        "MemorySize": 1024,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs12.x",
+        "Timeout": 6,
+        "Environment": {
+          "Variables": {
+            "PIR_TABLE": "PIR-sensor"
+          }
+        }
+      },
+      "DependsOn": [
+        "GetAllSensorDataLogGroup",
+        "IamRoleLambdaExecution"
+      ]
+    },
+    "GetAllSensorDataLambdaVersion90zkyJ5tp2OCxc8qqXKt9eWO5mczRPRiiS80zKI88": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "GetAllSensorDataLambdaFunction"
+        },
+        "CodeSha256": "4BscXUIre5oijHt4ESAMIULeq2eAZI0CzfuyzFz2Am0="
+      }
+    },
     "ApiGatewayRestApi": {
       "Type": "AWS::ApiGateway::RestApi",
       "Properties": {
@@ -217,6 +311,33 @@
             "ApiGatewayRestApi",
             "RootResourceId"
           ]
+        },
+        "PathPart": "{proxy+}",
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayResourceSensor": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "ApiGatewayRestApi",
+            "RootResourceId"
+          ]
+        },
+        "PathPart": "sensor",
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        }
+      }
+    },
+    "ApiGatewayResourceSensorProxyVar": {
+      "Type": "AWS::ApiGateway::Resource",
+      "Properties": {
+        "ParentId": {
+          "Ref": "ApiGatewayResourceSensor"
         },
         "PathPart": "{proxy+}",
         "RestApiId": {
@@ -313,7 +434,93 @@
         "MethodResponses": []
       }
     },
-    "ApiGatewayDeployment1588388103813": {
+    "ApiGatewayMethodSensorProxyVarGet": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "HttpMethod": "GET",
+        "RequestParameters": {},
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceSensorProxyVar"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        },
+        "ApiKeyRequired": false,
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "GetOneSensorDataLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "/invocations"
+              ]
+            ]
+          }
+        },
+        "MethodResponses": []
+      }
+    },
+    "ApiGatewayMethodSensorGet": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "HttpMethod": "GET",
+        "RequestParameters": {},
+        "ResourceId": {
+          "Ref": "ApiGatewayResourceSensor"
+        },
+        "RestApiId": {
+          "Ref": "ApiGatewayRestApi"
+        },
+        "ApiKeyRequired": false,
+        "AuthorizationType": "NONE",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "GetAllSensorDataLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "/invocations"
+              ]
+            ]
+          }
+        },
+        "MethodResponses": []
+      }
+    },
+    "ApiGatewayDeployment1588464817332": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
@@ -323,7 +530,9 @@
       },
       "DependsOn": [
         "ApiGatewayMethodAny",
-        "ApiGatewayMethodProxyVarAny"
+        "ApiGatewayMethodProxyVarAny",
+        "ApiGatewayMethodSensorProxyVarGet",
+        "ApiGatewayMethodSensorGet"
       ]
     },
     "PiLambdaPermissionApiGateway": {
@@ -332,6 +541,80 @@
         "FunctionName": {
           "Fn::GetAtt": [
             "PiLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "/*/*"
+            ]
+          ]
+        }
+      }
+    },
+    "GetOneSensorDataLambdaPermissionApiGateway": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "GetOneSensorDataLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "/*/*"
+            ]
+          ]
+        }
+      }
+    },
+    "GetAllSensorDataLambdaPermissionApiGateway": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "GetAllSensorDataLambdaFunction",
             "Arn"
           ]
         },
@@ -400,6 +683,18 @@
       "Description": "Current Lambda function version",
       "Value": {
         "Ref": "PiLambdaVersionf5qqYi3ClGk0LVnq3ycSMhXEFnv1a4Dnj2E6E3s7I"
+      }
+    },
+    "GetOneSensorDataLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "GetOneSensorDataLambdaVersionbO2nrWrk6emOZoASSNvQ1v0MEJVEylgniwPOz2qSo"
+      }
+    },
+    "GetAllSensorDataLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "GetAllSensorDataLambdaVersion90zkyJ5tp2OCxc8qqXKt9eWO5mczRPRiiS80zKI88"
       }
     },
     "ServiceEndpoint": {

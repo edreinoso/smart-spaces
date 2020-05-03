@@ -1,5 +1,8 @@
 # serverless.yml
 
+plugins:
+  - serverless-offline
+
 service: motion-detection-service
 
 provider:
@@ -27,6 +30,14 @@ functions:
     events:
       - http: ANY /
       - http: "ANY {proxy+}"
+  getOneSensorData: 
+    handler: index.handler
+    events:
+      - http: "GET /sensor/{proxy+}"
+  getAllSensorData: 
+    handler: index.handler
+    events:
+      - http: "GET /sensor"
 
 resources:
   Resources:

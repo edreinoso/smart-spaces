@@ -5,12 +5,15 @@ import string
 import time
 from datetime import datetime
 
+table_name="PIR-sensor" # with amplify
+room_name="Ed's Room"
+# table_name="pirsensordata" # with amplify
+
 client_ddb = boto3.resource('dynamodb')
-ddb_table = client_ddb.Table('pirsensordata-dev')
+ddb_table = client_ddb.Table(table_name)
 randomVariable = ""
 currentTime = ""
 now = ""
-ttl_number = 0
 
 SENSOR_PIN = 24
 
@@ -27,13 +30,14 @@ def my_callback(channel):
     currentTime = datetime.now()
     now = datetime.now()
     ttl_number = int(now.strftime('%s'))
-    print('values sent to dynamodb: id:' + randomVariable + ' time: ' + str(currentTime) + ' ttl: ' + str(ttl_number))
+    print('values sent to dynamodb: id: ' + randomVariable + ' roomName: ' + room_name + ' time: ' + str(currentTime))
     ddb_table.put_item(
         Item={
             'id': randomVariable,
-            'timestamp':  str(currentTime.strftime("%Y-%m-%d %H:%M:%S")),
+            'roomName': room_name,
             'roomId': 1,
-            'ttl': ttl_number,
+            'timestamp':  str(currentTime.strftime("%Y-%m-%d %H:%M:%S")),
+            'ttl': int(now.strftime('%s')),
             # 'object': # boolean
         }
     )

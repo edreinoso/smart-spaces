@@ -51,7 +51,8 @@ app.get('/sensor', function (req, res) {
       res.status(400).json({ error: 'Cloud not retrieve data' })
     } else {
       // const { id, roomId, roomName } = result.Item
-      console.log(result)
+      // console.log(result)
+      console.log('hello world!!')
       res.json(result);
     }
   })

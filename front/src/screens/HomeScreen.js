@@ -13,14 +13,19 @@ class HomeScreen extends Component {
     floor3: false,
 
     phoneRoom: [],
+    // mostRecentData: [],
 
     // sensor data variables
     today: null,
     todayMinus5: null,
-    sensorDate: null
+    sensorDate: null,
   }
 
   componentWillMount() {
+    // console.log(phoneRoomMockData)
+    phoneRoomMockData.map((item, index) => {
+      console.log(item.roomName)
+    })
     // this.fetchDataFromDDB()
   }
 
@@ -60,13 +65,10 @@ class HomeScreen extends Component {
     let active = false
     let today = new Date()
     let todayMinus5 = new Date()
-    todayMinus5.setMinutes(today.getMinutes()-5)
+    todayMinus5.setMinutes(today.getMinutes()-10)
     let sensorData = new Date(item.timestamp)
-    console.log(today, todayMinus5, sensorData)
     if(sensorData > todayMinus5) active = true
-    console.log(active)
-    // console.log(today, todayMinus5, item.timestamp)
-    // console.log(today, todayMinus5, typeof(item.timestamp))
+    // console.log(active)
     return (
       <PhoneRoom
         index={item.id}
@@ -126,6 +128,7 @@ class HomeScreen extends Component {
               {/* meeting room boxes */}
               <View>
                 <FlatList
+                  // data={this.state.phoneRoom}
                   data={phoneRoomMockData}
                   keyExtractor={item => item.id}
                   renderItem={this.renderPhoneRooms}

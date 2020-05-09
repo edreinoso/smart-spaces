@@ -16,6 +16,8 @@ There are a number of use cases that can be drawn with this concept of motion de
 among other posibilities
 
 ### Tech stack description:
+![aws-devops](https://personal-website-assets.s3.amazonaws.com/Projects/smart-spaces.png)
+
 This application uses a variety of technologies to accomplish the goal of showing availability on a certain space. It is primarly composed by a frontend, business logic and the backend. 
 - Frontend is developed in React Native using Expo as testing and deployment mechanism. 
 - Business logic is using the serverless framework, which deploys an AWS Lambda function and a DynamoDB table. 

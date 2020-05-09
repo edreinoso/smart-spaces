@@ -1,23 +1,26 @@
 export const phoneRoomMockData = [
   {
-    "id": "HLr5P8IfY1",
+    "ttl": 1588982188,
     "roomId": 1,
     "roomName": "Ed's Room",
-    "timestamp": "2020-05-03T00:03:00",
-    "ttl": 1588417334,
+    "id": "cEpIf57S36",
+    "floor": 1,
+    "timestamp": "2020-05-08 19:56:28"
   },
   {
-    "id": "L9llq9jskj",
+    "ttl": 1588982184,
     "roomId": 1,
     "roomName": "Ed's Room",
-    "timestamp": "2020-05-02T23:53:00",
-    "ttl": 1588417371,
+    "id": "4JEjZTQFN4",
+    "floor": 1,
+    "timestamp": "2020-05-08 19:56:24"
   },
   {
-    "id": "jJ4NhVaWfa",
+    "ttl": 1588982177,
     "roomId": 1,
     "roomName": "Ed's Room",
-    "timestamp": "2020-05-03T00:30:00",
-    "ttl": 1588417381,
-  },
+    "id": "3QWC6vsqsD",
+    "floor": 1,
+    "timestamp": "2020-05-08T20:45:43.471332"
+  }
 ]

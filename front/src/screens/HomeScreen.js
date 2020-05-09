@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import { View, ScrollView, Text, StyleSheet, FlatList } from 'react-native';
+import { View, ScrollView, Text, StyleSheet, FlatList, RefreshControl, } from 'react-native';
 import { container, text, colors, header } from '../styles/index';
 import { Picture, Button, PhoneRoom } from '../components/index';
 import axios from 'axios';
-import { phoneRoomMockData } from "../store/mockdata";
+import { phoneRoomMockData, hello } from "../store/mockdata";
 const api = "https://hqpgo0kmqi.execute-api.us-east-1.amazonaws.com/dev/sensor"
+const local_api = "http://localhost:3000/dev/sensor/"
 
 class HomeScreen extends Component {
   state = {
@@ -13,20 +14,52 @@ class HomeScreen extends Component {
     floor3: false,
 
     phoneRoom: [],
-    // mostRecentData: [],
+    // phoneRoomsAvailable: [],
+    // phoneRoomsUnavailable: [],
+    roomAvailable: false,
 
-    // sensor data variables
-    today: null,
-    todayMinus5: null,
-    sensorDate: null,
+    refreshing: false,
   }
 
   componentWillMount() {
-    // console.log(phoneRoomMockData)
-    phoneRoomMockData.map((item, index) => {
-      console.log(item.roomName)
-    })
-    // this.fetchDataFromDDB()
+    // Local
+    // this.fetchDataFromLocal()
+
+    // API
+    this.fetchDataFromDDB()
+  }
+
+  fetchDataFromLocal = () => {
+    this.setState({ refreshing: false })
+    // console.log(Math.max.apply(Math, phoneRoomMockData.map(function (o) { return o.ttl; })))
+    console.log(typeof (phoneRoomMockData))
+    const maxPeak = phoneRoomMockData.reduce((p, c) => p.ttl > c.ttl ? p : c);
+    // console.log(maxPeak);
+    // console.log(typeof(maxPeak));
+    this.state.phoneRoom.push(maxPeak)
+    // this.state.phoneRoom.push('"HelloWorld": flase')
+    // this.setState({ phoneRoom: maxPeak }) // you are equalizing an array to an object: no bueno!
+    console.log(this.state.phoneRoom)
+  }
+
+  fetchDataFromDDB = async () => {
+    axios.get(api)
+      .then(response => {
+        // console.log(response.data)
+        this.setState({ phoneRoom: response.data.Items, roomAvailable: response.data.List, refreshing: false })
+        // if (response.data.List) {
+        //   // populate
+        //   this.setState({ phoneRoomsAvailable: response.data.Items, roomAvailable: response.data.List, refreshing: false })
+        // } else {
+        //   this.setState({ phoneRoomsUnavailable: response.data.Items, roomAvailable: response.data.List, refreshing: false })
+        // }
+        // console.log(this.state.phoneRoomsAvailable, this.state.phoneRoomsUnavailable, this.state.roomAvailable)
+        console.log(this.state.phoneRoom, this.state.roomAvailable)
+      })
+      .catch(error => {
+        this.setState({ refreshing: false })
+        console.log(error);
+      });
   }
 
   onValueChange(key) {
@@ -51,31 +84,23 @@ class HomeScreen extends Component {
     }
   }
 
-  fetchDataFromDDB = async () => {
-    axios.get(api)
-      .then(response => {
-        this.setState({ phoneRoom: response.data.Items })
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  }
-
   renderPhoneRooms = ({ item }) => {
-    let active = false
-    let today = new Date()
-    let todayMinus5 = new Date()
-    todayMinus5.setMinutes(today.getMinutes()-10)
-    let sensorData = new Date(item.timestamp)
-    if(sensorData > todayMinus5) active = true
-    // console.log(active)
     return (
       <PhoneRoom
         index={item.id}
         roomName={item.roomName}
-        peopleInRoom={active}
+        peopleInRoom={this.state.roomAvailable}
       />
     )
+  }
+
+  handleRefresh = () => {
+    this.setState({
+      refreshing: true,
+    }, () => {
+      this.fetchDataFromDDB()
+      // this.fetchDataFromLocal()
+    })
   }
 
   render() {
@@ -116,20 +141,38 @@ class HomeScreen extends Component {
           </View>
         </View>
         {/* body */}
-        <ScrollView style={container.bodyContainer}>
+        <ScrollView
+          style={container.bodyContainer}
+          refreshControl={
+            <RefreshControl refreshing={this.state.refreshing} onRefresh={this.handleRefresh} />
+          }
+        >
           <View style={container.bodySubContainer}>
             {/* title available */}
             <View style={container.contentContainer}>
               <View style={{ paddingLeft: 5 }}>
                 <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>
                   Available
-              </Text>
+                </Text>
               </View>
               {/* meeting room boxes */}
               <View>
                 <FlatList
-                  // data={this.state.phoneRoom}
-                  data={phoneRoomMockData}
+                  data={this.state.phoneRoom}
+                  // data={phoneRoomMockData}
+                  keyExtractor={item => item.id}
+                  renderItem={this.renderPhoneRooms}
+                />
+              </View>
+              <View style={{ paddingLeft: 5, paddingTop: 20 }}>
+                <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>
+                  Not Available
+                </Text>
+              </View>
+              <View>
+                <FlatList
+                  data={this.state.phoneRoom}
+                  // data={phoneRoomMockData}
                   keyExtractor={item => item.id}
                   renderItem={this.renderPhoneRooms}
                 />

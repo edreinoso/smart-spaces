@@ -48,40 +48,44 @@ app.get('/sensor', function (req, res) {
     "Items": [],
     "List": false
   }
-  var latestData = []
+  var phoneRoom = []
+  var roomIdHolder = ""
 
   dynamodDB.scan(params, (error, result) => {
     if (error) {
       console.log(error)
       res.status(400).json({ error: 'Cloud not retrieve data' })
     } else {
-      let maxPeak = result.Items.reduce((p, c) => p.ttl > c.ttl ? p : c); // object
-      response['Items'].push(maxPeak)
-      const today = new Date()
-      // date for comparison whether sensor has 
-      // sensed something in the past X minutes      
-      const todayMinus5 = new Date()
-      todayMinus5.setMinutes(today.getMinutes() - 2)
-      console.log('todayMinus5: ', todayMinus5, ' maxPeakTime: ', maxPeak.timestamp)
-      let sensorData = new Date(maxPeak.timestamp)
-      console.log('sensorData: ',sensorData)
-      if (sensorData > todayMinus5) {
-        // need to append a value to  
-        console.log('Hello')
-        response['List'] = true
-        // active = true
-      } else {
-        console.log('World')
-        response['List'] = false
-      }
-      console.log(response)
-      // latestData.push(maxPeak)
-      // console.log('data from latestData', latestData)
-      // console.log('type of for: maxPeak', typeof(maxPeak))
-      // console.log('type of for: result', typeof(result.Items))
-      res.json(response)
+      console.log(result.Items)
+      result.Items.map((item, index) => {
+        if (item.roomId != roomIdHolder){ 
+          console.log(item.roomId)
+          phoneRoom.push(item)
+          roomIdHolder = item.roomId
+        }
+      })
+      
+      // let maxPeak = result.Items.reduce((p, c) => p.ttl > c.ttl ? p : c); // object
+      // response['Items'].push(maxPeak)
+      
+      // // Date Logic Calculation
+      // const today = new Date()
+      // // date for comparison whether sensor has 
+      // // sensed something in the past X minutes      
+      // const todayMinus5 = new Date()
+      // todayMinus5.setMinutes(today.getMinutes() - 2)
+      // // console.log('todayMinus5: ', todayMinus5, ' maxPeakTime: ', maxPeak.timestamp)
+      // let sensorData = new Date(maxPeak.timestamp)
+      // // console.log('sensorData: ',sensorData)
+      // if (sensorData > todayMinus5) {
+      //   // need to append a value to  
+      //   console.log('Hello')
+      //   response['List'] = true
+      //   // active = true
+      // }
+      console.log(phoneRoom)
+      res.json(phoneRoom)
       // res.json(result)
-      // res.json(latestData);
     }
   })
 })

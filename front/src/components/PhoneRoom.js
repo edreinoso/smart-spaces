@@ -7,6 +7,7 @@ class PhoneRoom extends Component {
   render() {
     const {
       roomName,
+      roomId,
       onItemSelected,
       peopleInRoom,
       index
@@ -23,7 +24,7 @@ class PhoneRoom extends Component {
           >
             <View style={peopleInRoom ? styles.avRoomContainer : styles.ocRoomContainer}>
               <Text style={peopleInRoom ? styles.avRoomText : styles.ocRoomText}>
-                {roomName}
+                {roomName} {roomId}
               </Text>
             </View>
           </LinearGradient>

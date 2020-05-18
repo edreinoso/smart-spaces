@@ -36,7 +36,7 @@ def my_callback(channel):
             'id': randomVariable,
             'roomName': room_name,
             'roomId': 1,
-            'timestamp':  str(currentTime.strftime("%Y-%m-%d %H:%M:%S")),
+            'timestamp':  str(currentTime.strftime("%Y-%m-%dT%H:%M:%SZ")),
             'ttl': int(now.strftime('%s')),
             # 'object': # boolean
         }
@@ -45,7 +45,7 @@ def my_callback(channel):
 try:
     GPIO.add_event_detect(SENSOR_PIN, GPIO.RISING, callback=my_callback)
     while True:
-        time.sleep(100)
+        time.sleep(100) # this piece is definitely slowing down the process... Play around with other timeouts
 except KeyboardInterrupt:
     print "Finish..."
 GPIO.cleanup()

@@ -16,83 +16,39 @@ class HomeScreen extends Component {
     phoneRoom: [],
     phoneRoomsAvailable: [],
     phoneRoomsUnavailable: [],
-    roomAvailable: false,
 
     refreshing: false,
   }
 
   componentWillMount() {
     // Local
-    this.fetchDataFromLocal()
+    // this.fetchDataFromLocal()
 
     // API
-    // this.fetchDataFromDDB()
+    this.fetchDataFromDDB()
   }
 
   fetchDataFromLocal = () => {
     // this.setState({ refreshing: false })
     // console.log(Math.max.apply(Math, phoneRoomMockData.map(function (o) { return o.ttl; })))
     // console.log(typeof (phoneRoomMockData))
-    // const maxPeak = phoneRoomMockData.reduce((p, c) => p.ttl > c.ttl ? p : c);
+    const maxPeak = phoneRoomMockData.reduce((p, c) => p.ttl > c.ttl ? p : c);
     // console.log(maxPeak);
     // console.log(typeof(maxPeak));
-
-    var array = [
-      { "ttl": 1588982188, "roomId": 4, "roomName": "Ed's Room", "id": "cEpIf57S36", "floor": 1, "timestamp": "2020-05-09T21:48:00.232010" },
-      { "ttl": 1588982184, "roomId": 1, "roomName": "Ed's Room", "id": "4JEjZTQFN4", "floor": 1, "timestamp": "2020-05-08T20:45:43.471332" },
-      { "ttl": 1588982177, "roomId": 3, "roomName": "Ed's Room", "id": "3QWC6vsqsD", "floor": 1, "timestamp": "2020-05-08T20:45:43.471332" },
-      { "ttl": 1588982177, "roomId": 1, "roomName": "Third Room", "id": "3QWC6vsqsT", "floor": 1, "timestamp": "2020-05-08T20:45:43.471332" },
-      { "ttl": 1588982177, "roomId": 2, "roomName": "Ed's Room", "id": "3QWC6vsqsG", "floor": 1, "timestamp": "2020-05-08T20:45:43.471332" },
-      // { "id": "4JEjZTQFN4", "roomId": 4, "roomName": 'Hello World', "fiscalYear": 2018 },
-      // { "id": "3QWC6vsqsD", "roomId": 1, "roomName": 'Eds Room', "fiscalYear": 2018 },
-      // { "id": "3QWC6vsqsT", "roomId": 3, "roomName": 'Miguels Room', "fiscalYear": 2017 },
-      // { "id": "3QWC6vsqsT", "roomId": 1, "roomName": 'Eds Room', "fiscalYear": 2017 },
-      // { "id": "3QWC6vsqsG", "roomId": 2, "roomName": 'Venezuela', "fiscalYear": 2017 }
-    ]
-
-    // const result = Array.from(new Set(array.map(s => s.roomId)))
-    //   .map(roomId => {
-    //     return {
-    //       roomId: roomId,
-    //       id: array.find(s => s.roomId === roomId).id,
-    //       roomName: array.find(s => s.roomId === roomId).roomName,
-    //       // fiscalYear: array.find(s => s.roomId === roomId).fiscalYear,
-    //       floor: array.find(s => s.roomId === roomId).floor,
-    //       ttl: array.find(s => s.roomId === roomId).ttl,
-    //       timestamp: array.find(s => s.roomId === roomId).timestamp
-    //     }
-    //   })
     const result = Array.from(new Set(phoneRoomMockData.map(s => s.roomId)))
       .map(roomId => {
-        // console.log(roomId)
         return {
           roomId: roomId,
-          id: array.find(s => s.roomId === roomId).id,
-          roomName: array.find(s => s.roomId === roomId).roomName,
-          // fiscalYear: array.find(s => s.roomId === roomId).fiscalYear,
-          floor: array.find(s => s.roomId === roomId).floor,
-          ttl: array.find(s => s.roomId === roomId).ttl,
-          timestamp: array.find(s => s.roomId === roomId).timestamp
+          id: phoneRoomMockData.find(s => s.roomId === roomId).id,
+          roomName: phoneRoomMockData.find(s => s.roomId === roomId).roomName,
+          floor: phoneRoomMockData.find(s => s.roomId === roomId).floor,
+          ttl: phoneRoomMockData.find(s => s.roomId === roomId).ttl,
+          timestamp: phoneRoomMockData.find(s => s.roomId === roomId).timestamp
         }
       })
     console.log(result)
     this.setState({ phoneRoom: result })
-    
-    let roomIdHolder = ""
-    var loop = 0
-    // console.log(phoneRoomMockData.length)
-    phoneRoomMockData.map((item, index) => {
-      // console.log(item.roomId)
-      loop += 1
-      // console.log('console: loop', loop)
-      if (loop >= phoneRoomMockData.length) {
-        // console.log('hello world')
-      }
-      if (item.roomId != roomIdHolder) {
-        // this.state.phoneRoom.push(item)
-        roomIdHolder = item.roomId
-      }
-    })
+
     // console.log(this.state.phoneRoom)
     // this.state.phoneRoomsAvailable.push(phoneRoomMockData)
     // this.state.phoneRoomsAvailable.push(maxPeak)
@@ -106,19 +62,38 @@ class HomeScreen extends Component {
   fetchDataFromDDB = async () => {
     axios.get(api)
       .then(response => {
+        var foo = []
+        var bar = []
         // console.log(response.data)
-        if (response.data.List) {
-          // populate
-          this.setState({ phoneRoomsAvailable: response.data.Items, phoneRoomsUnavailable: [], roomAvailable: response.data.List, refreshing: false })
-        } else {
-          this.setState({ phoneRoomsAvailable: [], phoneRoomsUnavailable: response.data.Items, roomAvailable: response.data.List, refreshing: false })
-        }
-        console.log(this.state.phoneRoomsAvailable, this.state.phoneRoomsUnavailable, this.state.roomAvailable)
+        response.data.map((item, index) => {
+          // console.log(item)
+          if (item.list) {
+            foo.push(item)
+            // this.state.phoneRoomsAvailable.push(item)
+          } else {
+            bar.push(item)
+            // this.state.phoneRoomsUnavailable.push(item)
+          }
+        })
+        // console.log(bar)
+        // console.log(foo)
+        this.setState({ phoneRoomsAvailable: foo, phoneRoomsUnavailable: bar, refreshing: false })
+        // this.setState({ refreshing: false })
+        // this logic is not going to work! 
+        // if (response.data.List) {
+        //   // populate
+        //   console.log('response true')
+        //   this.setState({ phoneRoomsAvailable: response.data, phoneRoomsUnavailable: [], refreshing: false })
+        // } else {
+        //   console.log('response false')
+        //   this.setState({ phoneRoomsAvailable: [], phoneRoomsUnavailable: response.data, refreshing: false })
+        // }
+        // console.log(this.state.phoneRoomsAvailable, this.state.phoneRoomsUnavailable)
       })
       .catch(error => {
+        console.log(error);
         this.setState({ refreshing: false })
       });
-    console.log(error);
   }
 
   onValueChange(key) {
@@ -149,7 +124,7 @@ class HomeScreen extends Component {
         index={item.id}
         roomName={item.roomName}
         roomId={item.roomId}
-        peopleInRoom={this.state.roomAvailable}
+        peopleInRoom={item.list}
       />
     )
   }
@@ -218,8 +193,8 @@ class HomeScreen extends Component {
               {/* meeting room boxes */}
               <View>
                 <FlatList
-                  // data={this.state.phoneRoomsAvailable}
-                  data={this.state.phoneRoom}
+                  data={this.state.phoneRoomsAvailable}
+                  // data={this.state.phoneRoom}
                   // data={phoneRoomMockData}
                   keyExtractor={item => item.id}
                   renderItem={this.renderPhoneRooms}

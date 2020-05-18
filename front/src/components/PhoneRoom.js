@@ -24,7 +24,7 @@ class PhoneRoom extends Component {
           >
             <View style={peopleInRoom ? styles.avRoomContainer : styles.ocRoomContainer}>
               <Text style={peopleInRoom ? styles.avRoomText : styles.ocRoomText}>
-                {roomName} {roomId}
+                {roomName}
               </Text>
             </View>
           </LinearGradient>

@@ -5,7 +5,10 @@ import { Picture, Button, PhoneRoom } from '../components/index';
 import axios from 'axios';
 import { phoneRoomMockData, hello } from "../store/mockdata";
 const api = "https://hqpgo0kmqi.execute-api.us-east-1.amazonaws.com/dev/sensor"
-const local_api = "http://localhost:3000/dev/sensor/"
+var api_first_floor = api + '/1'
+var api_second_floor = api + '/2'
+var api_third_floor = api + '/3'
+var interval;
 
 class HomeScreen extends Component {
   state = {
@@ -18,6 +21,22 @@ class HomeScreen extends Component {
     phoneRoomsUnavailable: [],
 
     refreshing: false,
+
+    interval: null
+  }
+
+  componentDidMount() {
+    this.state.interval = setInterval(() => {
+      // console.log(this.state.floor1, this.state.floor2, this.state.floor3)
+      if (this.state.floor1) this.fetchDataFromDDB(api_first_floor)
+      else if (this.state.floor2) this.fetchDataFromDDB(api_second_floor)
+      else if (this.state.floor3) this.fetchDataFromDDB(api_third_floor)
+      // console.log('Ed')
+    }, 5000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(interval);
   }
 
   componentWillMount() {
@@ -25,16 +44,13 @@ class HomeScreen extends Component {
     // this.fetchDataFromLocal()
 
     // API
-    this.fetchDataFromDDB()
+    // this.fetchDataFromDDB()
+    api_first_floor = api + '/1'
+    this.fetchDataFromDDB(api_first_floor)
   }
 
   fetchDataFromLocal = () => {
-    // this.setState({ refreshing: false })
-    // console.log(Math.max.apply(Math, phoneRoomMockData.map(function (o) { return o.ttl; })))
-    // console.log(typeof (phoneRoomMockData))
     const maxPeak = phoneRoomMockData.reduce((p, c) => p.ttl > c.ttl ? p : c);
-    // console.log(maxPeak);
-    // console.log(typeof(maxPeak));
     const result = Array.from(new Set(phoneRoomMockData.map(s => s.roomId)))
       .map(roomId => {
         return {
@@ -48,47 +64,21 @@ class HomeScreen extends Component {
       })
     console.log(result)
     this.setState({ phoneRoom: result })
-
-    // console.log(this.state.phoneRoom)
-    // this.state.phoneRoomsAvailable.push(phoneRoomMockData)
-    // this.state.phoneRoomsAvailable.push(maxPeak)
-    // there should be some local logic for this
-
-    // this.state.phoneRoom.push('"HelloWorld": flase')
-    // this.setState({ phoneRoom: maxPeak }) // you are equalizing an array to an object: no bueno!
-    // console.log(this.state.phoneRoomsAvailable)
   }
 
-  fetchDataFromDDB = async () => {
+  fetchDataFromDDB = async (api) => {
     axios.get(api)
       .then(response => {
-        var foo = []
-        var bar = []
-        // console.log(response.data)
+        var roomAvailable = [] // true: the room is not available
+        var roomNotAvailable = [] // false: the room is available
         response.data.map((item, index) => {
-          // console.log(item)
-          if (item.list) {
-            foo.push(item)
-            // this.state.phoneRoomsAvailable.push(item)
+          if (item.availability) {
+            roomAvailable.push(item) 
           } else {
-            bar.push(item)
-            // this.state.phoneRoomsUnavailable.push(item)
+            roomNotAvailable.push(item)
           }
         })
-        // console.log(bar)
-        // console.log(foo)
-        this.setState({ phoneRoomsAvailable: foo, phoneRoomsUnavailable: bar, refreshing: false })
-        // this.setState({ refreshing: false })
-        // this logic is not going to work! 
-        // if (response.data.List) {
-        //   // populate
-        //   console.log('response true')
-        //   this.setState({ phoneRoomsAvailable: response.data, phoneRoomsUnavailable: [], refreshing: false })
-        // } else {
-        //   console.log('response false')
-        //   this.setState({ phoneRoomsAvailable: [], phoneRoomsUnavailable: response.data, refreshing: false })
-        // }
-        // console.log(this.state.phoneRoomsAvailable, this.state.phoneRoomsUnavailable)
+        this.setState({ phoneRoomsAvailable: roomAvailable, phoneRoomsUnavailable: roomNotAvailable, refreshing: false })
       })
       .catch(error => {
         console.log(error);
@@ -103,18 +93,24 @@ class HomeScreen extends Component {
         floor2: false,
         floor3: false
       })
+      // Call api for floor1
+      this.fetchDataFromDDB(api_first_floor)
     } else if (key === 'floor2') {
       this.setState({
         floor1: false,
         floor2: true,
         floor3: false
       })
+      // Call api for floor2
+      this.fetchDataFromDDB(api_second_floor)
     } else if (key === 'floor3') {
       this.setState({
         floor1: false,
         floor2: false,
         floor3: true
       })
+      // Call api for floor3
+      this.fetchDataFromDDB(api_third_floor)
     }
   }
 
@@ -124,7 +120,7 @@ class HomeScreen extends Component {
         index={item.id}
         roomName={item.roomName}
         roomId={item.roomId}
-        peopleInRoom={item.list}
+        peopleInRoom={item.availability}
       />
     )
   }
@@ -133,13 +129,16 @@ class HomeScreen extends Component {
     this.setState({
       refreshing: true,
     }, () => {
-      this.fetchDataFromDDB()
+      // refreshing according to the floor
+      // console.log(this.state.floor1, this.state.floor2, this.state.floor3)
+      if (this.state.floor1) this.fetchDataFromDDB(api_first_floor)
+      else if (this.state.floor2) this.fetchDataFromDDB(api_second_floor)
+      else if (this.state.floor3) this.fetchDataFromDDB(api_third_floor)
       // this.fetchDataFromLocal()
     })
   }
 
   render() {
-    // console.log(phoneRoomMockData)
     return (
       // this flex is necessary for persistency
       <View style={{ flex: 1 }}>

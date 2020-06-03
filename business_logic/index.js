@@ -5,64 +5,32 @@ const app = express()
 const AWS = require('aws-sdk')
 
 const TABLE = process.env.PIR_TABLE;
-const HARD_CODE_TABLE = 'PIR-sensor-2';
-const dynamodDB = new AWS.DynamoDB.DocumentClient();
+const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
 app.use(bodyParser.json({ strict: false }))
 
-app.get('/', function (req, res) {
-  res.send('Hello World!')
-})
-
-app.get('/sensor/:id', function (req, res) {
-  console.log(req.params)
+app.get('/sensor/:floor', function (req, res) {
+  // console.log('Is it working?', req.params.floor)
+  // console.log(typeof(parseInt(req.params.floor)))
+  // Trying to sort by floor
   const params = {
     TableName: TABLE,
-    Key: {
-      id: req.params.id
-    }
+    FilterExpression: 'floor = :floor',
+    ExpressionAttributeValues: { ':floor': parseInt(req.params.floor) }
   }
-
-  dynamodDB.get(params, (error, result) => {
-    if (error) {
-      console.log(error)
-      res.status(400).json({ error: 'Cloud not retrieve data' })
-    } else if (result.Item) {
-      // const { id, roomId, roomName } = result.Item
-      console.log(result.Item)
-      res.json(result.Item);
-    } else {
-      res.status(404).json({ error: "Something else happened" })
-    }
-  })
-})
-
-app.get('/sensor', function (req, res) {
-  console.log(req.params)
-  const params = {
-    TableName: TABLE,
-    Key: {
-      id: req.params.id
-    }
-  }
-  var response = {
-    "Items": [],
-    "List": false
-  }
-  var phoneRoom = []
-  var roomIdHolder = ""
-
-  dynamodDB.scan(params, (error, result) => {
+  dynamoDB.scan(params, (error, result) => {
     if (error) {
       console.log(error)
       res.status(400).json({ error: 'Cloud not retrieve data' })
     } else {
       // Sorting array by date descending
+      console.log(result)
       result.Items.sort(function (a, b) {
         var dateA = new Date(a.timestamp), dateB = new Date(b.timestamp);
         return dateB - dateA;
       });
 
+      // Getting all unique room IDs
       const data = Array.from(new Set(result.Items.map(s => s.roomId)))
         .map(roomId => {
           return {
@@ -81,26 +49,18 @@ app.get('/sensor', function (req, res) {
       // sensed something in the past X minutes      
       const todayMinus5 = new Date()
       todayMinus5.setMinutes(today.getMinutes() - 2)
-      console.log('today: ',  today,'todayMinus5: ', todayMinus5)
+      // console.log('today: ', today, 'todayMinus5: ', todayMinus5)
       data.map((item, index) => {
         // console.log(item)
         let sensorData = new Date(item.timestamp)
         // console.log(sensorData)
-        if (sensorData > todayMinus5) item['list'] = true
-        else item['list'] = false
+        // Plain english logic: if the sensor data is greater than 5 minutes.
+        // this means that the room is not available. 
+        if (sensorData > todayMinus5) item['availability'] = false
+        else item['availability'] = true
         console.log(item)
       })
-      // let sensorData = new Date(maxPeak.timestamp)
-      // console.log('sensorData: ',sensorData)
-      // if (sensorData > todayMinus5) {
-      //   // need to append a value to  
-      //   console.log('Hello')
-      //   response['List'] = true
-      // }
-      // console.log(data)
       res.json(data)
-      // console.log(result.Items)
-      // res.json(result.Items)
     }
   })
 })

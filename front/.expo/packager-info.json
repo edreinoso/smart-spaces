@@ -1,10 +1,10 @@
 {
   "devToolsPort": 19002,
-  "expoServerPort": null,
-  "packagerPort": null,
-  "packagerPid": null,
-  "expoServerNgrokUrl": null,
-  "packagerNgrokUrl": null,
-  "ngrokPid": null,
+  "expoServerPort": 19000,
+  "packagerPort": 19001,
+  "packagerPid": 6385,
+  "expoServerNgrokUrl": "https://zw-isg.chocoreinoso23.front.exp.direct",
+  "packagerNgrokUrl": "https://packager.zw-isg.chocoreinoso23.front.exp.direct",
+  "ngrokPid": 6398,
   "webpackServerPort": null
 }

@@ -25,19 +25,10 @@ provider:
     PIR_TABLE: "PIR-sensor"
 
 functions:
-  pi:
-    handler: index.handler
-    events:
-      - http: ANY /
-      - http: "ANY {proxy+}"
-  getOneSensorData: 
+  getSensorData: 
     handler: index.handler
     events:
       - http: "GET /sensor/{proxy+}"
-  getAllSensorData: 
-    handler: index.handler
-    events:
-      - http: "GET /sensor"
 
 resources:
   Resources:

@@ -17,6 +17,12 @@ export const container = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center'
   },
+  authContainer: {
+    width: '80%',
+    // maxWidth: 400,
+    // maxHeight: 400,
+    padding: 20
+  },
   bodySubContainer: {
     paddingHorizontal: 40,
     paddingVertical: 5,
@@ -34,6 +40,21 @@ export const dimensions = {
   height: Dimensions.get('window').height,
   width: Dimensions.get('window').width
 }
+
+export const cards = StyleSheet.create({
+  container: {
+    borderRadius: 5,
+    backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowRadius: 3, // new to me
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.27,
+    elevation: 6,
+  }
+})
 
 export const colors = {
   black: 'black',
@@ -111,4 +132,27 @@ export const text = StyleSheet.create({
   subheaderText: 17,
   normalText: 15,
   buttonText: 15,
+})
+
+export const borders = StyleSheet.create({
+  black: {
+    borderWidth: 1,
+    borderColor: 'black'
+  },
+  green: {
+    borderWidth: 1,
+    borderColor: 'green'
+  },
+  pink: {
+    borderWidth: 1,
+    borderColor: 'pink'
+  },
+  purple: {
+    borderWidth: 1,
+    borderColor: 'purple'
+  },
+  red: {
+    borderWidth: 1,
+    borderColor: 'red'
+  },
 })

@@ -1,7 +1,9 @@
 import HomeScreen from './HomeScreen';
-import LoginScreen from './LoginScreen'
+import AuthScreen from './AuthScreen';
+import ProfileScreen from './ProfileScreen';
 
 export {
   HomeScreen,
-  LoginScreen
+  AuthScreen,
+  ProfileScreen
 };

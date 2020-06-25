@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { View, ScrollView, Text, StyleSheet, FlatList, RefreshControl, } from 'react-native';
 import { container, text, colors, header } from '../styles/index';
-import { Picture, Button, PhoneRoom } from '../components/index';
+import { Picture, HomeButton, PhoneRoom } from '../components/index';
 import axios from 'axios';
 import { phoneRoomMockData, hello } from "../store/mockdata";
 const api = "https://hqpgo0kmqi.execute-api.us-east-1.amazonaws.com/dev/sensor"
@@ -157,17 +157,17 @@ class HomeScreen extends Component {
             </View>
           </View>
           <View style={header.tabsHeader}>
-            <Button
+            <HomeButton
               text={'Floor 1'}
               onButtonPress={() => this.onValueChange('floor1')}
               value={this.state.floor1}
             />
-            <Button
+            <HomeButton
               text={'Floor 2'}
               onButtonPress={() => this.onValueChange('floor2')}
               value={this.state.floor2}
             />
-            <Button
+            <HomeButton
               text={'Floor 3'}
               onButtonPress={() => this.onValueChange('floor3')}
               value={this.state.floor3}

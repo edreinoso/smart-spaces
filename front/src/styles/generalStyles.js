@@ -12,6 +12,11 @@ export const container = StyleSheet.create({
     // borderWidth: 1
     // temporary
   },
+  centerScreen: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
   bodySubContainer: {
     paddingHorizontal: 40,
     paddingVertical: 5,
@@ -25,7 +30,7 @@ export const container = StyleSheet.create({
   }
 })
 
-export const dimensions = { 
+export const dimensions = {
   height: Dimensions.get('window').height,
   width: Dimensions.get('window').width
 }
@@ -40,7 +45,10 @@ export const colors = {
   purple: 'purple',
   grey: '#A3A3A3',
   occupied: '#F0F0F0',
-  occupiedBorders: '#DADADA'
+  occupiedBorders: '#DADADA',
+  // legacy
+  primary: '#7EB72E',
+  darkGreen: '#5D8B1C',
 }
 
 export const header = StyleSheet.create({

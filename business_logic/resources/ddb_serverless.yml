@@ -1,0 +1,29 @@
+Resources:
+  PIRSensor:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      TableName: PIR-table
+      # TableName: ${self:custom.tableName}
+      Tags:
+        - Key: "Name"
+          Value: PIR-table
+          # Value: ${self:custom.tableName}
+        - Key: "Template"
+          # Value: ${self:custom.application}
+          Value: smart_spaces
+        - Key: "Environment"
+          # Value: ${self:provider.stage}
+          Value: dev
+        - Key: "Purpose"
+          Value: "PIR DynamoDB to hold the data from the sensor"
+        - Key: "Creation_Date"
+          Value: "Tue_June_23"

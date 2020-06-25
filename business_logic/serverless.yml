@@ -5,6 +5,12 @@ plugins:
 
 service: motion-detection-service
 
+custom:
+  tableName: "PIR-table"
+  queueName: "PIR-queue"
+  cognitoName: "PIR-cognito"
+  application: "smart-spaces"
+
 provider:
   name: aws
   runtime: nodejs12.x
@@ -22,28 +28,32 @@ provider:
       Resource:
         - { "Fn::GetAtt": ["PIRSensor", "Arn"] }
   environment:
-    PIR_TABLE: "PIR-sensor"
+    PIR_TABLE: ${self:custom.tableName}
 
 functions:
-  getSensorData: 
-    handler: index.handler
+  getSensorData:
+    handler: motion.handler
     events:
       - http: "GET /sensor/{proxy+}"
+  queueHandler:
+    handler: queue.handler
+    events:
+      - sqs:
+          arn: arn:aws:sqs:us-east-1:130193131803:${self:custom.queueName}
+          batchSize: 10
+  # userAuth:
+  #   handler: user.handler
+  #   events:
+  #     - http: "GET /user/:userId"
+  # userSignUp:
+  #   handler: user.handler
+  #   events:
+  #     - http: "POST /user/"
 
 resources:
-  Resources:
-    PIRSensor:
-      Type: 'AWS::DynamoDB::Table'
-      Properties:
-        AttributeDefinitions:
-          -
-            AttributeName: id
-            AttributeType: S
-        KeySchema:
-          -
-            AttributeName: id
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 5
-          WriteCapacityUnits: 5
-        TableName: 'PIR-sensor'
+  # DDB
+  - ${file(resources/ddb_serverless.yml)}
+  # SQS
+  - ${file(resources/sqs_serverless.yml)}
+  # Cognito
+  - ${file(resources/cognito_serverless.yml)}

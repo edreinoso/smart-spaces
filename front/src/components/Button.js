@@ -1,55 +1,93 @@
 import React, { Component } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { text, colors, dimensions } from '../styles/index';
-import { LinearGradient } from 'expo-linear-gradient';
+import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
+import { colors } from '../styles/index';
 
 class Button extends Component {
-  render() {
-    const {
-      text,
-      onButtonPress,
-      value, // this would be the boolean value that is used in the home screen
-    } = this.props;
-
-    return (
-      <TouchableOpacity onPress={onButtonPress}>
-        <View style={
-          value ? styles.buttonHeaderShadow : null
-        }>
-          <LinearGradient
-            colors={
-              value ? ['#6FA229', '#04F3E5'] : [colors.white, colors.white]
-            }
-            start={[.1, .1]}
-            end={[1, 1]}
-            style={{
-              padding: 10, alignItems: 'center', borderRadius: 15, width: dimensions.width / 5
-            }}>
-            <Text style={
-              value ? styles.buttonHeaderTextStyle : null
-            }>
-              {text}
-            </Text>
-          </LinearGradient>
-        </View>
-      </TouchableOpacity>
-    );
-  }
+    render() {
+        const {
+            children,
+            // confirm,
+            // warning,
+            borders,
+            onButtonPress,
+            backgroundColor,
+            buttonHeight,
+            buttonWidth,
+            size,
+            fontColor,
+            borderWidth,
+            borderColor,
+            paddingVerticalProps
+            // disable
+        } = this.props;
+        return (
+            <View style={{ paddingVertical: paddingVerticalProps }}>
+                {/* <View style={{ padding: 20 }}> */}
+                {/* <View> */}
+                <TouchableOpacity onPress={onButtonPress}>
+                    <View style={[
+                        styles.container,
+                        {
+                            width: buttonWidth,
+                            borderWidth: borderWidth,
+                            borderWidth: borderWidth,
+                            borderColor: borderColor,
+                            height: buttonHeight,
+                            backgroundColor: backgroundColor
+                            // backgroundColor:'red'
+                        },
+                        borders ? [styles.shadows] : null
+                        // (backgroundColor != '') ? {backgroundColor: 'white'} : {backgroundColor: 'green'}
+                        // disable ? styles.disabled : confirm && styles.confirm
+                        // confirm && styles.confirm,
+                        // warning &&  styles.warning,
+                    ]}>
+                        <Text style={[
+                            styles.text,
+                            {
+                                fontSize: size,
+                                color: fontColor
+                            }
+                        ]}>
+                            {children}
+                        </Text>
+                    </View>
+                </TouchableOpacity>
+            </View>
+        );
+    }
 }
 
 const styles = StyleSheet.create({
-  buttonHeaderShadow: {
-    shadowColor: colors.grey,
-    shadowOffset: { width: 1, height: 3 },
-    shadowOpacity: .1,
-    elevation: 5,
-  },
-  buttonHeaderTextStyle: {
-    backgroundColor: 'transparent',
-    fontSize: text.buttonText,
-    color: colors.white,
-    fontWeight: '600'
-  },
-});
+    container: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 10
+    },
+    text: {
+        color: '#FFF',
+        fontWeight: '600',
+    },
+    disabled: {
+        backgroundColor: colors.darkGreen
+    },
+    confirm: {
+        backgroundColor: colors.primary
+    },
+    warning: {
+        backgroundColor: '#ed6a58'
+    },
+    shadows: {
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 3,
+        },
+        shadowOpacity: 0.29,
+        shadowRadius: 4.65,
+
+        elevation: 7,
+    }
+})
 
 export default Button;

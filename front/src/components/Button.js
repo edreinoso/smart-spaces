@@ -17,12 +17,15 @@ class Button extends Component {
             fontColor,
             borderWidth,
             borderColor,
-            paddingVerticalProps
-            // disable
+            paddingVerticalProps,
+            disable
         } = this.props;
         return (
             <View style={{ paddingVertical: paddingVerticalProps }}>
-                <TouchableOpacity style={{ width: buttonWidth }} onPress={onButtonPress}>
+                <TouchableOpacity 
+                disabled={disable ? true : false}
+                style={{ width: buttonWidth }} 
+                onPress={onButtonPress}>
                     <View style={[
                         styles.container,
                         {
@@ -31,9 +34,8 @@ class Button extends Component {
                             height: buttonHeight,
                             backgroundColor: backgroundColor,
                         },
-                        borders ? [styles.shadows] : null
+                        borders ? [styles.shadows] : null,
                         // (backgroundColor != '') ? {backgroundColor: 'white'} : {backgroundColor: 'green'}
-                        // disable ? styles.disabled : confirm && styles.confirm
                         // confirm && styles.confirm,
                         // warning &&  styles.warning,
                     ]}>

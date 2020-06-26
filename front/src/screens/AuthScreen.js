@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Dimensions } from 'react-native'
+import { View, Text, TouchableOpacity, Dimensions } from 'react-native'
 import validity from '../utility/validate'
 import { container, colors, borders } from '../styles/index'
 import { Logo, Button, Cards, Input } from '../components/index'
 
 class LoginScreen extends Component {
     state = {
-        showLogin: false,
-        showSignUp: false,
+        initialState: false,
+        showLogin: true,
+        showSignUp: true,
         showLoginButton: true,
         showSignUpButton: true,
         confirmPass: false,
@@ -20,6 +21,14 @@ class LoginScreen extends Component {
     reset = () => {
         this.setState({
             controls: {
+                name: {
+                    value: '',
+                    validity: false,
+                    validationRules: {
+                        default: true
+                    },
+                    touched: false
+                },
                 email: {
                     value: '',
                     validity: true,
@@ -79,25 +88,46 @@ class LoginScreen extends Component {
         })
     }
 
-    onLoginPress = () => {
-        // console.log('Home')
-        // for these props to work, need to have = () =>
-        // in the function declaration
-        this.setState({ showLogin: !this.state.showLogin, showLoginButton: true, showSignUpButton: false })
+    onLoginPress = (initialState) => {
+        console.log('testing disabled buttons login')
+        if (initialState) {
+            this.setState({ initialState: true, showLogin: true, showSignUp: false, showLoginButton: true, showSignUpButton: false })
+
+        } else {
+            this.setState({ showLogin: true, showSignUp: false, showLoginButton: true, showSignUpButton: false })
+        }
         // this.props.navigation.navigate('Home')
     }
 
-    onSignUpPress = () => {
-        this.setState({ showSignUp: !this.state.showSignUp, showSignUpButton: true, showLoginButton: false })
-        // console.log('Sign Up')
+    onSignUpPress = (initialState) => {
+        console.log('testing disabled buttons sign up')
+        if (initialState) {
+            this.setState({ initialState: true, showSignUp: true, showLogin: false, showSignUpButton: true, showLoginButton: false })
+        } else {
+            this.setState({ showSignUp: true, showLogin: false, showSignUpButton: true, showLoginButton: false })
+        }
     }
 
     renderAuthPanel() {
-        console.log('renderLogin', this.state.showLogin)
-        // if (!this.state.showSignUp && this.state.showLogin) {
-        // if (this.state.showLogin) {
         return (
-            <Cards style={container.authContainer}>
+            <Cards style={[container.authContainer, {
+                marginBottom: 20
+            }]}>
+                {!this.state.showLogin ? <Input
+                    onChangeInput={val => this.onChangeTextField('name', val)}
+                    onFinishInput={val => this.onFinishTextField('name', val)}
+                    value={this.state.controls.name.value}
+                    valid={this.state.controls.email.validity}
+                    touched={this.state.controls.name.touched}
+                    errorText='Please enter a valid name'
+                    keyboardType='default'
+                    autoCapitalize='none'
+                    //Styles
+                    title={'Name'}
+                    color={colors.black}
+                    borderColor={colors.black}
+                    borderWidth={1}
+                /> : null}
                 <Input
                     onChangeInput={val => this.onChangeTextField('email', val)}
                     onFinishInput={val => this.onFinishTextField('email', val)}
@@ -146,24 +176,6 @@ class LoginScreen extends Component {
                 ) : null}
             </Cards>
         )
-        // }
-    }
-
-    renderLoginInfo() {
-
-    }
-
-    renderSignUpInfo() {
-        // if (!this.state.showLogin && this.state.showSignUp) {
-        if (this.state.showSignUp) {
-            return (
-                <View>
-                    <Text style={{ fontSize: 20 }}>
-                        Sign Up
-                    </Text>
-                </View>
-            )
-        }
     }
 
     renderLoginButton() {
@@ -171,7 +183,7 @@ class LoginScreen extends Component {
             return (
                 <View>
                     <Button
-                        onButtonPress={this.onLoginPress}
+                        onButtonPress={() => this.onLoginPress(true)}
                         buttonWidth={Dimensions.get('window').width * 2 / 3}
                         buttonHeight={50}
                         size={18}
@@ -179,18 +191,19 @@ class LoginScreen extends Component {
                         backgroundColor={colors.white}
                         fontColor={colors.black}
                         borders
-                    // disable={
-                    //     !this.state.controls.email.touched ||
-                    //     !this.state.controls.password.touched
-                    // }
+                        disable={
+                            this.state.initialState &&
+                            (!this.state.controls.email.touched ||
+                            !this.state.controls.password.touched)
+                        }
                     >
                         Login
                     </Button>
                     {!this.state.showSignUpButton ? <View>
                         <Text>
-                            Don't have an account yet
+                            Don't have an account yet?
                     </Text>
-                        <TouchableOpacity onPress={this.onSignUpPress}>
+                        <TouchableOpacity onPress={() => this.onSignUpPress(false)}>
                             <Text>Sign Up</Text>
                         </TouchableOpacity>
                     </View> : null}
@@ -204,19 +217,25 @@ class LoginScreen extends Component {
             return (
                 <View>
                     <Button
-                        onButtonPress={this.onSignUpPress}
+                        onButtonPress={() => this.onSignUpPress(true)}
                         buttonWidth={Dimensions.get('window').width * 2 / 3}
                         buttonHeight={50}
                         paddingVerticalProps={15}
                         size={18}
                         backgroundColor={colors.primary}
                         fontColor={colors.black}
+                        disable={
+                            this.state.initialState &&
+                            (!this.state.controls.name.touched ||
+                            !this.state.controls.email.touched ||
+                            !this.state.controls.password.touched)
+                        }
                     >Sign Up</Button>
                     {!this.state.showLoginButton ? <View>
                         <Text>
                             Already have an account?
                     </Text>
-                        <TouchableOpacity onPress={this.onLoginPress}>
+                        <TouchableOpacity onPress={() => this.onLoginPress(false)}>
                             <Text>Login</Text>
                         </TouchableOpacity>
                     </View> : null}
@@ -235,9 +254,8 @@ class LoginScreen extends Component {
                     <Logo
                         fontSize={25}
                     />
-
                 </View>
-                {/* {this.renderAuthPanel()} */}
+                {this.state.initialState ? this.renderAuthPanel() : null}
                 {this.renderLoginButton()}
                 {this.renderSignUpButton()}
             </View>

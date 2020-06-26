@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { View, Text, TouchableOpacity, Dimensions } from 'react-native'
+import { View, Text, TouchableOpacity, Dimensions, Alert } from 'react-native'
 import validity from '../utility/validate'
-import { container, colors, borders } from '../styles/index'
+import { container, colors } from '../styles/index'
 import { Logo, Button, Cards, Input } from '../components/index'
+import { Auth } from 'aws-amplify';
 
 class LoginScreen extends Component {
     state = {
@@ -12,6 +13,7 @@ class LoginScreen extends Component {
         showLoginButton: true,
         showSignUpButton: true,
         confirmPass: false,
+        newUser: null
     }
 
     componentWillMount() {
@@ -54,6 +56,7 @@ class LoginScreen extends Component {
                     touched: false
                 }
             },
+            initialState: false
         })
     }
 
@@ -88,32 +91,70 @@ class LoginScreen extends Component {
         })
     }
 
-    onLoginPress = (initialState) => {
-        console.log('testing disabled buttons login')
+    onLoginPress = async (initialState) => {
         if (initialState) {
             this.setState({ initialState: true, showLogin: true, showSignUp: false, showLoginButton: true, showSignUpButton: false })
 
         } else {
             this.setState({ showLogin: true, showSignUp: false, showLoginButton: true, showSignUpButton: false })
         }
-        // this.props.navigation.navigate('Home')
+        // Executing auth if email and password are not empty
+        if (this.state.controls.email.value != "" || this.state.controls.password.value != "") {
+            // console.log('execute auth function')
+            await Auth.signIn(this.state.controls.email.value, this.state.controls.password.value).then(() => {
+                this.props.navigation.navigate('Home')
+            }).catch((err) => {
+                Alert.alert("Error found", err.message)
+            })
+        }
     }
 
-    onSignUpPress = (initialState) => {
-        console.log('testing disabled buttons sign up')
+    onSignUpPress = async (initialState) => {
         if (initialState) {
             this.setState({ initialState: true, showSignUp: true, showLogin: false, showSignUpButton: true, showLoginButton: false })
         } else {
             this.setState({ showSignUp: true, showLogin: false, showSignUpButton: true, showLoginButton: false })
         }
+        // 
+        if (this.state.controls.email.value != "" || this.state.controls.password.value != "" || this.state.controls.name.value != "") {
+            await Auth.signUp({
+                username: this.state.controls.email.value,
+                password: this.state.controls.password.value,
+                attributes: {
+                    email: this.state.controls.email.value,
+                }
+            }).then((data) => {
+                // console.log(data)
+                this.setState({
+                    newUser: data,
+                    showSignUpButton: false
+                })
+            }).catch((err) => {
+                Alert.alert("Error found", err.message)
+            })
+        }
     }
 
-    renderAuthPanel() {
+    onVerifyPress = async () => {
+        await Auth.confirmSignUp(this.state.controls.email.value, this.state.controls.confirmCode.value);
+        await Auth.signIn(this.state.controls.email.value, this.state.controls.password.value).then(() => {
+            this.props.navigation.navigate('Home')
+        }).catch((err) => {
+            Alert.alert("Error found", err.message)
+        });
+    }
+
+    onSendEmailAgain = async () => {
+        await Auth.resendSignUp(this.state.controls.email.value).then(() => { console.log('code resent sucessfully') }).catch((err) => {
+            Alert.alert("Error occured", err.message)
+        });
+    }
+
+
+    renderNewUser() {
         return (
-            <Cards style={[container.authContainer, {
-                marginBottom: 20
-            }]}>
-                {!this.state.showLogin ? <Input
+            <View>
+                {/* {!this.state.showLogin ? <Input
                     onChangeInput={val => this.onChangeTextField('name', val)}
                     onFinishInput={val => this.onFinishTextField('name', val)}
                     value={this.state.controls.name.value}
@@ -127,7 +168,7 @@ class LoginScreen extends Component {
                     color={colors.black}
                     borderColor={colors.black}
                     borderWidth={1}
-                /> : null}
+                /> : null} */}
                 <Input
                     onChangeInput={val => this.onChangeTextField('email', val)}
                     onFinishInput={val => this.onFinishTextField('email', val)}
@@ -158,22 +199,37 @@ class LoginScreen extends Component {
                     borderColor={colors.black}
                     borderWidth={1}
                 />
-                {this.state.confirmPass ? (
-                    <Input
-                        onChangeInput={val => this.onChangeTextField('confirmCode', val)}
-                        onFinishInput={val => this.onFinishTextField('password', val)}
-                        value={this.state.controls.confirmCode.value}
-                        valid={this.state.controls.password.validity}
-                        touched={this.state.controls.password.touched}
-                        keyboardType='default'
-                        errorText='Please enter a 6 digit code'
-                        // Styles
-                        title={'Confirm Code'}
-                        color={colors.black}
-                        borderColor={colors.black}
-                        borderWidth={1}
-                    />
-                ) : null}
+            </View>
+        )
+    }
+
+    renderVerifyUser() {
+        return (
+            <View>
+                <Input
+                    onChangeInput={val => this.onChangeTextField('confirmCode', val)}
+                    onFinishInput={val => this.onFinishTextField('password', val)}
+                    value={this.state.controls.confirmCode.value}
+                    valid={this.state.controls.password.validity}
+                    touched={this.state.controls.password.touched}
+                    keyboardType='default'
+                    errorText='Please enter a 6 digit code'
+                    // Styles
+                    title={'Confirm Code'}
+                    color={colors.black}
+                    borderColor={colors.black}
+                    borderWidth={1}
+                />
+            </View>
+        )
+    }
+
+    renderAuthPanel() {
+        return (
+            <Cards style={[container.authContainer, {
+                marginBottom: 20
+            }]}>
+                {this.state.newUser === null ? this.renderNewUser() : this.renderVerifyUser()}
             </Cards>
         )
     }
@@ -194,7 +250,7 @@ class LoginScreen extends Component {
                         disable={
                             this.state.initialState &&
                             (!this.state.controls.email.touched ||
-                            !this.state.controls.password.touched)
+                                !this.state.controls.password.touched)
                         }
                     >
                         Login
@@ -226,9 +282,9 @@ class LoginScreen extends Component {
                         fontColor={colors.black}
                         disable={
                             this.state.initialState &&
-                            (!this.state.controls.name.touched ||
-                            !this.state.controls.email.touched ||
-                            !this.state.controls.password.touched)
+                            // (!this.state.controls.name.touched ||
+                            (!this.state.controls.email.touched ||
+                                !this.state.controls.password.touched)
                         }
                     >Sign Up</Button>
                     {!this.state.showLoginButton ? <View>
@@ -245,6 +301,27 @@ class LoginScreen extends Component {
         }
     }
 
+    renderVerifyButton() {
+        return (
+            <View>
+                <Button
+                    onButtonPress={() => this.onVerifyPress()}
+                    buttonWidth={Dimensions.get('window').width * 2 / 3}
+                    buttonHeight={50}
+                    paddingVerticalProps={15}
+                    size={18}
+                    backgroundColor={colors.primary}
+                    fontColor={colors.black}
+                    disable={
+                        !this.state.controls.confirmCode.touched
+                    }
+                >Verify</Button>
+                <Text>Did not get an email?</Text>
+                <TouchableOpacity onPress={() => this.onSendEmailAgain()}><Text>Send again</Text></TouchableOpacity>
+            </View>
+        )
+    }
+
     render() {
         return (
             <View style={container.centerScreen}>
@@ -258,6 +335,7 @@ class LoginScreen extends Component {
                 {this.state.initialState ? this.renderAuthPanel() : null}
                 {this.renderLoginButton()}
                 {this.renderSignUpButton()}
+                {this.state.newUser != null ? this.renderVerifyButton() : null}
             </View>
         )
     }

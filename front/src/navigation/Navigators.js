@@ -9,8 +9,7 @@ import { Button } from '../components/index'
 // import { useDispatch } from 'react-redux'
 import { dimensions, colors, text } from '../styles/index'
 // import * as authAction from '../store/actions/auth'
-
-// Render tab bar icon
+import { Auth } from 'aws-amplify'
 
 // Components used for the tab bar
 const HomeNavigator = createStackNavigator({
@@ -24,6 +23,13 @@ const ProfileNavigator = createStackNavigator({
 }, {
     headerMode: 'none'
 })
+
+onLogOutPress = async (props) => {
+    // console.log('onLogOutPress')
+    // console.log(props)
+    await Auth.signOut();
+    props.navigation.navigate('Auth')
+}
 
 const DrawerNavigator = createDrawerNavigator({
     Main: {
@@ -58,8 +64,10 @@ const DrawerNavigator = createDrawerNavigator({
                     }}>
                         <Button
                             onButtonPress={() => {
+                                // console.log(props)
                                 console.log('Log Out!')
-                                props.navigation.navigate('Login')
+                                // props.navigation.navigate('Auth')
+                                this.onLogOutPress(props)
                             }}
                             // onButtonPress={this.onSignUpPress}
                             // borderWidth={2}

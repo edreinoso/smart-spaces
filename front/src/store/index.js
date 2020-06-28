@@ -1,5 +1,8 @@
-// Here is the location for all the reducers in redux for the app
+import { combineReducers } from 'redux';
+import authReducer from './reducers/auth';
+// import uiReducer from './reducers/ui';
 
-// import { combinedReducers } from 'redux';
-
-// export default combinedReducers({})
+export default combineReducers({
+    auth: authReducer,
+    // ui: uiReducer
+})

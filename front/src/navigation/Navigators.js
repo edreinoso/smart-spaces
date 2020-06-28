@@ -6,10 +6,10 @@ import { createDrawerNavigator, DrawerNavigatorItems } from 'react-navigation-dr
 import { createAppContainer } from 'react-navigation'
 import { HomeScreen, ProfileScreen } from '../screens/index'
 import { Button } from '../components/index'
-// import { useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { dimensions, colors, text } from '../styles/index'
-// import * as authAction from '../store/actions/auth'
-import { Auth } from 'aws-amplify'
+import * as authAction from '../store/actions/auth'
+// import { Auth } from 'aws-amplify'
 
 // Components used for the tab bar
 const HomeNavigator = createStackNavigator({
@@ -24,12 +24,12 @@ const ProfileNavigator = createStackNavigator({
     headerMode: 'none'
 })
 
-onLogOutPress = async (props) => {
-    // console.log('onLogOutPress')
-    // console.log(props)
-    await Auth.signOut();
-    props.navigation.navigate('Auth')
-}
+// onLogOutPress = async (props) => {
+//     // console.log('onLogOutPress')
+//     // console.log(props)
+//     await Auth.signOut();
+//     props.navigation.navigate('Auth')
+// }
 
 const DrawerNavigator = createDrawerNavigator({
     Main: {
@@ -49,7 +49,7 @@ const DrawerNavigator = createDrawerNavigator({
         activeTintColor: colors.blue
     },
     contentComponent: props => {
-        // const dispatch = useDispatch()
+        const dispatch = useDispatch()
         return (
             <View>
                 <SafeAreaView>
@@ -66,8 +66,10 @@ const DrawerNavigator = createDrawerNavigator({
                             onButtonPress={() => {
                                 // console.log(props)
                                 console.log('Log Out!')
+                                dispatch(authAction.logout())
+                                props.navigation.navigate('Auth')
                                 // props.navigation.navigate('Auth')
-                                this.onLogOutPress(props)
+                                // this.onLogOutPress(props)
                             }}
                             // onButtonPress={this.onSignUpPress}
                             // borderWidth={2}

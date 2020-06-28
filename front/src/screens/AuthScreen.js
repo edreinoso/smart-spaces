@@ -3,9 +3,10 @@ import { View, Text, TouchableOpacity, Dimensions, Alert } from 'react-native'
 import validity from '../utility/validate'
 import { container, colors } from '../styles/index'
 import { Logo, Button, Cards, Input } from '../components/index'
-import { Auth } from 'aws-amplify';
+import { connect } from 'react-redux'
+import { auth, confirmCodeSignUp } from '../store/actions/index'
 
-class LoginScreen extends Component {
+class AuthScreen extends Component {
     state = {
         initialState: false,
         showLogin: true,
@@ -13,7 +14,7 @@ class LoginScreen extends Component {
         showLoginButton: true,
         showSignUpButton: true,
         confirmPass: false,
-        newUser: null
+        newUser: null,
     }
 
     componentWillMount() {
@@ -101,10 +102,14 @@ class LoginScreen extends Component {
         // Executing auth if email and password are not empty
         if (this.state.controls.email.value != "" || this.state.controls.password.value != "") {
             // console.log('execute auth function')
-            await Auth.signIn(this.state.controls.email.value, this.state.controls.password.value).then(() => {
+            await this.props.auth(
+                this.state.controls.email.value,
+                this.state.controls.password.value,
+                'login'
+            ).then(() => {
                 this.props.navigation.navigate('Home')
             }).catch((err) => {
-                Alert.alert("Error found", err.message)
+                Alert.alert('Error found', err.message)
             })
         }
     }
@@ -117,39 +122,46 @@ class LoginScreen extends Component {
         }
         // 
         if (this.state.controls.email.value != "" || this.state.controls.password.value != "" || this.state.controls.name.value != "") {
-            await Auth.signUp({
-                username: this.state.controls.email.value,
-                password: this.state.controls.password.value,
-                attributes: {
-                    email: this.state.controls.email.value,
-                }
-            }).then((data) => {
-                // console.log(data)
+            await this.props.auth(
+                this.state.controls.email.value,
+                this.state.controls.password.value,
+                'signUp'
+            ).then(() => {
+            // ).then((response) => {
+                // console.log(response)
                 this.setState({
-                    newUser: data,
+                    newUser: 'newUser_Created',
                     showSignUpButton: false
                 })
             }).catch((err) => {
-                Alert.alert("Error found", err.message)
+                Alert.alert('Error found', err.message)
             })
         }
     }
 
     onVerifyPress = async () => {
-        await Auth.confirmSignUp(this.state.controls.email.value, this.state.controls.confirmCode.value);
-        await Auth.signIn(this.state.controls.email.value, this.state.controls.password.value).then(() => {
+        this.setState({ authMode: 'login' })
+        
+        await this.props.confirmCodeStep(
+            this.state.controls.email.value,
+            this.state.controls.confirmCode.value
+        )
+        await this.props.auth(
+            this.state.controls.email.value,
+            this.state.controls.password.value,
+            'login'
+        ).then(() => {
             this.props.navigation.navigate('Home')
         }).catch((err) => {
-            Alert.alert("Error found", err.message)
-        });
+            Alert.alert('Error found', err.message)
+        })
     }
 
     onSendEmailAgain = async () => {
-        await Auth.resendSignUp(this.state.controls.email.value).then(() => { console.log('code resent sucessfully') }).catch((err) => {
+        await Auth.resendSignUp(this.state.controls.email.value).catch((err) => {
             Alert.alert("Error occured", err.message)
         });
     }
-
 
     renderNewUser() {
         return (
@@ -342,4 +354,11 @@ class LoginScreen extends Component {
 
 }
 
-export default LoginScreen;
+const mapDispatchToProps = dispatch => {
+    return {
+        auth: (email, password, authMode) => dispatch(auth(email, password, authMode)),
+        confirmCodeStep: (email, confirmCode) => dispatch(confirmCodeSignUp(email, confirmCode)),
+    }
+}
+
+export default connect(null, mapDispatchToProps)(AuthScreen);

@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
-import { View, ScrollView, Text, StyleSheet, FlatList, RefreshControl, } from 'react-native';
+import { View, ScrollView, Text, StyleSheet, FlatList, RefreshControl, Alert } from 'react-native';
 import { container, text, colors, header } from '../styles/index';
 import { Picture, HomeButton, PhoneRoom } from '../components/index';
 import axios from 'axios';
-import { phoneRoomMockData, hello } from "../store/mockdata";
+import { connect } from 'react-redux';
+import { phoneRoomMockData } from "../store/mockdata";
+
 const api = "https://hqpgo0kmqi.execute-api.us-east-1.amazonaws.com/dev/sensor"
 var api_first_floor = api + '/1'
 var api_second_floor = api + '/2'
@@ -26,6 +28,8 @@ class HomeScreen extends Component {
   }
 
   componentDidMount() {
+    console.log('authenticated: ', this.props.authenticated)
+    // if (this.props.authenticated) {
     this.state.interval = setInterval(() => {
       // console.log(this.state.floor1, this.state.floor2, this.state.floor3)
       if (this.state.floor1) this.fetchDataFromDDB(api_first_floor)
@@ -33,6 +37,9 @@ class HomeScreen extends Component {
       else if (this.state.floor3) this.fetchDataFromDDB(api_third_floor)
       // console.log('Ed')
     }, 30000);
+    // } else {
+    //   Alert.alert('Sign In Required')
+    // }
   }
 
   componentWillUnmount() {
@@ -41,6 +48,7 @@ class HomeScreen extends Component {
   }
 
   componentWillMount() {
+    // if (authenticated) {
     // console.log('do I enter home?')
     // Local
     // this.fetchDataFromLocal()
@@ -49,6 +57,9 @@ class HomeScreen extends Component {
     // this.fetchDataFromDDB()
     api_first_floor = api + '/1'
     this.fetchDataFromDDB(api_first_floor)
+    // } else {
+    //   Alert.alert('Sign In Required')
+    // }
   }
 
   fetchDataFromLocal = () => {
@@ -75,7 +86,7 @@ class HomeScreen extends Component {
         var roomNotAvailable = [] // false: the room is available
         response.data.map((item, index) => {
           if (item.availability) {
-            roomAvailable.push(item) 
+            roomAvailable.push(item)
           } else {
             roomNotAvailable.push(item)
           }
@@ -141,6 +152,7 @@ class HomeScreen extends Component {
   }
 
   render() {
+    const { authenticated } = this.props
     return (
       // this flex is necessary for persistency
       <View style={{ flex: 1 }}>
@@ -230,4 +242,11 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeScreen;
+
+const mapStateToProps = (state) => {
+  console.log('hello world: ', state)
+  return state.authenticated;
+}
+
+export default connect(mapStateToProps, null)(HomeScreen)
+// export default HomeScreen;

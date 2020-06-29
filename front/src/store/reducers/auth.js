@@ -7,13 +7,13 @@ const initialState = {
 export default (state = initialState, action) => {
     switch (action.type) {
         case AUTHENTICATED:
-            // console.log('Hello World from reducer', action)
+            console.log('Hello World from reducer', action)
             return {
                 ...state,
                 authenticated: action.authenticatedUser,
             }
         case LOGOUT:
-            // console.log('log out funcitonality from reducer')
+            console.log('log out funcitonality from reducer')
             return initialState
         default:
             return state;

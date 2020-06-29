@@ -9,6 +9,7 @@ import { auth, getUser, confirmCodeSignUp } from '../store/actions/index'
 class AuthScreen extends Component {
     state = {
         newUser: null,
+        forgotPass: null
     }
 
     componentWillMount() {
@@ -21,7 +22,7 @@ class AuthScreen extends Component {
         this.setState({
             controls: {
                 email: {
-                    value: '',
+                    value: 'edgardo_16_@hotmail.com',
                     validity: true,
                     validationRules: {
                         isEmail: true
@@ -29,7 +30,7 @@ class AuthScreen extends Component {
                     touched: false
                 },
                 password: {
-                    value: '',
+                    value: 'Passw0rd!',
                     validity: true,
                     validationRules: {
                         minLength: 6
@@ -92,23 +93,29 @@ class AuthScreen extends Component {
 
         } else {
             this.setState({ showLogin: true, showSignUp: false, showLoginButton: true, showSignUpButton: false })
+            // Executing auth if email and password are not empty
+            if (this.state.controls.email.value != "" || this.state.controls.password.value != "") {
+                // console.log('execute auth function')
+                await this.props.auth(
+                    this.state.controls.email.value,
+                    this.state.controls.password.value,
+                    'login'
+                ).then(() => {
+                    // console.log(data)
+                    this.props.getUser(true)
+                    this.props.navigation.navigate('Home')
+                    this.reset()
+                }).catch((err) => {
+                    Alert.alert('Error found', err.message)
+                })
+            }
         }
-        // Executing auth if email and password are not empty
-        if (this.state.controls.email.value != "" || this.state.controls.password.value != "") {
-            // console.log('execute auth function')
-            await this.props.auth(
-                this.state.controls.email.value,
-                this.state.controls.password.value,
-                'login'
-            ).then(() => {
-                // console.log(data)
-                this.props.getUser(true)
-                this.props.navigation.navigate('Home')
-                this.reset()
-            }).catch((err) => {
-                Alert.alert('Error found', err.message)
-            })
-        }
+    }
+
+    onForgotPassPress = () => {
+        this.setState({
+            forgotPass: true
+        })
     }
 
     onSignUpPress = async (initialState) => {
@@ -127,7 +134,7 @@ class AuthScreen extends Component {
                 // ).then((response) => {
                 // console.log(response)
                 this.setState({
-                    newUser: 'newUser_Created',
+                    newUser: 'newUser_Created', // newUser is changed from null to createdUser
                     showSignUpButton: false
                 })
             }).catch((err) => {
@@ -208,11 +215,32 @@ class AuthScreen extends Component {
                     onFinishInput={val => this.onFinishTextField('password', val)}
                     value={this.state.controls.confirmCode.value}
                     valid={this.state.controls.password.validity}
-                    touched={this.state.controls.password.touched}
+                    touched={this.state.controls.confirmCode.touched}
                     keyboardType='default'
                     errorText='Please enter a 6 digit code'
                     // Styles
                     title={'Confirm Code'}
+                    color={colors.black}
+                    borderColor={colors.black}
+                    borderWidth={1}
+                />
+            </View>
+        )
+    }
+
+    renderForgotPass() {
+        return (
+            <View>
+                <Input
+                    onChangeInput={val => this.onChangeTextField('email', val)}
+                    onFinishInput={val => this.onFinishTextField('email', val)}
+                    value={this.state.controls.email.value}
+                    valid={this.state.controls.email.validity}
+                    touched={this.state.controls.email.touched}
+                    keyboardType='email-address'
+                    errorText='Please enter a valid email'
+                    // Styles
+                    title={'email'}
                     color={colors.black}
                     borderColor={colors.black}
                     borderWidth={1}
@@ -226,13 +254,16 @@ class AuthScreen extends Component {
             <Cards style={[container.authContainer, {
                 marginBottom: 20
             }]}>
-                {this.state.newUser === null ? this.renderNewUser() : this.renderVerifyUser()}
+                {this.state.newUser === null && this.state.forgotPass === null ? this.renderNewUser() : null}
+                {this.state.newUser === null ? null : this.renderVerifyUser()}
+                {this.state.forgotPass === null ? null : this.renderForgotPass()}
             </Cards>
         )
     }
 
+    // BUTTONS // 
     renderLoginButton() {
-        if (this.state.showLoginButton) {
+        if (this.state.showLoginButton && this.state.forgotPass === null) {
             return (
                 <View>
                     <Button
@@ -252,7 +283,7 @@ class AuthScreen extends Component {
                     >
                         Login
                     </Button>
-                    {!this.state.showSignUpButton ? <View><View style={[styles.inlineText]}><TouchableOpacity><Text>Forgot Password?</Text></TouchableOpacity></View><View style={[styles.inlineText]}>
+                    {!this.state.showSignUpButton ? <View><View style={[styles.inlineText]}><TouchableOpacity onPress={() => this.onForgotPassPress()}><Text>Forgot Password?</Text></TouchableOpacity></View><View style={[styles.inlineText]}>
                         <Text>
                             Don't have an account yet?
                         </Text>
@@ -321,6 +352,28 @@ class AuthScreen extends Component {
         )
     }
 
+    ////Confirm button
+    renderConfirmButton() {
+        return (
+            <Button
+                onButtonPress={() => this.onLoginPress(true)}
+                buttonWidth={Dimensions.get('window').width * 2 / 3}
+                buttonHeight={50}
+                size={18}
+                paddingVerticalProps={15}
+                backgroundColor={colors.white}
+                fontColor={colors.black}
+                borders
+                disable={
+                    this.state.initialState &&
+                    (!this.state.controls.email.touched)
+                }
+            >
+                Confirm
+            </Button>
+        )
+    }
+
     render() {
         // console.log('Initial State', this.state.initialState)
         return (
@@ -334,6 +387,7 @@ class AuthScreen extends Component {
                 {this.renderLoginButton()}
                 {this.renderSignUpButton()}
                 {this.state.newUser != null ? this.renderVerifyButton() : null}
+                {this.state.forgotPass != null ? this.renderConfirmButton() : null}
             </View>
         )
     }

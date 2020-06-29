@@ -1,19 +1,19 @@
-import { AUTH, LOGOUT } from '../actions/types';
+import { AUTHENTICATED, LOGOUT } from '../actions/types';
 
 const initialState = {
-    token: null,
-    userId: null
+    authenticated: false,
 }
 
 export default (state = initialState, action) => {
     switch (action.type) {
-        case AUTH:
-            console.log('Hello World')
+        case AUTHENTICATED:
+            // console.log('Hello World from reducer', action)
             return {
-                token: action.token,
-                userId: action.userId
+                ...state,
+                authenticated: action.authenticatedUser,
             }
         case LOGOUT:
+            // console.log('log out funcitonality from reducer')
             return initialState
         default:
             return state;

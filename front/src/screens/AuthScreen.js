@@ -1,23 +1,18 @@
 import React, { Component } from 'react';
 import { View, Text, TouchableOpacity, Dimensions, Alert, StyleSheet } from 'react-native'
 import validity from '../utility/validate'
-import { container, colors } from '../styles/index'
+import { container, colors, borders } from '../styles/index'
 import { Logo, Button, Cards, Input } from '../components/index'
 import { connect } from 'react-redux'
-import { auth, confirmCodeSignUp } from '../store/actions/index'
+import { auth, getUser, confirmCodeSignUp } from '../store/actions/index'
 
 class AuthScreen extends Component {
     state = {
-        initialState: false,
-        showLogin: true,
-        showSignUp: true,
-        showLoginButton: true,
-        showSignUpButton: true,
-        confirmPass: false,
         newUser: null,
     }
 
     componentWillMount() {
+        console.log('do I enter auth?')
         this.reset()
     }
 
@@ -25,14 +20,6 @@ class AuthScreen extends Component {
     reset = () => {
         this.setState({
             controls: {
-                name: {
-                    value: '',
-                    validity: false,
-                    validationRules: {
-                        default: true
-                    },
-                    touched: false
-                },
                 email: {
                     value: '',
                     validity: true,
@@ -58,7 +45,12 @@ class AuthScreen extends Component {
                     touched: false
                 }
             },
-            initialState: false
+            initialState: false,
+            showLogin: true,
+            showSignUp: true,
+            showLoginButton: true,
+            showSignUpButton: true,
+            confirmPass: false,
         })
     }
 
@@ -109,7 +101,10 @@ class AuthScreen extends Component {
                 this.state.controls.password.value,
                 'login'
             ).then(() => {
+                // console.log(data)
+                this.props.getUser(true)
                 this.props.navigation.navigate('Home')
+                this.reset()
             }).catch((err) => {
                 Alert.alert('Error found', err.message)
             })
@@ -153,7 +148,9 @@ class AuthScreen extends Component {
             this.state.controls.password.value,
             'login'
         ).then(() => {
+            this.props.getUser(true)
             this.props.navigation.navigate('Home')
+            this.reset()
         }).catch((err) => {
             Alert.alert('Error found', err.message)
         })
@@ -169,21 +166,6 @@ class AuthScreen extends Component {
     renderNewUser() {
         return (
             <View>
-                {/* {!this.state.showLogin ? <Input
-                    onChangeInput={val => this.onChangeTextField('name', val)}
-                    onFinishInput={val => this.onFinishTextField('name', val)}
-                    value={this.state.controls.name.value}
-                    valid={this.state.controls.email.validity}
-                    touched={this.state.controls.name.touched}
-                    errorText='Please enter a valid name'
-                    keyboardType='default'
-                    autoCapitalize='none'
-                    //Styles
-                    title={'Name'}
-                    color={colors.black}
-                    borderColor={colors.black}
-                    borderWidth={1}
-                /> : null} */}
                 <Input
                     onChangeInput={val => this.onChangeTextField('email', val)}
                     onFinishInput={val => this.onFinishTextField('email', val)}
@@ -270,14 +252,14 @@ class AuthScreen extends Component {
                     >
                         Login
                     </Button>
-                    {!this.state.showSignUpButton ? <View style={styles.inlineText}>
+                    {!this.state.showSignUpButton ? <View><View style={[styles.inlineText]}><TouchableOpacity><Text>Forgot Password?</Text></TouchableOpacity></View><View style={[styles.inlineText]}>
                         <Text>
                             Don't have an account yet?
                         </Text>
                         <TouchableOpacity style={{ paddingLeft: 5 }} onPress={() => this.onSignUpPress(false)}>
                             <Text>Sign Up</Text>
                         </TouchableOpacity>
-                    </View> : null}
+                    </View></View> : null}
                 </View>
             )
         }
@@ -340,6 +322,7 @@ class AuthScreen extends Component {
     }
 
     render() {
+        // console.log('Initial State', this.state.initialState)
         return (
             <View style={container.centerScreen}>
                 <View style={[{
@@ -361,13 +344,14 @@ const styles = StyleSheet.create({
     inlineText: {
         flexDirection: "row",
         justifyContent: "space-evenly",
-        marginTop: 5
+        marginTop: 10
     }
 });
 
 const mapDispatchToProps = dispatch => {
     return {
         auth: (email, password, authMode) => dispatch(auth(email, password, authMode)),
+        getUser: (authenticatedUser) => dispatch(getUser(authenticatedUser)),
         confirmCodeStep: (email, confirmCode) => dispatch(confirmCodeSignUp(email, confirmCode)),
     }
 }

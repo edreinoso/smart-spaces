@@ -32,14 +32,16 @@ class HomeScreen extends Component {
       else if (this.state.floor2) this.fetchDataFromDDB(api_second_floor)
       else if (this.state.floor3) this.fetchDataFromDDB(api_third_floor)
       // console.log('Ed')
-    }, 5000);
+    }, 30000);
   }
 
   componentWillUnmount() {
-    clearInterval(interval);
+    // console.log('do I leave home?')
+    clearInterval(this.state.interval);
   }
 
   componentWillMount() {
+    // console.log('do I enter home?')
     // Local
     // this.fetchDataFromLocal()
 

@@ -14,7 +14,7 @@ import * as authAction from '../store/actions/auth'
 const TabIcon = (iconName, color, iconSize) => {
     return (
         <View>
-        {/* <View style={borders.black}> */}
+            {/* <View style={borders.black}> */}
             <Icon
                 name={iconName}
                 color={color}
@@ -67,7 +67,7 @@ const DrawerNavigator = createDrawerNavigator({
         const dispatch = useDispatch()
         return (
             <View>
-            {/* <View style={borders.black}> */}
+                {/* <View style={borders.black}> */}
                 <SafeAreaView>
                     <View style={{ height: '90%' }}>
                         <DrawerNavigatorItems {...props} />
@@ -80,9 +80,11 @@ const DrawerNavigator = createDrawerNavigator({
                     }}>
                         <Button
                             onButtonPress={() => {
-                                console.log('Log Out!')
+                                // console.log('Log Out!')
                                 dispatch(authAction.logout())
-                                props.navigation.navigate('Auth')
+                                // dispatch(authAction.logout(false), authAction.getUser(false))
+                                props.navigation.pop()
+                                // props.navigation.navigate('Auth')
                                 // this.onLogOutPress(props)
                             }}
                             buttonWidth={dimensions.width / 4}

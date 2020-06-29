@@ -3,17 +3,14 @@ import { View, StyleSheet, Text } from 'react-native';
 
 class Logo extends Component {
     render() {
-        const {
-            fontSize,
-        } = this.props;
         return (
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={{ fontSize: fontSize }}>
-                    SMART
+                <Text style={styles.fontSize}>
+                    Smart
                 </Text>
-                <Text style={[styles.greenText, { fontSize: fontSize, paddingLeft: 10}] }>S</Text>
-                <Text style={{ fontSize: fontSize }}>
-                    PACES
+                <Text style={[styles.greenText, styles.fontSize] }>S</Text>
+                <Text style={styles.fontSize}>
+                    paces
                 </Text>
             </View>
         );
@@ -25,6 +22,9 @@ const styles = StyleSheet.create({
         color: '#7EB72E',
         fontWeight: '500'
     },
+    fontSize: {
+        fontSize: 35
+    }
 });
 
 export default Logo;

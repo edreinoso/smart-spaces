@@ -8,6 +8,7 @@ const initialState = {
 export default (state = initialState, action) => {
     switch (action.type) {
         case AUTH:
+            console.log('Hello World')
             return {
                 token: action.token,
                 userId: action.userId

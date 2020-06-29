@@ -1,15 +1,28 @@
 import React from 'react'
-import { View, SafeAreaView } from 'react-native'
 import Icon from 'react-native-vector-icons/Ionicons'
+import { View, SafeAreaView } from 'react-native'
 import { createStackNavigator } from 'react-navigation-stack'
 import { createDrawerNavigator, DrawerNavigatorItems } from 'react-navigation-drawer'
 import { createAppContainer } from 'react-navigation'
 import { HomeScreen, ProfileScreen } from '../screens/index'
 import { Button } from '../components/index'
 import { useDispatch } from 'react-redux'
-import { dimensions, colors, text } from '../styles/index'
+import { dimensions, colors, borders } from '../styles/index'
 import * as authAction from '../store/actions/auth'
 // import { Auth } from 'aws-amplify'
+
+const TabIcon = (iconName, color, iconSize) => {
+    return (
+        <View>
+        {/* <View style={borders.black}> */}
+            <Icon
+                name={iconName}
+                color={color}
+                size={iconSize}
+            />
+        </View>
+    )
+}
 
 // Components used for the tab bar
 const HomeNavigator = createStackNavigator({
@@ -35,23 +48,26 @@ const DrawerNavigator = createDrawerNavigator({
     Main: {
         screen: HomeNavigator,
         navigationOptions: {
-            title: 'Home'
+            drawerLabel: 'Home',
+            drawerIcon: ({ tintColor }) => TabIcon("ios-home", tintColor, 24)
         }
     },
     Profile: {
         screen: ProfileNavigator,
-        navigationOption: {
-            title: 'Profile'
+        navigationOptions: {
+            drawerLabel: 'Profile',
+            drawerIcon: ({ tintColor }) => TabIcon("ios-person", tintColor, 24)
         }
     }
 }, {
     contentOptions: {
-        activeTintColor: colors.blue
+        activeTintColor: colors.primary
     },
     contentComponent: props => {
         const dispatch = useDispatch()
         return (
             <View>
+            {/* <View style={borders.black}> */}
                 <SafeAreaView>
                     <View style={{ height: '90%' }}>
                         <DrawerNavigatorItems {...props} />
@@ -64,37 +80,14 @@ const DrawerNavigator = createDrawerNavigator({
                     }}>
                         <Button
                             onButtonPress={() => {
-                                // console.log(props)
                                 console.log('Log Out!')
                                 dispatch(authAction.logout())
                                 props.navigation.navigate('Auth')
-                                // props.navigation.navigate('Auth')
                                 // this.onLogOutPress(props)
                             }}
-                            // onButtonPress={this.onSignUpPress}
-                            // borderWidth={2}
-                            // borderColor={colors.black}
                             buttonWidth={dimensions.width / 4}
-                            // paddingVerticalProps={15}
-                            // buttonHeight={50}
-                            // size={18}
                             backgroundColor={colors.white}
                             fontColor={colors.black}
-
-                        // Previous button properties
-                        // fontSize={text.buttonText}
-                        // width={dimensions.width / 3}
-                        // borderWidth={1}
-                        // padding={10}
-                        // color={colors.white}
-                        // textColor={colors.blue}
-                        // // text={'Log out'}
-                        // borderColor={colors.blue}
-                        // borderRadius={5}
-                        // onButtonPress={() => {
-                        //     dispatch(authAction.logout()),
-                        //         props.navigation.navigate('Auth')
-                        // }}
                         >Log out</Button>
                     </View>
                 </SafeAreaView>

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, TouchableOpacity, Dimensions, Alert } from 'react-native'
+import { View, Text, TouchableOpacity, Dimensions, Alert, StyleSheet } from 'react-native'
 import validity from '../utility/validate'
 import { container, colors } from '../styles/index'
 import { Logo, Button, Cards, Input } from '../components/index'
@@ -21,6 +21,7 @@ class AuthScreen extends Component {
         this.reset()
     }
 
+    // TEXT CHANGES //
     reset = () => {
         this.setState({
             controls: {
@@ -92,6 +93,7 @@ class AuthScreen extends Component {
         })
     }
 
+    // ACTION BUTTONS //
     onLoginPress = async (initialState) => {
         if (initialState) {
             this.setState({ initialState: true, showLogin: true, showSignUp: false, showLoginButton: true, showSignUpButton: false })
@@ -127,7 +129,7 @@ class AuthScreen extends Component {
                 this.state.controls.password.value,
                 'signUp'
             ).then(() => {
-            // ).then((response) => {
+                // ).then((response) => {
                 // console.log(response)
                 this.setState({
                     newUser: 'newUser_Created',
@@ -141,7 +143,7 @@ class AuthScreen extends Component {
 
     onVerifyPress = async () => {
         this.setState({ authMode: 'login' })
-        
+
         await this.props.confirmCodeStep(
             this.state.controls.email.value,
             this.state.controls.confirmCode.value
@@ -163,6 +165,7 @@ class AuthScreen extends Component {
         });
     }
 
+    // RENDERS //
     renderNewUser() {
         return (
             <View>
@@ -267,11 +270,11 @@ class AuthScreen extends Component {
                     >
                         Login
                     </Button>
-                    {!this.state.showSignUpButton ? <View>
+                    {!this.state.showSignUpButton ? <View style={styles.inlineText}>
                         <Text>
                             Don't have an account yet?
-                    </Text>
-                        <TouchableOpacity onPress={() => this.onSignUpPress(false)}>
+                        </Text>
+                        <TouchableOpacity style={{ paddingLeft: 5 }} onPress={() => this.onSignUpPress(false)}>
                             <Text>Sign Up</Text>
                         </TouchableOpacity>
                     </View> : null}
@@ -290,8 +293,9 @@ class AuthScreen extends Component {
                         buttonHeight={50}
                         paddingVerticalProps={15}
                         size={18}
+                        borders
                         backgroundColor={colors.primary}
-                        fontColor={colors.black}
+                        fontColor={colors.white}
                         disable={
                             this.state.initialState &&
                             // (!this.state.controls.name.touched ||
@@ -299,11 +303,11 @@ class AuthScreen extends Component {
                                 !this.state.controls.password.touched)
                         }
                     >Sign Up</Button>
-                    {!this.state.showLoginButton ? <View>
+                    {!this.state.showLoginButton ? <View style={styles.inlineText}>
                         <Text>
                             Already have an account?
                     </Text>
-                        <TouchableOpacity onPress={() => this.onLoginPress(false)}>
+                        <TouchableOpacity style={{ paddingLeft: 5 }} onPress={() => this.onLoginPress(false)}>
                             <Text>Login</Text>
                         </TouchableOpacity>
                     </View> : null}
@@ -322,8 +326,9 @@ class AuthScreen extends Component {
                     buttonHeight={50}
                     paddingVerticalProps={15}
                     size={18}
+                    borders
                     backgroundColor={colors.primary}
-                    fontColor={colors.black}
+                    fontColor={colors.white}
                     disable={
                         !this.state.controls.confirmCode.touched
                     }
@@ -340,9 +345,7 @@ class AuthScreen extends Component {
                 <View style={[{
                     flex: .2
                 }]}>
-                    <Logo
-                        fontSize={25}
-                    />
+                    <Logo />
                 </View>
                 {this.state.initialState ? this.renderAuthPanel() : null}
                 {this.renderLoginButton()}
@@ -353,6 +356,14 @@ class AuthScreen extends Component {
     }
 
 }
+
+const styles = StyleSheet.create({
+    inlineText: {
+        flexDirection: "row",
+        justifyContent: "space-evenly",
+        marginTop: 5
+    }
+});
 
 const mapDispatchToProps = dispatch => {
     return {

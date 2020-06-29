@@ -3,14 +3,6 @@ import { StyleSheet, Dimensions } from "react-native";
 export const container = StyleSheet.create({
   bodyContainer: {
     flex: 1,
-    // this would make the whole thing be in the middle
-    // alignItems: 'center',
-    // justifyContent: 'center',
-
-    // temporary
-    // borderColor: colors.red,
-    // borderWidth: 1
-    // temporary
   },
   centerScreen: {
     flex: 1,
@@ -19,17 +11,11 @@ export const container = StyleSheet.create({
   },
   authContainer: {
     width: '80%',
-    // maxWidth: 400,
-    // maxHeight: 400,
     padding: 20
   },
   bodySubContainer: {
     paddingHorizontal: 40,
     paddingVertical: 5,
-    // temporary
-    // borderColor: colors.blue,
-    // borderWidth: 1
-    // temporary
   },
   contentContainer: {
     paddingVertical: 20,
@@ -88,30 +74,16 @@ export const header = StyleSheet.create({
   titleHeader: {
     flex: .8,
     flexDirection: 'row',
-    // alignItems: 'center',
-    // justifyContent: 'center',
-    // temporary
-    // borderColor: colors.pink,
-    // borderWidth: 1
-    // temporary
   },
   titleStyle: {
     flex: .8,
     alignItems: 'center',
     justifyContent: 'center',
-    // temporary
-    // borderColor: colors.green,
-    // borderWidth: 1
-    // temporary
   },
   pictureStyle: {
     flex: .2,
     alignItems: 'flex-start',
     justifyContent: 'center',
-    // temporary
-    // borderColor: colors.purple,
-    // borderWidth: 1
-    // temporary
   },
   // Header B: - buttons and tabs
   tabsHeader: {
@@ -119,10 +91,6 @@ export const header = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    // temporary
-    // borderColor: colors.blue,
-    // borderWidth: 1
-    // temporary
   },
 })
 

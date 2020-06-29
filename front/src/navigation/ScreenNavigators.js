@@ -1,9 +1,8 @@
 import { createStackNavigator } from 'react-navigation-stack';
 import { createAppContainer } from 'react-navigation';
 
-import { HomeScreen, AuthScreen } from '../screens/index'
+import { AuthScreen } from '../screens/index'
 import HomeNavigator from './Navigators'
-// Exporting navigator from the Tab Navigator
 
 const ScreenNavigators = createStackNavigator({
   // Main: {

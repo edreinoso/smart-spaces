@@ -19,7 +19,7 @@ Amplify.configure({
   API: {
     endpoints: [
       {
-        name: 'testApi',
+        name: 'emptyRoom',
         endpoint: config.apiGateway.URL,
         region: config.apiGateway.REGION,
       }

@@ -13,12 +13,12 @@ const reducer = (state = initialState, action) => {
             return {
                 ...state,
                 // authenticated: true  
-                // authenticated: action.payload.authenticatedUser
-                authenticated: action.authenticatedUser
+                authenticated: action.payload.authenticatedUser
+                // authenticated: action.authenticatedUser
             }
         case LOGOUT:
-            console.log('log out funcitonality from reducer')
-            return INITIAL_STATE
+            // console.log('log out funcitonality from reducer')
+            return initialState
         default:
             return state;
     }

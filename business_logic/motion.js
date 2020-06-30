@@ -10,10 +10,10 @@ const dynamoDB = new AWS.DynamoDB.DocumentClient();
 app.use(bodyParser.json({ strict: false }))
 
 app.get('/sensor/:floor', function (req, res) {
-  // console.log('Is it working?', req.params.floor)
   // console.log(typeof(parseInt(req.params.floor)))
+  // console.log('value of floor: ', typeof(req.params.floor))
+  console.log('value of floor: ', req.params.floor)
   // Trying to sort by floor
-  console.log('value of floor: ', typeof(req.params.floor))
   const params = {
     TableName: TABLE,
     FilterExpression: 'floor = :floor',

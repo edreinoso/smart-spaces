@@ -1,8 +1,8 @@
 export default {
     apiGateway: {
-        name: 'emptyRoom',
         REGION: 'us-east-1',
         URL: 'https://hqpgo0kmqi.execute-api.us-east-1.amazonaws.com/dev'
+        // URL: 'https://hqpgo0kmqi.execute-api.us-east-1.amazonaws.com/dev/sensor'
     },
     cognito: {
         REGION: 'us-east-1',

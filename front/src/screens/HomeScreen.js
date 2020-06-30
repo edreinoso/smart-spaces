@@ -4,12 +4,16 @@ import { container, text, colors, header } from '../styles/index';
 import { Picture, HomeButton, PhoneRoom } from '../components/index';
 import { connect } from 'react-redux';
 import { phoneRoomMockData } from "../store/mockdata";
+import { API } from 'aws-amplify';
 import axios from 'axios';
 
-const api = "https://hqpgo0kmqi.execute-api.us-east-1.amazonaws.com/dev/sensor"
-var api_first_floor = api + '/1'
-var api_second_floor = api + '/2'
-var api_third_floor = api + '/3'
+const api = "https://hqpgo0kmqi.execute-api.us-east-1.amazonaws.com/dev/sensor/"
+var api_first_floor = '1'
+// var api_first_floor = api + '/1'
+var api_second_floor = '2'
+// var api_second_floor = api + '/2'
+var api_third_floor = '3'
+// var api_third_floor = api + '/3'
 
 class HomeScreen extends Component {
   state = {
@@ -27,8 +31,6 @@ class HomeScreen extends Component {
   }
 
   componentDidMount() {
-    // console.log('authenticated: ', this.props.authenticated)
-    // if (this.props.authenticated) {
     this.state.interval = setInterval(() => {
       // console.log(this.state.floor1, this.state.floor2, this.state.floor3)
       if (this.state.floor1) this.fetchDataFromDDB(api_first_floor)
@@ -36,13 +38,9 @@ class HomeScreen extends Component {
       else if (this.state.floor3) this.fetchDataFromDDB(api_third_floor)
       // console.log('Ed')
     }, 30000);
-    // } else {
-    //   Alert.alert('Sign In Required')
-    // }
   }
 
   componentWillUnmount() {
-    // console.log('do I leave home?')
     clearInterval(this.state.interval);
   }
 
@@ -54,7 +52,7 @@ class HomeScreen extends Component {
 
       // API
       // this.fetchDataFromDDB()
-      api_first_floor = api + '/1'
+      // api_first_floor = api + '1'
       this.fetchDataFromDDB(api_first_floor)
     } else {
       Alert.alert(
@@ -66,11 +64,18 @@ class HomeScreen extends Component {
           { text: 'Okay', onPress: () => { this.props.navigation.navigate('Auth') } },
         ],
         { cancelable: false }
-        //clicking out side of alert will not cancel
-      );
+      ); ƒ
     }
   }
 
+  apiCall(floor) {
+    console.log(`/sensor/${floor}`)
+    // return api + floor
+    return API.get('emptyRoom', `/sensor/${floor}`);
+    // return API.get('emptyRoom', `/sensor/'${floor}'`);
+  }
+
+  // to be deprecated
   fetchDataFromLocal = () => {
     const maxPeak = phoneRoomMockData.reduce((p, c) => p.ttl > c.ttl ? p : c);
     const result = Array.from(new Set(phoneRoomMockData.map(s => s.roomId)))
@@ -88,12 +93,19 @@ class HomeScreen extends Component {
     this.setState({ phoneRoom: result })
   }
 
-  fetchDataFromDDB = async (api) => {
-    axios.get(api)
+  fetchDataFromDDB = async (floor) => {
+    // console.log('fetching data from ddb')
+
+    // console.log(this.apiCall(floor))
+    // console.log(API)
+    // const response = this.apiCall(floor)
+    // console.log(response)
+    await this.apiCall(floor)
       .then(response => {
+        console.log(response) // this is empty
         var roomAvailable = [] // true: the room is not available
         var roomNotAvailable = [] // false: the room is available
-        response.data.map((item, index) => {
+        response.map((item, index) => {
           if (item.availability) {
             roomAvailable.push(item)
           } else {
@@ -103,9 +115,26 @@ class HomeScreen extends Component {
         this.setState({ phoneRoomsAvailable: roomAvailable, phoneRoomsUnavailable: roomNotAvailable, refreshing: false })
       })
       .catch(error => {
-        console.log(error);
+        console.log('error, hello world', error);
         this.setState({ refreshing: false })
-      });
+      })
+    // axios.get(this.apiCall(floor))
+    //   .then(response => {
+    //     var roomAvailable = [] // true: the room is not available
+    //     var roomNotAvailable = [] // false: the room is available
+    //     response.data.map((item, index) => {
+    //       if (item.availability) {
+    //         roomAvailable.push(item)
+    //       } else {
+    //         roomNotAvailable.push(item)
+    //       }
+    //     })
+    //     this.setState({ phoneRoomsAvailable: roomAvailable, phoneRoomsUnavailable: roomNotAvailable, refreshing: false })
+    //   })
+    //   .catch(error => {
+    //     console.log(error);
+    //     this.setState({ refreshing: false })
+    //   });
   }
 
   onValueChange(key) {
@@ -161,7 +190,6 @@ class HomeScreen extends Component {
   }
 
   render() {
-    // const { authenticated } = this.props
     return (
       // this flex is necessary for persistency
       <View style={{ flex: 1 }}>
@@ -253,17 +281,9 @@ const styles = StyleSheet.create({
 
 
 const mapStateToProps = state => {
-  // console.log('hello world: ', state)
   return {
     authenticated: state.auth.authenticated
   }
-  // return state.authenticated
-  // authenticated: state.authenticated // this is undefined
 }
-// const mapStateToProps = (state) => ({
-//   console.log('hello world: ', state),
-//   authenticated: state.authenticated // this is undefined
-// })
 
 export default connect(mapStateToProps, null)(HomeScreen)
-// export default HomeScreen;

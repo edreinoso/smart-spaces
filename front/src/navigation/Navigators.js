@@ -37,13 +37,6 @@ const ProfileNavigator = createStackNavigator({
     headerMode: 'none'
 })
 
-// onLogOutPress = async (props) => {
-//     // console.log('onLogOutPress')
-//     // console.log(props)
-//     await Auth.signOut();
-//     props.navigation.navigate('Auth')
-// }
-
 const DrawerNavigator = createDrawerNavigator({
     Main: {
         screen: HomeNavigator,

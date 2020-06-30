@@ -1,1 +1,1 @@
-export { auth, getUser, confirmCodeSignUp } from './auth';
+export { auth, getUser, forgotPass, confirmForgotPass, confirmCodeSignUp } from './auth';

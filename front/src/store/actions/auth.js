@@ -1,5 +1,5 @@
 import { Auth } from 'aws-amplify'
-import { AUTHENTICATED, LOGOUT } from './types'
+import { AUTH, LOGOUT } from './types'
 
 export const confirmCodeSignUp = (username, code) => {
     console.log(username, code)
@@ -38,7 +38,7 @@ export const getUser = (authenticatedUser) => {
     // export const getUser = async () => {
     // console.log('calling getUser action')
     return {
-        type: AUTHENTICATED,
+        type: AUTH,
         payload: {
             authenticatedUser: authenticatedUser
         }
@@ -63,7 +63,23 @@ export const getUser = (authenticatedUser) => {
     // }
 }
 
-export const logout = (authenticatedUser) => {
+export const forgotPass = (username) => {
+    return async dispatch => {
+        const response = await Auth.forgotPassword(username)
+            .then(data => console.log(data))
+            .catch(err => console.log(err));
+    }
+}
+
+export const confirmForgotPass = (username, code, newPass) => {
+    return async dispath => {
+        const response = await Auth.forgotPasswordSubmit(username, code, newPass)
+            .then(data => console.log(data))
+            .catch(err => console.log(err));
+    }
+}
+
+export const logout = () => {
     // this is returning undefined, yet when trying to get the current user from the auth screen
     // there is a return as no user authenticated. For now skip this error, if it comes back later
     // take a look at it

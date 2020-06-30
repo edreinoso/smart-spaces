@@ -2,15 +2,14 @@ import React, { Component } from 'react';
 import { View, ScrollView, Text, StyleSheet, FlatList, RefreshControl, Alert } from 'react-native';
 import { container, text, colors, header } from '../styles/index';
 import { Picture, HomeButton, PhoneRoom } from '../components/index';
-import axios from 'axios';
 import { connect } from 'react-redux';
 import { phoneRoomMockData } from "../store/mockdata";
+import axios from 'axios';
 
 const api = "https://hqpgo0kmqi.execute-api.us-east-1.amazonaws.com/dev/sensor"
 var api_first_floor = api + '/1'
 var api_second_floor = api + '/2'
 var api_third_floor = api + '/3'
-var interval;
 
 class HomeScreen extends Component {
   state = {
@@ -28,7 +27,7 @@ class HomeScreen extends Component {
   }
 
   componentDidMount() {
-    console.log('authenticated: ', this.props.authenticated)
+    // console.log('authenticated: ', this.props.authenticated)
     // if (this.props.authenticated) {
     this.state.interval = setInterval(() => {
       // console.log(this.state.floor1, this.state.floor2, this.state.floor3)
@@ -48,18 +47,28 @@ class HomeScreen extends Component {
   }
 
   componentWillMount() {
-    // if (authenticated) {
-    // console.log('do I enter home?')
-    // Local
-    // this.fetchDataFromLocal()
+    if (this.props.authenticated) {
+      // console.log('do I enter home?')
+      // Local
+      // this.fetchDataFromLocal()
 
-    // API
-    // this.fetchDataFromDDB()
-    api_first_floor = api + '/1'
-    this.fetchDataFromDDB(api_first_floor)
-    // } else {
-    //   Alert.alert('Sign In Required')
-    // }
+      // API
+      // this.fetchDataFromDDB()
+      api_first_floor = api + '/1'
+      this.fetchDataFromDDB(api_first_floor)
+    } else {
+      Alert.alert(
+        //title
+        'Sign In Required',
+        //body
+        '',
+        [
+          { text: 'Okay', onPress: () => { this.props.navigation.navigate('Auth') } },
+        ],
+        { cancelable: false }
+        //clicking out side of alert will not cancel
+      );
+    }
   }
 
   fetchDataFromLocal = () => {
@@ -152,7 +161,7 @@ class HomeScreen extends Component {
   }
 
   render() {
-    const { authenticated } = this.props
+    // const { authenticated } = this.props
     return (
       // this flex is necessary for persistency
       <View style={{ flex: 1 }}>
@@ -243,10 +252,18 @@ const styles = StyleSheet.create({
 });
 
 
-const mapStateToProps = (state) => {
-  console.log('hello world: ', state)
-  return state.authenticated;
+const mapStateToProps = state => {
+  // console.log('hello world: ', state)
+  return {
+    authenticated: state.auth.authenticated
+  }
+  // return state.authenticated
+  // authenticated: state.authenticated // this is undefined
 }
+// const mapStateToProps = (state) => ({
+//   console.log('hello world: ', state),
+//   authenticated: state.authenticated // this is undefined
+// })
 
 export default connect(mapStateToProps, null)(HomeScreen)
 // export default HomeScreen;

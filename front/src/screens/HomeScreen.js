@@ -231,22 +231,23 @@ class HomeScreen extends Component {
           <View style={container.bodySubContainer}>
             {/* title available */}
             <View style={container.contentContainer}>
-              {this.state.favPhoneRoom.length ?
+              {/* {this.state.favPhoneRoom.length ? */}
+              {this.props.favRooms.length != 0 ?
                 <View>
                   <View style={{ paddingLeft: 5 }}>
                     <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>
                       Favorites
                   </Text>
                   </View>
-                  {/* <View>
+                  <View>
+                    {/* not showing with this.props.favoriteRooms */}
                     <FlatList
-                      data={this.props.favoriteRoomsAvailable} // this would be this.props.phoneRoomsAvailable
-                      // data={this.state.phoneRoom}
-                      // data={phoneRoomMockData}
+                      // data={this.props.phoneRoomsAvailable} // this would be this.props.favoriteRooms
+                      data={this.props.favRooms} // this would be this.props.favoriteRooms
                       keyExtractor={item => item.id}
                       renderItem={this.renderPhoneRooms}
                     />
-                  </View> */}
+                  </View>
                 </View> : null}
               <View style={{ paddingLeft: 5 }}>
                 <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>
@@ -301,6 +302,7 @@ const mapStateToProps = state => {
     authenticated: state.auth.authenticated,
     phoneRoomsAvailable: state.rooms.phoneRoomsAvailable,
     phoneRoomsUnavailable: state.rooms.phoneRoomsUnavailable,
+    favRooms: state.rooms.favRooms,
   }
 }
 

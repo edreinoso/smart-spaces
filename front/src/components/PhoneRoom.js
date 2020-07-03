@@ -3,6 +3,7 @@ import Icon from 'react-native-vector-icons/AntDesign'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { text, colors, borders } from '../styles/index';
 import { LinearGradient } from 'expo-linear-gradient';
+import { stars, addItemToFav } from '../store/actions/index'
 import { connect } from 'react-redux';
 
 class PhoneRoom extends Component {
@@ -16,6 +17,7 @@ class PhoneRoom extends Component {
       initialStarState: !this.state.initialStarState
     })
     console.log(this.state.initialStarState, item.roomId)
+    this.props.addItemToFav(item, !this.state.initialStarState)
   }
 
   render() {
@@ -113,6 +115,13 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps, null)(PhoneRoom)
+const mapDispatchToProps = dispatch => {
+  return {
+    addItemToFav: (item, state) => dispatch(addItemToFav(item, state)),
+  }
+}
+
+// export default connect(mapStateToProps, null)(PhoneRoom)
+export default connect(mapStateToProps, mapDispatchToProps)(PhoneRoom)
 
 // export default PhoneRoom;

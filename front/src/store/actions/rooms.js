@@ -1,4 +1,4 @@
-import { STARS, ADD_ROOMS_U, ADD_ROOMS_A } from './types';
+import { STARS, ADD_ROOMS_U, ADD_ROOMS_A, FAV_ROOMS } from './types';
 
 export const stars = (starring) => {
     console.log('line 4 actions stars:', starring)
@@ -26,6 +26,17 @@ export const add = (item, type) => {
             payload: {
                 item: item
             }
+        }
+    }
+}
+
+export const addItemToFav = (item, state) => {
+    console.log('line 34 rooms action - item and type', item, state)
+    return {
+        type: FAV_ROOMS,
+        payload: {
+            item: item,
+            state: state
         }
     }
 }

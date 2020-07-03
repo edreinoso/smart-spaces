@@ -1,34 +1,73 @@
 import React, { Component } from 'react';
+import Icon from 'react-native-vector-icons/AntDesign'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { text, colors } from '../styles/index';
+import { text, colors, borders } from '../styles/index';
 import { LinearGradient } from 'expo-linear-gradient';
+import { connect } from 'react-redux';
 
 class PhoneRoom extends Component {
+  state = {
+    initialStarState: false,
+  }
+
+  onStarPress = () => {
+    const { item } = this.props;
+    this.setState({
+      initialStarState: !this.state.initialStarState
+    })
+    console.log(this.state.initialStarState, item.roomId)
+  }
+
   render() {
     const {
-      roomName,
-      roomId,
-      onItemSelected,
-      peopleInRoom,
-      index
+      item,
+      // roomName, // item.roomName
+      // roomId, // item.roomId
+      // onItemSelected,
+      // initialStarState,
+      // peopleInRoom, // item.availability
+      // onStarPress,
+      // index,
+      // fav,
     } = this.props;
-
     return (
       <View style={styles.roomContainer}>
-        <TouchableOpacity key={index}>
-          <LinearGradient
-            start={[0.1, 0.1]}
-            end={[1, 1]}
-            colors={peopleInRoom ? ['#6FA229', '#04F3E5'] : ['#DADADA', '#DADADA']}
-            style={{ borderRadius: 5 }}
-          >
-            <View style={peopleInRoom ? styles.avRoomContainer : styles.ocRoomContainer}>
-              <Text style={peopleInRoom ? styles.avRoomText : styles.ocRoomText}>
-                {roomName}
-              </Text>
-            </View>
-          </LinearGradient>
-        </TouchableOpacity>
+        <LinearGradient
+          start={[0.1, 0.1]}
+          end={[1, 1]}
+          colors={item.availability ? ['#6FA229', '#04F3E5'] : ['#DADADA', '#DADADA']}
+          style={{ borderRadius: 5 }}
+        >
+          <View style={[item.availability ? styles.avRoomContainer : styles.ocRoomContainer, { flexDirection: 'row', justifyContent: 'space-between' }]}>
+            {/* <qText style={[peopleInRoom ? styles.avRoomText : styles.ocRoomText, borders.pink]}> */}
+            <Text style={[item.availability ? styles.avRoomText : styles.ocRoomText]}>
+              {item.roomName}
+            </Text>
+            {/* <TouchableOpacity style={[borders.black, { justifyContent: 'center' }]}><Text>Star</Text></TouchableOpacity> */}
+            {/* this information should be passed to the backend! */}
+            <TouchableOpacity onPress={() => this.onStarPress()} style={[{ justifyContent: 'center', margin: 15, paddingHorizontal: 6 }]}>
+              {/* <TouchableOpacity onPress={() => onStarPress()} style={[{ justifyContent: 'center', margin: 15, paddingHorizontal: 6 }]}> */}
+              {/* <Text>Star</Text> */}
+              {/* this could receive the state change from redux */}
+              {/* {fav ? */}
+              {this.state.initialStarState ?
+                // {/* {initialStarState ? */}
+                // {/* {this.props.starState ? */}
+                <Icon
+                  name={'star'}
+                  color={colors.yellow}
+                  size={20}
+                />
+                :
+                <Icon
+                  name={'staro'}
+                  color={colors.yellow}
+                  size={20}
+                />
+              }
+            </TouchableOpacity>
+          </View>
+        </LinearGradient>
       </View>
     );
   }
@@ -68,4 +107,12 @@ const styles = StyleSheet.create({
   }
 });
 
-export default PhoneRoom;
+const mapStateToProps = state => {
+  return {
+    starState: state.auth.starState
+  }
+}
+
+export default connect(mapStateToProps, null)(PhoneRoom)
+
+// export default PhoneRoom;

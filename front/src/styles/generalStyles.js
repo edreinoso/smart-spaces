@@ -50,6 +50,7 @@ export const colors = {
   pink: 'pink',
   green: 'green',
   purple: 'purple',
+  yellow: '#FFCB00',
   grey: '#A3A3A3',
   occupied: '#F0F0F0',
   occupiedBorders: '#DADADA',

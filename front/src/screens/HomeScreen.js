@@ -5,23 +5,21 @@ import { Picture, HomeButton, PhoneRoom } from '../components/index';
 import { connect } from 'react-redux';
 import { phoneRoomMockData } from "../store/mockdata";
 import { API } from 'aws-amplify';
-import axios from 'axios';
+import { stars, add } from '../store/actions/index'
 
-const api = "https://hqpgo0kmqi.execute-api.us-east-1.amazonaws.com/dev/sensor/"
 var api_first_floor = '1'
-// var api_first_floor = api + '/1'
 var api_second_floor = '2'
-// var api_second_floor = api + '/2'
 var api_third_floor = '3'
-// var api_third_floor = api + '/3'
 
 class HomeScreen extends Component {
   state = {
     floor1: true,
     floor2: false,
     floor3: false,
+    initialStarState: false,
 
-    phoneRoom: [],
+    // phoneRoom: [],
+    favPhoneRoom: [],
     phoneRoomsAvailable: [],
     phoneRoomsUnavailable: [],
 
@@ -69,10 +67,7 @@ class HomeScreen extends Component {
   }
 
   apiCall(floor) {
-    console.log(`/sensor/${floor}`)
-    // return api + floor
     return API.get('emptyRoom', `/sensor/${floor}`);
-    // return API.get('emptyRoom', `/sensor/'${floor}'`);
   }
 
   // to be deprecated
@@ -94,47 +89,30 @@ class HomeScreen extends Component {
   }
 
   fetchDataFromDDB = async (floor) => {
-    // console.log('fetching data from ddb')
-
-    // console.log(this.apiCall(floor))
-    // console.log(API)
-    // const response = this.apiCall(floor)
-    // console.log(response)
     await this.apiCall(floor)
       .then(response => {
-        console.log(response) // this is empty
+        // console.log(response)
         var roomAvailable = [] // true: the room is not available
         var roomNotAvailable = [] // false: the room is available
         response.map((item, index) => {
           if (item.availability) {
             roomAvailable.push(item)
+            this.props.add(roomAvailable, 'available')
           } else {
             roomNotAvailable.push(item)
+            this.props.add(roomNotAvailable, 'unavailable')
           }
         })
-        this.setState({ phoneRoomsAvailable: roomAvailable, phoneRoomsUnavailable: roomNotAvailable, refreshing: false })
+        // this.props.addAvailableRooms(roomAvailable)
+        // this.props.addUnavailableRooms(roomNotAvailable)
+        // would be best to call reducer here to initialize these two arrays
+        // test with no calling the local state of the file
+        // this.setState({ phoneRoomsAvailable: roomAvailable, phoneRoomsUnavailable: roomNotAvailable, refreshing: false })
       })
       .catch(error => {
         console.log('error, hello world', error);
         this.setState({ refreshing: false })
       })
-    // axios.get(this.apiCall(floor))
-    //   .then(response => {
-    //     var roomAvailable = [] // true: the room is not available
-    //     var roomNotAvailable = [] // false: the room is available
-    //     response.data.map((item, index) => {
-    //       if (item.availability) {
-    //         roomAvailable.push(item)
-    //       } else {
-    //         roomNotAvailable.push(item)
-    //       }
-    //     })
-    //     this.setState({ phoneRoomsAvailable: roomAvailable, phoneRoomsUnavailable: roomNotAvailable, refreshing: false })
-    //   })
-    //   .catch(error => {
-    //     console.log(error);
-    //     this.setState({ refreshing: false })
-    //   });
   }
 
   onValueChange(key) {
@@ -165,13 +143,31 @@ class HomeScreen extends Component {
     }
   }
 
+  // need to add the item to the room that's fav
+  // this could change the state in redux
+  onStarPress = (item) => {
+    console.log('method line 140: onStarPress', item)
+    this.setState({
+      initialStarState: !this.state.initialStarState
+    })
+    console.log(this.state.initialStarState)
+    // sending the starring to redux
+    // change the item.favorite to false
+    // update the state --> actions --> reducers
+    this.props.stars(!this.state.initialStarState) // it's not a function (?)
+  }
+
   renderPhoneRooms = ({ item }) => {
     return (
       <PhoneRoom
-        index={item.id}
-        roomName={item.roomName}
-        roomId={item.roomId}
-        peopleInRoom={item.availability}
+        item={item}
+      // index={item.id}
+      // roomName={item.roomName}
+      // roomId={item.roomId}
+      // peopleInRoom={item.availability}
+      // onStarPress={() => this.onStarPress(item)}
+      // fav={item.favorite}
+      // initialStarState={this.state.initialStarState}
       />
     )
   }
@@ -235,6 +231,23 @@ class HomeScreen extends Component {
           <View style={container.bodySubContainer}>
             {/* title available */}
             <View style={container.contentContainer}>
+              {this.state.favPhoneRoom.length ?
+                <View>
+                  <View style={{ paddingLeft: 5 }}>
+                    <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>
+                      Favorites
+                  </Text>
+                  </View>
+                  {/* <View>
+                    <FlatList
+                      data={this.props.favoriteRoomsAvailable} // this would be this.props.phoneRoomsAvailable
+                      // data={this.state.phoneRoom}
+                      // data={phoneRoomMockData}
+                      keyExtractor={item => item.id}
+                      renderItem={this.renderPhoneRooms}
+                    />
+                  </View> */}
+                </View> : null}
               <View style={{ paddingLeft: 5 }}>
                 <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>
                   Available
@@ -243,7 +256,8 @@ class HomeScreen extends Component {
               {/* meeting room boxes */}
               <View>
                 <FlatList
-                  data={this.state.phoneRoomsAvailable}
+                  // data={this.state.phoneRoomsAvailable} // this would be this.props.phoneRoomsAvailable
+                  data={this.props.phoneRoomsAvailable} // this would be this.props.phoneRoomsAvailable
                   // data={this.state.phoneRoom}
                   // data={phoneRoomMockData}
                   keyExtractor={item => item.id}
@@ -257,7 +271,8 @@ class HomeScreen extends Component {
               </View>
               <View>
                 <FlatList
-                  data={this.state.phoneRoomsUnavailable}
+                  // data={this.state.phoneRoomsUnavailable}  // this would be this.props.phoneRoomsAvailable
+                  data={this.props.phoneRoomsUnavailable}  // this would be this.props.phoneRoomsAvailable
                   // data={phoneRoomMockData}
                   keyExtractor={item => item.id}
                   renderItem={this.renderPhoneRooms}
@@ -281,9 +296,19 @@ const styles = StyleSheet.create({
 
 
 const mapStateToProps = state => {
+  console.log('line 299 - mapstatetoprops home:', state)
   return {
-    authenticated: state.auth.authenticated
+    authenticated: state.auth.authenticated,
+    phoneRoomsAvailable: state.rooms.phoneRoomsAvailable,
+    phoneRoomsUnavailable: state.rooms.phoneRoomsUnavailable,
   }
 }
 
-export default connect(mapStateToProps, null)(HomeScreen)
+const mapDispatchToProps = dispatch => {
+  return {
+    stars: (starring) => dispatch(stars(starring)),
+    add: (item, type) => dispatch(add(item, type)),
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen)

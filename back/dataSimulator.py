@@ -36,6 +36,7 @@ for x in range(10):
             'floor': room[randomNum]['floor'],
             'timestamp':  str(currentTime.strftime("%Y-%m-%dT%H:%M:%SZ")),
             'ttl': int(now.strftime('%s')),
+            # 'favorite': false,
         }
     )
     time.sleep(10)

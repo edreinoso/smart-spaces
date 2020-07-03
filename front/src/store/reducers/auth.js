@@ -1,7 +1,8 @@
-import { AUTH, LOGOUT } from '../actions/types';
+import { AUTH, LOGOUT, STARS } from '../actions/types';
 
 const initialState = {
     authenticated: false,
+    starState: false
 }
 
 const reducer = (state = initialState, action) => {
@@ -19,6 +20,12 @@ const reducer = (state = initialState, action) => {
         case LOGOUT:
             // console.log('log out funcitonality from reducer')
             return initialState
+        case STARS: 
+            console.log('line 24 reducer stars:', action.payload)
+            return {
+                ...state,
+                starState: action.payload.star
+            }
         default:
             return state;
     }

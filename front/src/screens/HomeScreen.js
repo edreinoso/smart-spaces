@@ -5,7 +5,7 @@ import { Picture, HomeButton, PhoneRoom } from '../components/index';
 import { connect } from 'react-redux';
 import { phoneRoomMockData } from "../store/mockdata";
 import { API } from 'aws-amplify';
-import { stars, add } from '../store/actions/index'
+import { stars, add, addItemToFav } from '../store/actions/index'
 
 var api_first_floor = '1'
 var api_second_floor = '2'
@@ -154,16 +154,35 @@ class HomeScreen extends Component {
   // need to add the item to the room that's fav
   // this could change the state in redux
   onStarPress = (item) => {
-    if (!this.state.favPhoneRoom.some(alreadyFavorite => alreadyFavorite.id == item.id)) {
-      this.setState(prevState => {
-        return {
-          favPhoneRoom: [...this.state.favPhoneRoom, item],
-          phoneRoomsAvailable: prevState.phoneRoomsAvailable.filter(phoneRoomsAvailable => {
-            return phoneRoomsAvailable.id !== item.id;
-          }),
-        };
-      });
-    }
+    // this is not exactly accurate, because it doesn't reflect
+    // the state of the item itself. So this variable might as
+    // well be useless
+    this.setState({
+      initialStarState: !this.state.initialStarState
+    })
+    // I am passing the item to the reducer
+    // this item will be modified according
+    // to the starring feature
+    this.props.addItemToFav(item, !this.state.initialStarState)
+    // try to implement this logic inside of the reducer!!
+    // this works at the homescreen level
+    // if (!this.state.favPhoneRoom.some(alreadyFavorite => alreadyFavorite.id == item.id)) {
+    //   this.setState(prevState => {
+    //     return {
+    //       favPhoneRoom: [...this.state.favPhoneRoom, item],
+    //       phoneRoomsAvailable: prevState.phoneRoomsAvailable.filter(phoneRoomsAvailable => {
+    //         return phoneRoomsAvailable.id !== item.id;
+    //       }),
+    //       initialStarState: !this.state.initialStarState
+    //     };
+    //   });
+    // }
+    // console.log('line 175: initialStarState at homescreen', this.state.initialStarState)
+
+    // sending the starring to redux
+    // change the item.favorite to false
+    // update the state --> actions --> reducers
+    // this.props.stars(!this.state.initialStarState)
     // console.log('line 165: onStarPress', this.state.favPhoneRoom)
   }
 
@@ -241,8 +260,8 @@ class HomeScreen extends Component {
           <View style={container.bodySubContainer}>
             {/* title available */}
             <View style={container.contentContainer}>
-              {this.state.favPhoneRoom.length ?
-                //{/* {this.props.favPhoneRoom.length > 0 ? */}
+              {/* {this.state.favPhoneRoom.length ? */}
+              {this.props.favRooms.length > 0 ?
                 <View>
                   <View style={{ paddingLeft: 5 }}>
                     <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>
@@ -253,22 +272,22 @@ class HomeScreen extends Component {
                     {/* not showing with this.props.favoriteRooms */}
                     <FlatList
                       // data={favRoom} // this would be this.props.favoriteRooms
-                      data={this.state.favPhoneRoom} // this would be this.props.favoriteRooms
-                      // data={this.props.favRooms} // this would be this.props.favoriteRooms
+                      // data={this.state.favPhoneRoom} // this would be this.props.favoriteRooms
+                      data={this.props.favRooms} // this would be this.props.favoriteRooms
                       keyExtractor={item => item.id}
                       renderItem={this.renderPhoneRooms}
                     />
                   </View>
                 </View> : null}
-              <View style={{ paddingLeft: 5 }}>
+              <View style={{ paddingLeft: 5, paddingTop: 20 }}>
                 <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>
                   Available
                 </Text>
               </View>
-              {/* meeting room boxes */}
               <View>
                 <FlatList
-                  data={this.state.phoneRoomsAvailable} // this would be this.props.phoneRoomsAvailable
+                  data={this.props.mockData}
+                  // data={this.state.phoneRoomsAvailable} // this would be this.props.phoneRoomsAvailable
                   // data={this.props.phoneRoomsAvailable} // this would be this.props.phoneRoomsAvailable
                   // data={this.state.phoneRoom}
                   // data={phoneRoomMockData}
@@ -290,6 +309,7 @@ class HomeScreen extends Component {
                   renderItem={this.renderPhoneRooms}
                 />
               </View>
+              {/* {this.renderFlatList()} */}
             </View>
           </View>
         </ScrollView>
@@ -308,9 +328,10 @@ const styles = StyleSheet.create({
 
 
 const mapStateToProps = state => {
-  // console.log('line 299 - mapstatetoprops home:', state)
+  console.log('line 299 - mapstatetoprops home:', state)
   return {
     authenticated: state.auth.authenticated,
+    mockData: state.rooms.mockData,
     phoneRoomsAvailable: state.rooms.phoneRoomsAvailable,
     phoneRoomsUnavailable: state.rooms.phoneRoomsUnavailable,
     favRooms: state.rooms.favRooms,
@@ -321,6 +342,7 @@ const mapDispatchToProps = dispatch => {
   return {
     stars: (starring) => dispatch(stars(starring)),
     add: (item, type) => dispatch(add(item, type)),
+    addItemToFav: (item, state) => dispatch(addItemToFav(item, state)),
   }
 }
 

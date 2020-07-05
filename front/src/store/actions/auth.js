@@ -43,24 +43,6 @@ export const getUser = (authenticatedUser) => {
             authenticatedUser: authenticatedUser
         }
     }
-    // const response = await Auth.currentSession()
-    //     .then(data => {
-    //         console.log(data)
-    //         return {
-    //             type: AUTHENTICATED,
-    //             payload: true
-    //         }
-    //     })
-    //     .catch(err => {
-    //         console.log(err)
-    //         return {
-    //             type: AUTHENTICATED,
-    //             payload: false
-    //         }
-    //     });
-    // return async dispatch => {
-    //     // const response = await Auth.currentSession()
-    // }
 }
 
 export const forgotPass = (username) => {

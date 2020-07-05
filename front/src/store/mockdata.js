@@ -7,7 +7,8 @@ export const phoneRoomMockData = [
     "id": "cEpIf57S36",
     "floor": 1,
     "timestamp": "2020-05-09T21:48:00.232010",
-    "availability": true
+    "availability": true,
+    "favorite": false
   },
   {
     "ttl": 1588982184,
@@ -16,7 +17,8 @@ export const phoneRoomMockData = [
     "id": "4JEjZTQFN4",
     "floor": 1,
     "timestamp": "2020-05-08T20:45:43.471332",
-    "availability": true
+    "availability": true,
+    "favorite": false
   },
   {
     "ttl": 1588982177,
@@ -25,7 +27,8 @@ export const phoneRoomMockData = [
     "id": "3QWC6vsqsT",
     "floor": 2,
     "timestamp": "2020-05-08T20:45:43.471332",
-    "availability": true
+    "availability": true,
+    "favorite": false
   },
   {
     "ttl": 1588982177,
@@ -34,7 +37,8 @@ export const phoneRoomMockData = [
     "id": "3QWC6vsqsG",
     "floor": 3,
     "timestamp": "2020-05-08T20:45:43.471332",
-    "availability": true
+    "availability": true,
+    "favorite": false
   },
 ]
 

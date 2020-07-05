@@ -49,12 +49,12 @@ class PhoneRoom extends Component {
             {/* this information should be passed to the backend! */}
             {/* <TouchableOpacity onPress={() => this.onStarPress()} style={[{ justifyContent: 'center', margin: 15, paddingHorizontal: 6 }]}> */}
             <TouchableOpacity onPress={() => onStarPress()} style={[{ justifyContent: 'center', margin: 15, paddingHorizontal: 6 }]}>
-              {/* <Text>Star</Text> */}
               {/* this could receive the state change from redux */}
               {/* {fav ? */}
-              {this.state.initialStarState ?
-                // {/* {initialStarState ? */}
-                // {/* {this.props.starState ? */}
+              {item.favorite ?
+                // {this.state.initialStarState ? */}
+                // {initialStarState ? */}
+                // {this.props.starState ? */}
                 <Icon
                   name={'star'}
                   color={colors.yellow}

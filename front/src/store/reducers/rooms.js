@@ -1,6 +1,8 @@
 import { ADD_ROOMS_A, ADD_ROOMS_U, FAV_ROOMS } from '../actions/types';
+import { phoneRoomMockData } from "../mockdata";
 
 const initialState = {
+    mockData: phoneRoomMockData,
     phoneRoomsAvailable: [],
     phoneRoomsUnavailable: [],
     favRooms: []
@@ -27,34 +29,33 @@ const reducer = (state = initialState, action) => {
             }
         case FAV_ROOMS:
             console.log('line 28 rooms reducer - FAV_ROOM: ', action.payload)
-            // if(!state.favRooms.some(item => item.id == action.payload.item.id)) {
-            //     console.log('Hello World')
-            //     return {
-            //         favRooms: state.favRooms.concat(action.payload.item)
-            //     }
-            // }
+            // this is favoriting a room
             return {
                 ...state,
-                // 1st part of this function, populate the favorite array
-                favRooms: state.favRooms.concat(action.payload.item),
-                // favRooms: state.favRooms.map((item, index) => {
-                //     console.log('line 36 rooms reducer - favRooms map')
-                //     if (item != action.payload.item) {
-                //         console.log('line 38 rooms reducer - if statement')
-                //         state.favRooms.concat(action.payload.item)
+                // this is for starring,
+                // need to populate favRooms
+                // mockData: state.mockData.map((item, index) => {
+                //     if (item.id === action.payload.item.id) {
+                //         return {
+                //             ...item,
+                //             favorite: action.payload.state,
+                //         }
                 //     }
-                //     // if state is true, then add
-                //     // if (action.payload.state) {
-                //     // } else { // if the state if false, then split
-                //     // }
+                //     return item
                 // }),
-                // 2nd part of this function, get rid of the values in other arrays
-                // the question would be, would I have to go through both arrays?
-                // phoneRoomsAvailable: state.phoneRoomsAvailable.map((item, index) => {
-                //     if (item.roomId === action.payload.item.roomId) {
-                //         // slice it
-                //     }
-                // })
+                // item modified has to be sent to second array
+                favRooms: state.favRooms.concat(action.payload.item).map((item, index) => {
+                    if (item.id === action.payload.item.id) {
+                        return {
+                            ...item,
+                            favorite: !item.favorite,
+                        }
+                    }
+                    return item
+                }),
+                mockData: state.mockData.filter(x => {
+                    return x.id !== action.payload.item.id
+                })
             }
         default:
             return state;

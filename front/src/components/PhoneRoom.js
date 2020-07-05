@@ -17,7 +17,7 @@ class PhoneRoom extends Component {
       initialStarState: !this.state.initialStarState
     })
     console.log(this.state.initialStarState, item.roomId)
-    this.props.addItemToFav(item, !this.state.initialStarState)
+    // this.props.addItemToFav(item, !this.state.initialStarState)
   }
 
   render() {
@@ -28,7 +28,7 @@ class PhoneRoom extends Component {
       // onItemSelected,
       // initialStarState,
       // peopleInRoom, // item.availability
-      // onStarPress,
+      onStarPress,
       // index,
       // fav,
     } = this.props;
@@ -47,8 +47,8 @@ class PhoneRoom extends Component {
             </Text>
             {/* <TouchableOpacity style={[borders.black, { justifyContent: 'center' }]}><Text>Star</Text></TouchableOpacity> */}
             {/* this information should be passed to the backend! */}
-            <TouchableOpacity onPress={() => this.onStarPress()} style={[{ justifyContent: 'center', margin: 15, paddingHorizontal: 6 }]}>
-              {/* <TouchableOpacity onPress={() => onStarPress()} style={[{ justifyContent: 'center', margin: 15, paddingHorizontal: 6 }]}> */}
+            {/* <TouchableOpacity onPress={() => this.onStarPress()} style={[{ justifyContent: 'center', margin: 15, paddingHorizontal: 6 }]}> */}
+            <TouchableOpacity onPress={() => onStarPress()} style={[{ justifyContent: 'center', margin: 15, paddingHorizontal: 6 }]}>
               {/* <Text>Star</Text> */}
               {/* this could receive the state change from redux */}
               {/* {fav ? */}

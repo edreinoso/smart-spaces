@@ -107,7 +107,7 @@ class AuthScreen extends Component {
                     // console.log(data)
                     this.props.getUser(true)
                     this.props.navigation.navigate('Home')
-                    this.reset()
+                    // this.reset() // this is affecting the way the screen goes
                 }).catch((err) => {
                     Alert.alert('Error found', err.message)
                 })

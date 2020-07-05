@@ -28,30 +28,26 @@ class HomeScreen extends Component {
     interval: null
   }
 
-  componentDidMount() {
-    this.state.interval = setInterval(() => {
-      // console.log(this.state.floor1, this.state.floor2, this.state.floor3)
-      if (this.state.floor1) this.fetchDataFromDDB(api_first_floor)
-      else if (this.state.floor2) this.fetchDataFromDDB(api_second_floor)
-      else if (this.state.floor3) this.fetchDataFromDDB(api_third_floor)
-      // console.log('Ed')
-    }, 30000);
-  }
+  // componentDidMount() {
+  //   this.state.interval = setInterval(() => {
+  //     // console.log(this.state.floor1, this.state.floor2, this.state.floor3)
+  //     if (this.state.floor1) this.fetchDataFromDDB(api_first_floor)
+  //     else if (this.state.floor2) this.fetchDataFromDDB(api_second_floor)
+  //     else if (this.state.floor3) this.fetchDataFromDDB(api_third_floor)
+  //     // console.log('Ed')
+  //   }, 30000);
+  // }
 
-  componentWillUnmount() {
-    clearInterval(this.state.interval);
-  }
+  // componentWillUnmount() {
+  //   clearInterval(this.state.interval);
+  // }
 
   componentWillMount() {
     if (this.props.authenticated) {
-      // console.log('do I enter home?')
       // Local
-      // this.fetchDataFromLocal()
-
+      this.fetchDataFromLocal()
       // API
-      // this.fetchDataFromDDB()
-      // api_first_floor = api + '1'
-      this.fetchDataFromDDB(api_first_floor)
+      // this.fetchDataFromDDB(api_first_floor)
     } else {
       Alert.alert(
         //title
@@ -71,21 +67,38 @@ class HomeScreen extends Component {
   }
 
   // to be deprecated
+  // testing purposes
   fetchDataFromLocal = () => {
-    const maxPeak = phoneRoomMockData.reduce((p, c) => p.ttl > c.ttl ? p : c);
-    const result = Array.from(new Set(phoneRoomMockData.map(s => s.roomId)))
-      .map(roomId => {
-        return {
-          roomId: roomId,
-          id: phoneRoomMockData.find(s => s.roomId === roomId).id,
-          roomName: phoneRoomMockData.find(s => s.roomId === roomId).roomName,
-          floor: phoneRoomMockData.find(s => s.roomId === roomId).floor,
-          ttl: phoneRoomMockData.find(s => s.roomId === roomId).ttl,
-          timestamp: phoneRoomMockData.find(s => s.roomId === roomId).timestamp
-        }
-      })
-    console.log(result)
-    this.setState({ phoneRoom: result })
+    var roomAvailable = []
+    var roomNotAvailable = []
+    phoneRoomMockData.map((item, index) => {
+      if (item.availability) {
+        roomAvailable.push(item)
+        // this.props.add(roomAvailable, 'available')
+      } else {
+        roomNotAvailable.push(item)
+        // this.props.add(roomNotAvailable, 'unavailable')
+      }
+    })
+    this.setState({
+      phoneRoomsAvailable: roomAvailable,
+      phoneRoomsUnavailable: roomNotAvailable
+    })
+
+    // const maxPeak = phoneRoomMockData.reduce((p, c) => p.ttl > c.ttl ? p : c);
+    // const result = Array.from(new Set(phoneRoomMockData.map(s => s.roomId)))
+    //   .map(roomId => {
+    //     return {
+    //       roomId: roomId,
+    //       id: phoneRoomMockData.find(s => s.roomId === roomId).id,
+    //       roomName: phoneRoomMockData.find(s => s.roomId === roomId).roomName,
+    //       floor: phoneRoomMockData.find(s => s.roomId === roomId).floor,
+    //       ttl: phoneRoomMockData.find(s => s.roomId === roomId).ttl,
+    //       timestamp: phoneRoomMockData.find(s => s.roomId === roomId).timestamp
+    //     }
+    //   })
+    // console.log(result)
+    // this.setState({ phoneRoom: result })
   }
 
   fetchDataFromDDB = async (floor) => {
@@ -103,11 +116,6 @@ class HomeScreen extends Component {
             this.props.add(roomNotAvailable, 'unavailable')
           }
         })
-        // this.props.addAvailableRooms(roomAvailable)
-        // this.props.addUnavailableRooms(roomNotAvailable)
-        // would be best to call reducer here to initialize these two arrays
-        // test with no calling the local state of the file
-        // this.setState({ phoneRoomsAvailable: roomAvailable, phoneRoomsUnavailable: roomNotAvailable, refreshing: false })
       })
       .catch(error => {
         console.log('error, hello world', error);
@@ -123,7 +131,7 @@ class HomeScreen extends Component {
         floor3: false
       })
       // Call api for floor1
-      this.fetchDataFromDDB(api_first_floor)
+      // this.fetchDataFromDDB(api_first_floor)
     } else if (key === 'floor2') {
       this.setState({
         floor1: false,
@@ -131,7 +139,7 @@ class HomeScreen extends Component {
         floor3: false
       })
       // Call api for floor2
-      this.fetchDataFromDDB(api_second_floor)
+      // this.fetchDataFromDDB(api_second_floor)
     } else if (key === 'floor3') {
       this.setState({
         floor1: false,
@@ -139,33 +147,35 @@ class HomeScreen extends Component {
         floor3: true
       })
       // Call api for floor3
-      this.fetchDataFromDDB(api_third_floor)
+      // this.fetchDataFromDDB(api_third_floor)
     }
   }
 
   // need to add the item to the room that's fav
   // this could change the state in redux
   onStarPress = (item) => {
-    console.log('method line 140: onStarPress', item)
-    this.setState({
-      initialStarState: !this.state.initialStarState
-    })
-    console.log(this.state.initialStarState)
-    // sending the starring to redux
-    // change the item.favorite to false
-    // update the state --> actions --> reducers
-    this.props.stars(!this.state.initialStarState) // it's not a function (?)
+    if (!this.state.favPhoneRoom.some(alreadyFavorite => alreadyFavorite.id == item.id)) {
+      this.setState(prevState => {
+        return {
+          favPhoneRoom: [...this.state.favPhoneRoom, item],
+          phoneRoomsAvailable: prevState.phoneRoomsAvailable.filter(phoneRoomsAvailable => {
+            return phoneRoomsAvailable.id !== item.id;
+          }),
+        };
+      });
+    }
+    // console.log('line 165: onStarPress', this.state.favPhoneRoom)
   }
 
   renderPhoneRooms = ({ item }) => {
     return (
       <PhoneRoom
         item={item}
+        onStarPress={() => this.onStarPress(item)}
       // index={item.id}
       // roomName={item.roomName}
       // roomId={item.roomId}
       // peopleInRoom={item.availability}
-      // onStarPress={() => this.onStarPress(item)}
       // fav={item.favorite}
       // initialStarState={this.state.initialStarState}
       />
@@ -231,8 +241,8 @@ class HomeScreen extends Component {
           <View style={container.bodySubContainer}>
             {/* title available */}
             <View style={container.contentContainer}>
-              {/* {this.state.favPhoneRoom.length ? */}
-              {this.props.favRooms.length != 0 ?
+              {this.state.favPhoneRoom.length ?
+                //{/* {this.props.favPhoneRoom.length > 0 ? */}
                 <View>
                   <View style={{ paddingLeft: 5 }}>
                     <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>
@@ -242,8 +252,9 @@ class HomeScreen extends Component {
                   <View>
                     {/* not showing with this.props.favoriteRooms */}
                     <FlatList
-                      // data={this.props.phoneRoomsAvailable} // this would be this.props.favoriteRooms
-                      data={this.props.favRooms} // this would be this.props.favoriteRooms
+                      // data={favRoom} // this would be this.props.favoriteRooms
+                      data={this.state.favPhoneRoom} // this would be this.props.favoriteRooms
+                      // data={this.props.favRooms} // this would be this.props.favoriteRooms
                       keyExtractor={item => item.id}
                       renderItem={this.renderPhoneRooms}
                     />
@@ -257,8 +268,8 @@ class HomeScreen extends Component {
               {/* meeting room boxes */}
               <View>
                 <FlatList
-                  // data={this.state.phoneRoomsAvailable} // this would be this.props.phoneRoomsAvailable
-                  data={this.props.phoneRoomsAvailable} // this would be this.props.phoneRoomsAvailable
+                  data={this.state.phoneRoomsAvailable} // this would be this.props.phoneRoomsAvailable
+                  // data={this.props.phoneRoomsAvailable} // this would be this.props.phoneRoomsAvailable
                   // data={this.state.phoneRoom}
                   // data={phoneRoomMockData}
                   keyExtractor={item => item.id}
@@ -272,8 +283,8 @@ class HomeScreen extends Component {
               </View>
               <View>
                 <FlatList
-                  // data={this.state.phoneRoomsUnavailable}  // this would be this.props.phoneRoomsAvailable
-                  data={this.props.phoneRoomsUnavailable}  // this would be this.props.phoneRoomsAvailable
+                  data={this.state.phoneRoomsUnavailable}  // this would be this.props.phoneRoomsAvailable
+                  // data={this.props.phoneRoomsUnavailable}  // this would be this.props.phoneRoomsAvailable
                   // data={phoneRoomMockData}
                   keyExtractor={item => item.id}
                   renderItem={this.renderPhoneRooms}
@@ -297,7 +308,7 @@ const styles = StyleSheet.create({
 
 
 const mapStateToProps = state => {
-  console.log('line 299 - mapstatetoprops home:', state)
+  // console.log('line 299 - mapstatetoprops home:', state)
   return {
     authenticated: state.auth.authenticated,
     phoneRoomsAvailable: state.rooms.phoneRoomsAvailable,

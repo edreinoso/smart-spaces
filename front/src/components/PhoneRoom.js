@@ -3,32 +3,32 @@ import Icon from 'react-native-vector-icons/AntDesign'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { text, colors, borders } from '../styles/index';
 import { LinearGradient } from 'expo-linear-gradient';
-import { stars, addItemToFav } from '../store/actions/index'
-import { connect } from 'react-redux';
+// import { stars } from '../store/actions/index'
+// import { connect } from 'react-redux';
 
 class PhoneRoom extends Component {
-  state = {
-    initialStarState: false,
-  }
+  // state = {
+  //   initialStarState: false,
+  // }
 
-  onStarPress = () => {
-    const { item } = this.props;
-    this.setState({
-      initialStarState: !this.state.initialStarState
-    })
-    console.log(this.state.initialStarState, item.roomId)
-    // this.props.addItemToFav(item, !this.state.initialStarState)
-  }
+  // onStarPress = () => {
+  //   const { item } = this.props;
+  //   this.setState({
+  //     initialStarState: !this.state.initialStarState
+  //   })
+  //   console.log(this.state.initialStarState, item.roomId)
+  //   this.props.addItemToFav(item, !this.state.initialStarState)
+  // }
 
   render() {
     const {
       item,
+      onStarPress,
       // roomName, // item.roomName
       // roomId, // item.roomId
       // onItemSelected,
       // initialStarState,
       // peopleInRoom, // item.availability
-      onStarPress,
       // index,
       // fav,
     } = this.props;
@@ -109,19 +109,19 @@ const styles = StyleSheet.create({
   }
 });
 
-const mapStateToProps = state => {
-  return {
-    starState: state.auth.starState
-  }
-}
+// const mapStateToProps = state => {
+//   return {
+//     starState: state.auth.starState
+//   }
+// }
 
-const mapDispatchToProps = dispatch => {
-  return {
-    addItemToFav: (item, state) => dispatch(addItemToFav(item, state)),
-  }
-}
+// const mapDispatchToProps = dispatch => {
+//   return {
+//     addItemToFav: (item, state) => dispatch(addItemToFav(item, state)),
+//   }
+// }
 
 // export default connect(mapStateToProps, null)(PhoneRoom)
-export default connect(mapStateToProps, mapDispatchToProps)(PhoneRoom)
+// export default connect(mapStateToProps, mapDispatchToProps)(PhoneRoom)
 
-// export default PhoneRoom;
+export default PhoneRoom;

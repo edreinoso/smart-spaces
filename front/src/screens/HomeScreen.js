@@ -5,7 +5,7 @@ import { Picture, HomeButton, PhoneRoom } from '../components/index';
 import { connect } from 'react-redux';
 import { phoneRoomMockData } from "../store/mockdata";
 import { API } from 'aws-amplify';
-import { stars, add, addItemToFav } from '../store/actions/index'
+import { stars, add } from '../store/actions/index'
 
 var api_first_floor = '1'
 var api_second_floor = '2'
@@ -18,7 +18,6 @@ class HomeScreen extends Component {
     floor3: false,
     initialStarState: false,
 
-    // phoneRoom: [],
     favPhoneRoom: [],
     phoneRoomsAvailable: [],
     phoneRoomsUnavailable: [],
@@ -157,13 +156,14 @@ class HomeScreen extends Component {
     // this is not exactly accurate, because it doesn't reflect
     // the state of the item itself. So this variable might as
     // well be useless
-    this.setState({
-      initialStarState: !this.state.initialStarState
-    })
+    // this.setState({
+    //   initialStarState: !this.state.initialStarState
+    // })
     // I am passing the item to the reducer
     // this item will be modified according
     // to the starring feature
-    this.props.addItemToFav(item, !this.state.initialStarState)
+    this.props.add(item, 'favorite')
+
     // try to implement this logic inside of the reducer!!
     // this works at the homescreen level
     // if (!this.state.favPhoneRoom.some(alreadyFavorite => alreadyFavorite.id == item.id)) {
@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
 
 
 const mapStateToProps = state => {
-  console.log('line 299 - mapstatetoprops home:', state)
+  // console.log('line 299 - mapstatetoprops home:', state)
   return {
     authenticated: state.auth.authenticated,
     mockData: state.rooms.mockData,
@@ -342,7 +342,7 @@ const mapDispatchToProps = dispatch => {
   return {
     stars: (starring) => dispatch(stars(starring)),
     add: (item, type) => dispatch(add(item, type)),
-    addItemToFav: (item, state) => dispatch(addItemToFav(item, state)),
+    // addItemToFav: (item, state) => dispatch(addItemToFav(item, state)),
   }
 }
 

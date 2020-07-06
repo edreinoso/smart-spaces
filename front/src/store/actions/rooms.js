@@ -20,23 +20,19 @@ export const add = (item, type) => {
                 item: item
             }
         }
+    } else if (type === "favorite") {
+        return {
+            type: FAV_ROOMS,
+            payload: {
+                item: item
+            }
+        }
     } else {
         return {
             type: ADD_ROOMS_A,
             payload: {
                 item: item
             }
-        }
-    }
-}
-
-export const addItemToFav = (item, state) => {
-    console.log('line 34 rooms action - item and type', item, state)
-    return {
-        type: FAV_ROOMS,
-        payload: {
-            item: item,
-            state: state
         }
     }
 }

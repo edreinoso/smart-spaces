@@ -6,7 +6,6 @@ const initialState = {
     phoneRoomsAvailable: [],
     phoneRoomsUnavailable: [],
     favRooms: []
-    // favRooms: {}
 }
 
 const reducer = (state = initialState, action) => {
@@ -15,47 +14,53 @@ const reducer = (state = initialState, action) => {
             // console.log('line 12 rooms reducer - ADD_ROOMS_A: ', action.payload.item)
             return {
                 ...state,
-                // let's see if this overrides the situation
-                // or just add things on top
                 phoneRoomsAvailable: action.payload.item
             }
         case ADD_ROOMS_U:
             // console.log('line 20 rooms reducer - ADD_ROOMS_U: ', action.payload.item)
             return {
                 ...state,
-                // let's see if this overrides the situation
-                // or just add things on top
                 phoneRoomsUnavailable: action.payload.item
             }
         case FAV_ROOMS:
-            console.log('line 28 rooms reducer - FAV_ROOM: ', action.payload)
-            // this is favoriting a room
-            return {
-                ...state,
-                // this is for starring,
-                // need to populate favRooms
-                // mockData: state.mockData.map((item, index) => {
-                //     if (item.id === action.payload.item.id) {
-                //         return {
-                //             ...item,
-                //             favorite: action.payload.state,
-                //         }
-                //     }
-                //     return item
-                // }),
-                // item modified has to be sent to second array
-                favRooms: state.favRooms.concat(action.payload.item).map((item, index) => {
-                    if (item.id === action.payload.item.id) {
-                        return {
-                            ...item,
-                            favorite: !item.favorite,
+            // console.log('line 28 rooms reducer - FAV_ROOM: ', action.payload)
+            // logic for avoiding double room adding
+            // it is already added
+            if (!state.favRooms.some(alreadyFavorite => alreadyFavorite.id == action.payload.item.id)) {
+                // console.log('line 34 rooms reducer - FAV_ROOM')
+                return {
+                    ...state,
+                    favRooms: state.favRooms.concat(action.payload.item).map((item, index) => {
+                        if (item.id === action.payload.item.id) {
+                            // console.log('line 49: rooms reducer - FAV_ROOMS', item)
+                            return {
+                                ...item,
+                                favorite: !item.favorite,
+                            }
                         }
-                    }
-                    return item
-                }),
-                mockData: state.mockData.filter(x => {
-                    return x.id !== action.payload.item.id
-                })
+                        return item
+                    }),
+                    mockData: state.mockData.filter(x => {
+                        return x.id !== action.payload.item.id
+                    })
+                }
+            } else {
+                // console.log('line 64: hello world else statmenet')
+                return {
+                    mockData: state.mockData.concat(action.payload.item).map((item, index) => {
+                        if (item.id === action.payload.item.id) {
+                            // console.log('line 68: else statement true to false')
+                            return {
+                                ...item,
+                                favorite: !item.favorite,
+                            }
+                        }
+                        return item
+                    }),
+                    favRooms: state.favRooms.filter(x => {
+                        return x.id !== action.payload.item.id
+                    })
+                }
             }
         default:
             return state;

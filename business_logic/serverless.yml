@@ -6,7 +6,9 @@ plugins:
 service: motion-detection-service
 
 custom:
-  tableName: "PIR-table"
+  pirTableName: "PIR-table"
+  phoneRoomTableName: "Phone-room-table"
+  favoriteTableName: "Favorite-table"
   queueName: "PIR-queue"
   cognitoName: "PIR-cognito"
   application: "smart-spaces"
@@ -27,28 +29,28 @@ provider:
         - dynamodb:DeleteItem
       Resource:
         - { "Fn::GetAtt": ["PIRSensor", "Arn"] }
+        - { "Fn::GetAtt": ["FavoriteTable", "Arn"] }
+        - { "Fn::GetAtt": ["PhoneRoomTable", "Arn"] }
   environment:
-    PIR_TABLE: ${self:custom.tableName}
+    PIR_TABLE: ${self:custom.pirTableName}
+    PHONE_ROOM_TABLE: ${self:custom.phoneRoomTableName}
+    FAVORITE_TABLE: ${self:custom.favoriteTableName}
 
 functions:
-  getSensorData:
+  getPhoneRoomData:
     handler: motion.handler
     events:
       - http: "GET /sensor/{proxy+}"
+      - http: "GET /phonerooms/{proxy+}"
+      - http: "GET /favorites"
+      - http: "POST /favorites"
+      - http: "DELETE /favorites"
   queueHandler:
     handler: queue.handler
     events:
       - sqs:
           arn: arn:aws:sqs:us-east-1:130193131803:${self:custom.queueName}
           batchSize: 10
-  # userAuth:
-  #   handler: user.handler
-  #   events:
-  #     - http: "GET /user/:userId"
-  # userSignUp:
-  #   handler: user.handler
-  #   events:
-  #     - http: "POST /user/"
 
 resources:
   # DDB

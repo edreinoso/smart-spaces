@@ -34,13 +34,20 @@ export const auth = (username, password, authMode) => {
     }
 }
 
-export const getUser = (authenticatedUser) => {
+export const getUser = (username, authenticatedUser) => {
     // export const getUser = async () => {
     // console.log('calling getUser action')
+    // var user = ""
+    // Auth.currentAuthenticatedUser().then(response => {
+    //     // console.log('auth action, line 42: ', response)
+    //     user = response.attributes.email
+    // })
+    // console.log('auth action, user line 45', user)
     return {
         type: AUTH,
         payload: {
-            authenticatedUser: authenticatedUser
+            authenticatedUser: authenticatedUser,
+            user: username
         }
     }
 }

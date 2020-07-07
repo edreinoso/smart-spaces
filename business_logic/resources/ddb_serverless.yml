@@ -24,6 +24,62 @@ Resources:
           # Value: ${self:provider.stage}
           Value: dev
         - Key: "Purpose"
-          Value: "PIR DynamoDB to hold the data from the sensor"
+          Value: "PIR sensor table to hold data about sensor data on each phone room"
         - Key: "Creation_Date"
           Value: "Tue_June_23"
+  FavoriteTable:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: roomId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: roomId
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      TableName: Favorite-table
+      # TableName: ${self:custom.tableName}
+      Tags:
+        - Key: "Name"
+          Value: Favorite-table
+          # Value: ${self:custom.tableName}
+        - Key: "Template"
+          # Value: ${self:custom.application}
+          Value: smart_spaces
+        - Key: "Environment"
+          # Value: ${self:provider.stage}
+          Value: dev
+        - Key: "Purpose"
+          Value: "Favorite table to hold data about users favorie phone rooms"
+        - Key: "Creation_Date"
+          Value: "Tue_July_07"
+  PhoneRoomTable:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: roomId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: roomId
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      TableName: Phone-room-table
+      # TableName: ${self:custom.tableName}
+      Tags:
+        - Key: "Name"
+          Value: Phone-room-table
+          # Value: ${self:custom.tableName}
+        - Key: "Template"
+          # Value: ${self:custom.application}
+          Value: smart_spaces
+        - Key: "Environment"
+          # Value: ${self:provider.stage}
+          Value: dev
+        - Key: "Purpose"
+          Value: "Phone room table to hold data about specific phone rooms"
+        - Key: "Creation_Date"
+          Value: "Tue_July_07"

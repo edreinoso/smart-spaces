@@ -5,7 +5,7 @@ import { Picture, HomeButton, PhoneRoom } from '../components/index';
 import { connect } from 'react-redux';
 import { phoneRoomMockData } from "../store/mockdata";
 import { API } from 'aws-amplify';
-import { stars, add } from '../store/actions/index'
+import { stars, add, favorite } from '../store/actions/index'
 
 var api_first_floor = '1'
 var api_second_floor = '2'
@@ -44,9 +44,10 @@ class HomeScreen extends Component {
   componentWillMount() {
     if (this.props.authenticated) {
       // Local
-      this.fetchDataFromLocal()
+      // this.fetchDataFromLocal()
       // API
-      // this.fetchDataFromDDB(api_first_floor)
+      // this.fetchDataFromDDB()
+      this.fetchDataFromDDB(api_first_floor)
     } else {
       Alert.alert(
         //title
@@ -57,15 +58,23 @@ class HomeScreen extends Component {
           { text: 'Okay', onPress: () => { this.props.navigation.navigate('Auth') } },
         ],
         { cancelable: false }
-      ); ƒ
+      );
     }
   }
 
-  apiCall(floor) {
-    return API.get('emptyRoom', `/sensor/${floor}`);
+  // apiCall() {
+  apiGetCall(floor) { // API Gateway caller
+    return API.get('motion', `/phonerooms/${floor}`);
   }
 
-  // to be deprecated
+
+  apiFavCall(item, type) {
+    console.log(item, type)
+    if (type === "GET") return API.get('motion', '/favorites')
+    else if (type === "POST") return API.post('motion', '/favorites', item)
+    else if (type === "DELETE") return API.del('motion', '/favorites', item)
+  }
+
   // testing purposes
   fetchDataFromLocal = () => {
     var roomAvailable = []
@@ -101,24 +110,26 @@ class HomeScreen extends Component {
   }
 
   fetchDataFromDDB = async (floor) => {
-    await this.apiCall(floor)
+    // making favorite api call
+    await this.apiFavCall(null, 'GET')
       .then(response => {
-        // console.log(response)
-        var roomAvailable = [] // true: the room is not available
-        var roomNotAvailable = [] // false: the room is available
-        response.map((item, index) => {
-          if (item.availability) {
-            roomAvailable.push(item)
-            this.props.add(roomAvailable, 'available')
-          } else {
-            roomNotAvailable.push(item)
-            this.props.add(roomNotAvailable, 'unavailable')
-          }
-        })
+        console.log(response)
+        this.props.add(response, 'favorite') // adding to favorite list 
+        this.setState({ phoneRoomsAvailable: response })
+        // should call action --> reducer
       })
       .catch(error => {
-        console.log('error, hello world', error);
-        this.setState({ refreshing: false })
+        console.log(error)
+      })
+    await this.apiGetCall(floor)
+      .then(response => {
+        console.log(response)
+        this.props.add(response)
+        this.setState({ phoneRoomsAvailable: response })
+        // should call action --> reducer
+      })
+      .catch(error => {
+        console.log(error)
       })
   }
 
@@ -130,7 +141,7 @@ class HomeScreen extends Component {
         floor3: false
       })
       // Call api for floor1
-      // this.fetchDataFromDDB(api_first_floor)
+      this.fetchDataFromDDB(api_first_floor)
     } else if (key === 'floor2') {
       this.setState({
         floor1: false,
@@ -138,7 +149,7 @@ class HomeScreen extends Component {
         floor3: false
       })
       // Call api for floor2
-      // this.fetchDataFromDDB(api_second_floor)
+      this.fetchDataFromDDB(api_second_floor)
     } else if (key === 'floor3') {
       this.setState({
         floor1: false,
@@ -146,44 +157,49 @@ class HomeScreen extends Component {
         floor3: true
       })
       // Call api for floor3
-      // this.fetchDataFromDDB(api_third_floor)
+      this.fetchDataFromDDB(api_third_floor)
     }
   }
 
   // need to add the item to the room that's fav
   // this could change the state in redux
-  onStarPress = (item) => {
-    // this is not exactly accurate, because it doesn't reflect
-    // the state of the item itself. So this variable might as
-    // well be useless
-    // this.setState({
-    //   initialStarState: !this.state.initialStarState
-    // })
-    // I am passing the item to the reducer
-    // this item will be modified according
-    // to the starring feature
-    this.props.add(item, 'favorite')
+  onStarPress = async (item) => {
+    const favItem = {
+      body: {
+        // username: this.props.username, // value needs to be gotten from cognito
+        username: "edgardo_16_@hotmail.com", // value needs to be gotten from cognito
+        roomName: item.roomName,
+        roomId: item.roomId,
+        availability: item.availability,
+        timestamp: Date.now(), // stamping the time which the favorite happened
+        favorite: true, // hardcode true for now
+      },
+      headers: {}, // OPTIONAL
+    };
 
-    // try to implement this logic inside of the reducer!!
-    // this works at the homescreen level
-    // if (!this.state.favPhoneRoom.some(alreadyFavorite => alreadyFavorite.id == item.id)) {
-    //   this.setState(prevState => {
-    //     return {
-    //       favPhoneRoom: [...this.state.favPhoneRoom, item],
-    //       phoneRoomsAvailable: prevState.phoneRoomsAvailable.filter(phoneRoomsAvailable => {
-    //         return phoneRoomsAvailable.id !== item.id;
-    //       }),
-    //       initialStarState: !this.state.initialStarState
-    //     };
-    //   });
-    // }
-    // console.log('line 175: initialStarState at homescreen', this.state.initialStarState)
+    if (!this.props.favRooms.some(alreadyFavorite => alreadyFavorite.roomId == item.roomId)) {
 
-    // sending the starring to redux
-    // change the item.favorite to false
-    // update the state --> actions --> reducers
-    // this.props.stars(!this.state.initialStarState)
-    // console.log('line 165: onStarPress', this.state.favPhoneRoom)
+      await this.apiFavCall(favItem, 'POST')
+        .then(response => {
+          // console.log(response)
+          // this.props.favorite(response, 'favorite') // it could give the same results
+          this.props.favorite(item, 'fav')
+        })
+        .catch(error => {
+          console.log(error)
+        })
+    } else {
+      // await this.apiDeleteFavCall("edgardo_16_@hotmail.com", item.roomId, favItem)
+      console.log('delete api')
+      await this.apiFavCall(favItem, 'DELETE')
+        .then(() => {
+          this.props.favorite(item, 'unfav')
+        })
+        .catch(error => {
+          console.log(error)
+        })
+      // await this.apiDeleteFavCall(this.props.username, item.roomId)
+    }
   }
 
   renderPhoneRooms = ({ item }) => {
@@ -191,12 +207,6 @@ class HomeScreen extends Component {
       <PhoneRoom
         item={item}
         onStarPress={() => this.onStarPress(item)}
-      // index={item.id}
-      // roomName={item.roomName}
-      // roomId={item.roomId}
-      // peopleInRoom={item.availability}
-      // fav={item.favorite}
-      // initialStarState={this.state.initialStarState}
       />
     )
   }
@@ -274,7 +284,7 @@ class HomeScreen extends Component {
                       // data={favRoom} // this would be this.props.favoriteRooms
                       // data={this.state.favPhoneRoom} // this would be this.props.favoriteRooms
                       data={this.props.favRooms} // this would be this.props.favoriteRooms
-                      keyExtractor={item => item.id}
+                      keyExtractor={item => item.roomId}
                       renderItem={this.renderPhoneRooms}
                     />
                   </View>
@@ -286,12 +296,12 @@ class HomeScreen extends Component {
               </View>
               <View>
                 <FlatList
-                  data={this.props.mockData}
+                  // data={this.props.mockData}
                   // data={this.state.phoneRoomsAvailable} // this would be this.props.phoneRoomsAvailable
-                  // data={this.props.phoneRoomsAvailable} // this would be this.props.phoneRoomsAvailable
+                  data={this.props.phoneRoomsAvailable} // this would be this.props.phoneRoomsAvailable
                   // data={this.state.phoneRoom}
                   // data={phoneRoomMockData}
-                  keyExtractor={item => item.id}
+                  keyExtractor={item => item.roomId}
                   renderItem={this.renderPhoneRooms}
                 />
               </View>
@@ -305,7 +315,7 @@ class HomeScreen extends Component {
                   data={this.state.phoneRoomsUnavailable}  // this would be this.props.phoneRoomsAvailable
                   // data={this.props.phoneRoomsUnavailable}  // this would be this.props.phoneRoomsAvailable
                   // data={phoneRoomMockData}
-                  keyExtractor={item => item.id}
+                  keyExtractor={item => item.roomId}
                   renderItem={this.renderPhoneRooms}
                 />
               </View>
@@ -331,6 +341,7 @@ const mapStateToProps = state => {
   // console.log('line 299 - mapstatetoprops home:', state)
   return {
     authenticated: state.auth.authenticated,
+    username: state.auth.username,
     mockData: state.rooms.mockData,
     phoneRoomsAvailable: state.rooms.phoneRoomsAvailable,
     phoneRoomsUnavailable: state.rooms.phoneRoomsUnavailable,
@@ -342,6 +353,7 @@ const mapDispatchToProps = dispatch => {
   return {
     stars: (starring) => dispatch(stars(starring)),
     add: (item, type) => dispatch(add(item, type)),
+    favorite: (item, type) => dispatch(favorite(item, type)),
     // addItemToFav: (item, state) => dispatch(addItemToFav(item, state)),
   }
 }

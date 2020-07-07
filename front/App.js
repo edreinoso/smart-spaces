@@ -19,7 +19,7 @@ Amplify.configure({
   API: {
     endpoints: [
       {
-        name: 'emptyRoom',
+        name: 'motion',
         endpoint: config.apiGateway.URL,
         region: config.apiGateway.REGION,
       }

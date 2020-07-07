@@ -105,7 +105,7 @@ class AuthScreen extends Component {
                     'login'
                 ).then(() => {
                     // console.log(data)
-                    this.props.getUser(true)
+                    this.props.getUser(this.state.controls.email.value, true)
                     this.props.navigation.navigate('Home')
                     // this.reset() // this is affecting the way the screen goes
                 }).catch((err) => {
@@ -453,7 +453,7 @@ const styles = StyleSheet.create({
 const mapDispatchToProps = dispatch => {
     return {
         auth: (email, password, authMode) => dispatch(auth(email, password, authMode)),
-        getUser: (authenticatedUser) => dispatch(getUser(authenticatedUser)),
+        getUser: (username, authenticatedUser) => dispatch(getUser(username, authenticatedUser)),
         forgotPass: (username) => dispatch(forgotPass(username)),
         confirmForgotPass: (username, code, newPass) => dispatch(confirmForgotPass(username, code, newPass)),
         confirmCodeStep: (email, confirmCode) => dispatch(confirmCodeSignUp(email, confirmCode)),

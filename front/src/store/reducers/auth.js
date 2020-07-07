@@ -1,6 +1,7 @@
 import { AUTH, LOGOUT, STARS } from '../actions/types';
 
 const initialState = {
+    username: "", // this is giving me undefined
     authenticated: false,
     starState: false
 }
@@ -10,11 +11,12 @@ const reducer = (state = initialState, action) => {
     // const reducer = (state = { authenticated: false }, action) => {
     switch (action.type) {
         case AUTH:
-            // console.log('Hello World from reducer', action)
+            // console.log('line 14, auth reducer', action.payload)
             return {
                 ...state,
                 // authenticated: true  
-                authenticated: action.payload.authenticatedUser
+                authenticated: action.payload.authenticatedUser,
+                username: action.payload.username
                 // authenticated: action.authenticatedUser
             }
         case LOGOUT:

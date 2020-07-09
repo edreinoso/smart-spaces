@@ -5,7 +5,7 @@ const app = express()
 const AWS = require('aws-sdk')
 
 const PIR_TABLE = process.env.PIR_TABLE;
-const PHONE_ROOM_TABLE = process.env.PHONE_ROOM_TABLE;
+const USER_TABLE = process.env.USER_TABLE;
 const FAVORITE_TABLE = process.env.FAVORITE_TABLE;
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
@@ -156,6 +156,88 @@ app.delete('/favorites', function (req, res) {
       res.json(result)
     }
   })
+})
+
+app.post('/users', function (req, res) {
+  const { username, rooms, favorites } = req.body
+
+  const params = {
+    TableName: USER_TABLE,
+    Item: {
+      username: username,
+      rooms: rooms,
+      favorites: favorites
+    }
+  }
+
+  dynamoDB.put(params, (error) => {
+    if (error) {
+      console.log(error)
+      res.status(400).json({ error: 'Could not post data' })
+    } else {
+      res.send({ username, rooms, favorites })
+    }
+  })
+})
+
+app.put('/users/', function (req, res) {
+  const { username, rooms, favorites } = req.body
+  console.log('putting items', req.body)
+  const params = {
+    TableName: USER_TABLE,
+    Item: {
+      username: username,
+      rooms: rooms, // this will have other value
+      favorites: favorites // this will have some value
+    }
+  }
+
+  dynamoDB.put(params, (error) => {
+    if (error) {
+      console.log(error)
+      res.status(400).json({ error: 'Could not post data' })
+    } else {
+      res.send({ username, rooms, favorites })
+    }
+  })
+})
+
+app.get('/users/:username', function (req, res) {
+  console.log(req.params)
+
+  const params = {
+    TableName: USER_TABLE,
+    FilterExpression: 'username = :username',
+    ExpressionAttributeValues: { ':username': req.params.username }
+  }
+  dynamoDB.scan(params, (error, result) => {
+    if (error) {
+      console.log(error)
+      res.status(400).json({ error: 'Could not retrieve data' })
+    } else {
+      // console.log(result)
+      var returnRooms = []
+      var favRooms = []
+      result.Items.map((item, index) => {
+        item.rooms.map((item2, index) => {
+          if (item2.floor == req.query.floor) {
+            returnRooms.push(item2)
+          }
+        })
+        item.favorites.map((item3, index) => {
+          if (item3.floor == req.query.floor) {
+            favRooms.push(item3)
+          }
+        })
+      })
+      console.log(returnRooms, favRooms)
+      res.json({returnRooms, favRooms})
+    }
+  })
+})
+
+app.get('/users/:username', function (req, res){
+
 })
 
 module.exports.handler = serverless(app);

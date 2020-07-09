@@ -24,7 +24,9 @@ class HomeScreen extends Component {
 
     refreshing: false,
 
-    interval: null
+    interval: null,
+
+    // showStar: true,
   }
 
   // componentDidMount() {
@@ -64,15 +66,17 @@ class HomeScreen extends Component {
 
   // apiCall() {
   apiGetCall(floor) { // API Gateway caller
-    return API.get('motion', `/phonerooms/${floor}`);
+    // console.log(`/users/${this.props.username}?floor=${floor}`)
+    return API.get('motion', `/users/${this.props.username}?floor=${floor}`);
   }
 
 
-  apiFavCall(item, type) {
-    console.log(item, type)
-    if (type === "GET") return API.get('motion', '/favorites')
-    else if (type === "POST") return API.post('motion', '/favorites', item)
-    else if (type === "DELETE") return API.del('motion', '/favorites', item)
+  apiFavCall(item) {
+    // console.log(item, type)
+    return API.put('motion', '/users', item)
+    // if (type === "GET") return API.get('motion', '/favorites')
+    // else if (type === "POST") return API.post('motion', '/favorites', item)
+    // else if (type === "DELETE") return API.del('motion', '/favorites', item)
   }
 
   // testing purposes
@@ -111,21 +115,23 @@ class HomeScreen extends Component {
 
   fetchDataFromDDB = async (floor) => {
     // making favorite api call
-    await this.apiFavCall(null, 'GET')
-      .then(response => {
-        console.log(response)
-        this.props.add(response, 'favorite') // adding to favorite list 
-        this.setState({ phoneRoomsAvailable: response })
-        // should call action --> reducer
-      })
-      .catch(error => {
-        console.log(error)
-      })
+    // await this.apiFavCall(null, 'GET')
+    //   .then(response => {
+    //     // console.log(response)
+    //     this.props.add(response, 'favorite') // adding to favorite list 
+    //     this.setState({ phoneRoomsAvailable: response })
+    //     // should call action --> reducer
+    //   })
+    //   .catch(error => {
+    //     console.log(error)
+    //   })
     await this.apiGetCall(floor)
       .then(response => {
         console.log(response)
-        this.props.add(response)
-        this.setState({ phoneRoomsAvailable: response })
+        // console.log(response.returnRooms)
+        this.props.add(response.favRooms, 'favorite')
+        this.props.add(response.returnRooms)
+        // this.setState({ phoneRoomsAvailable: response })
         // should call action --> reducer
       })
       .catch(error => {
@@ -161,44 +167,38 @@ class HomeScreen extends Component {
     }
   }
 
-  // need to add the item to the room that's fav
-  // this could change the state in redux
   onStarPress = async (item) => {
-    const favItem = {
-      body: {
-        // username: this.props.username, // value needs to be gotten from cognito
-        username: "edgardo_16_@hotmail.com", // value needs to be gotten from cognito
-        roomName: item.roomName,
-        roomId: item.roomId,
-        availability: item.availability,
-        timestamp: Date.now(), // stamping the time which the favorite happened
-        favorite: true, // hardcode true for now
-      },
-      headers: {}, // OPTIONAL
-    };
-
     if (!this.props.favRooms.some(alreadyFavorite => alreadyFavorite.roomId == item.roomId)) {
-
-      await this.apiFavCall(favItem, 'POST')
+      await this.props.favorite(item, 'fav')
+      const favItem = {
+        body: {
+          username: this.props.username,
+          rooms: this.props.phoneRoomsAvailable,
+          favorites: this.props.favRooms // not going well since the this.props is async
+        },
+      };
+      await this.apiFavCall(favItem)
         .then(response => {
-          // console.log(response)
-          // this.props.favorite(response, 'favorite') // it could give the same results
-          this.props.favorite(item, 'fav')
+          console.log(response)
         })
         .catch(error => {
           console.log(error)
         })
     } else {
-      // await this.apiDeleteFavCall("edgardo_16_@hotmail.com", item.roomId, favItem)
-      console.log('delete api')
-      await this.apiFavCall(favItem, 'DELETE')
+      await this.props.favorite(item, 'unfav')
+      const favItem = {
+        body: {
+          username: this.props.username,
+          rooms: this.props.phoneRoomsAvailable,
+          favorites: this.props.favRooms // not going well since the this.props is async
+        },
+      };
+      await this.apiFavCall(favItem)
         .then(() => {
-          this.props.favorite(item, 'unfav')
         })
         .catch(error => {
           console.log(error)
         })
-      // await this.apiDeleteFavCall(this.props.username, item.roomId)
     }
   }
 
@@ -206,6 +206,7 @@ class HomeScreen extends Component {
     return (
       <PhoneRoom
         item={item}
+        // showStar={this.state.showStar}
         onStarPress={() => this.onStarPress(item)}
       />
     )

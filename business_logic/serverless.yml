@@ -7,7 +7,7 @@ service: motion-detection-service
 
 custom:
   pirTableName: "PIR-table"
-  phoneRoomTableName: "Phone-room-table"
+  userTableName: "User-table"
   favoriteTableName: "Favorite-table"
   queueName: "PIR-queue"
   cognitoName: "PIR-cognito"
@@ -30,10 +30,10 @@ provider:
       Resource:
         - { "Fn::GetAtt": ["PIRSensor", "Arn"] }
         - { "Fn::GetAtt": ["FavoriteTable", "Arn"] }
-        - { "Fn::GetAtt": ["PhoneRoomTable", "Arn"] }
+        - { "Fn::GetAtt": ["UserTable", "Arn"] }
   environment:
     PIR_TABLE: ${self:custom.pirTableName}
-    PHONE_ROOM_TABLE: ${self:custom.phoneRoomTableName}
+    USER_TABLE: ${self:custom.userTableName}
     FAVORITE_TABLE: ${self:custom.favoriteTableName}
 
 functions:
@@ -41,10 +41,14 @@ functions:
     handler: motion.handler
     events:
       - http: "GET /sensor/{proxy+}"
-      - http: "GET /phonerooms/{proxy+}"
-      - http: "GET /favorites"
-      - http: "POST /favorites"
-      - http: "DELETE /favorites"
+      - http:
+          path: "/users/{proxy+}"
+          method: get
+          request:
+            template:
+              application/json: '{ "floor": "$input.params(''floor'')" }'
+      - http: "POST /users"
+      - http: "PUT /users"
   queueHandler:
     handler: queue.handler
     events:

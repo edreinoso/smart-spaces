@@ -4,13 +4,19 @@ import validity from '../utility/validate'
 import { container, colors, borders } from '../styles/index'
 import { Logo, Button, Cards, Input } from '../components/index'
 import { connect } from 'react-redux'
-import { auth, getUser, forgotPass, confirmForgotPass, confirmCodeSignUp } from '../store/actions/index'
+import { auth, getUser, forgotPass, confirmForgotPass, confirmCodeSignUp, addRooms } from '../store/actions/index'
+import { API } from 'aws-amplify';
+import { phoneRoomMockData } from "../store/mockdata";
 
 class AuthScreen extends Component {
     state = {
         newUser: null,
         forgotPass: null,
         confirmForgetPass: null,
+    }
+
+    apiCall(item) {
+        return API.post('motion', '/users', item)
     }
 
     componentWillMount() {
@@ -98,7 +104,6 @@ class AuthScreen extends Component {
             this.setState({ showLogin: true, showSignUp: false, showLoginButton: true, showSignUpButton: false })
             // Executing auth if email and password are not empty
             if (this.state.controls.email.value != "" || this.state.controls.password.value != "") {
-                // console.log('execute auth function')
                 await this.props.auth(
                     this.state.controls.email.value,
                     this.state.controls.password.value,
@@ -145,6 +150,21 @@ class AuthScreen extends Component {
             this.state.controls.email.value,
             this.state.controls.confirmCode.value
         )
+        var item = {
+            body: {
+                username: this.state.controls.email.value,
+                rooms: phoneRoomMockData,
+                favorites: "" // empty variable in the beginning
+            }
+        }
+        // console.log('auth line 113: item', item)
+        await this.apiCall(item).then(response => {
+            // console.log('line 115 response:', response)
+            // populate redux variable for rooms
+            // this.props.addRooms(response.rooms)
+        }).catch(error => {
+            console.log('line 117 error:', error)
+        })
         await this.props.auth(
             this.state.controls.email.value,
             this.state.controls.password.value,
@@ -182,8 +202,8 @@ class AuthScreen extends Component {
             console.log('authscreen, line 180: entering confirmPassword')
             if (this.state.controls.email.value != "" || this.state.controls.confirmCode.value != "" || this.state.controls.password.value != "") {
                 await this.props.confirmForgotPass(this.state.controls.email.value, this.state.controls.confirmCode.value, this.state.controls.password.value)
-                .then(() => console.log('auth, confirmForgotPass method api call - line 181: success'))
-                .catch((err) => Alert.alert('Error found', err.message))
+                    .then(() => console.log('auth, confirmForgotPass method api call - line 181: success'))
+                    .catch((err) => Alert.alert('Error found', err.message))
                 await this.props.auth(
                     this.state.controls.email.value,
                     this.state.controls.password.value,
@@ -323,11 +343,11 @@ class AuthScreen extends Component {
                         backgroundColor={colors.white}
                         fontColor={colors.black}
                         borders
-                        // disable={
-                        //     // this.state.initialState &&
-                        //     // (!this.state.controls.email.touched ||
-                        //     //     !this.state.controls.password.touched)
-                        // }
+                    // disable={
+                    //     // this.state.initialState &&
+                    //     // (!this.state.controls.email.touched ||
+                    //     //     !this.state.controls.password.touched)
+                    // }
                     >
                         Login
                     </Button>
@@ -457,6 +477,7 @@ const mapDispatchToProps = dispatch => {
         forgotPass: (username) => dispatch(forgotPass(username)),
         confirmForgotPass: (username, code, newPass) => dispatch(confirmForgotPass(username, code, newPass)),
         confirmCodeStep: (email, confirmCode) => dispatch(confirmCodeSignUp(email, confirmCode)),
+        addRooms: (item) => dispatch(addRooms(item))
     }
 }
 

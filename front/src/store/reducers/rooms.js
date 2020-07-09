@@ -47,9 +47,9 @@ const reducer = (state = initialState, action) => {
                     }
                     return item
                 }),
-                // phoneRoomsAvailable: state.phoneRoomsAvailable.filter(x => {
-                //     return x.id !== action.payload.item.id
-                // })
+                phoneRoomsAvailable: state.phoneRoomsAvailable.filter(item => {
+                    return item.roomId !== action.payload.item.roomId
+                })
             }
         // } else {
         //     console.log('line 50: hello world else statmenet')
@@ -74,6 +74,16 @@ const reducer = (state = initialState, action) => {
         case UNFAV_ROOM:
             return {
                 ...state,
+                phoneRoomsAvailable: state.phoneRoomsAvailable.concat(action.payload.item).map((item, index) => {
+                    if (item.roomId === action.payload.item.roomId) {
+                        // console.log('line 68: else statement true to false')
+                        return {
+                            ...item,
+                            favorite: !item.favorite,
+                        }
+                    }
+                    return item
+                }),
                 favRooms: state.favRooms.filter(item => {
                     return item.roomId !== action.payload.item.roomId
                 })

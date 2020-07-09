@@ -6,4 +6,4 @@ export {
     confirmCodeSignUp,
 } from './auth';
 
-export { add, favorite } from './rooms';
+export { add, favorite, addRooms } from './rooms';

@@ -10,6 +10,7 @@ class PhoneRoom extends Component {
     const {
       item,
       onStarPress,
+      showStar
     } = this.props;
     return (
       <View style={styles.roomContainer}>
@@ -23,21 +24,25 @@ class PhoneRoom extends Component {
             <Text style={[item.availability ? styles.avRoomText : styles.ocRoomText]}>
               {item.roomName}
             </Text>
-            <TouchableOpacity onPress={() => onStarPress()} style={[{ justifyContent: 'center', margin: 15, paddingHorizontal: 6 }]}>
-              {item.favorite ?
-                <Icon
-                  name={'star'} // empty
-                  color={colors.yellow}
-                  size={20}
-                />
-                :
-                <Icon 
-                  name={'staro'} // filled
-                  color={colors.yellow}
-                  size={20}
-                />
-              }
-            </TouchableOpacity>
+            {/* there is really no reference to the this.props.hide. It might hide all of the elements instead of a single one */}
+            {!showStar ?
+              <TouchableOpacity onPress={() => onStarPress()} style={[{ justifyContent: 'center', margin: 15, paddingHorizontal: 6 }]}>
+                {item.favorite ?
+                  <Icon
+                    name={'star'} // empty
+                    color={colors.yellow}
+                    size={20}
+                  />
+                  :
+                  <Icon
+                    name={'staro'} // filled
+                    color={colors.yellow}
+                    size={20}
+                  />
+                }
+              </TouchableOpacity>
+              : null
+            }
           </View>
         </LinearGradient>
       </View>

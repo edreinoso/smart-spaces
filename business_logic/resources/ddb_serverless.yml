@@ -55,23 +55,23 @@ Resources:
           Value: "Favorite table to hold data about users favorie phone rooms"
         - Key: "Creation_Date"
           Value: "Tue_July_07"
-  PhoneRoomTable:
+  UserTable:
     Type: "AWS::DynamoDB::Table"
     Properties:
       AttributeDefinitions:
-        - AttributeName: roomId
+        - AttributeName: username
           AttributeType: S
       KeySchema:
-        - AttributeName: roomId
+        - AttributeName: username
           KeyType: HASH
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
-      TableName: Phone-room-table
+      TableName: User-table
       # TableName: ${self:custom.tableName}
       Tags:
         - Key: "Name"
-          Value: Phone-room-table
+          Value: User-table
           # Value: ${self:custom.tableName}
         - Key: "Template"
           # Value: ${self:custom.application}

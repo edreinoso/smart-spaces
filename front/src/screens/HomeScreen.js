@@ -65,9 +65,9 @@ class HomeScreen extends Component {
   }
 
   // apiCall() {
-  apiGetCall(floor) { // API Gateway caller
-    // console.log(`/users/${this.props.username}?floor=${floor}`)
-    return API.get('motion', `/users/${this.props.username}?floor=${floor}`);
+  apiGetCall() { // API Gateway caller
+    // return API.get('motion', `/users/${this.props.username}?floor=${floor}`);
+    return API.get('motion', `/users/${this.props.username}`);
   }
 
 
@@ -96,47 +96,30 @@ class HomeScreen extends Component {
       phoneRoomsAvailable: roomAvailable,
       phoneRoomsUnavailable: roomNotAvailable
     })
-
-    // const maxPeak = phoneRoomMockData.reduce((p, c) => p.ttl > c.ttl ? p : c);
-    // const result = Array.from(new Set(phoneRoomMockData.map(s => s.roomId)))
-    //   .map(roomId => {
-    //     return {
-    //       roomId: roomId,
-    //       id: phoneRoomMockData.find(s => s.roomId === roomId).id,
-    //       roomName: phoneRoomMockData.find(s => s.roomId === roomId).roomName,
-    //       floor: phoneRoomMockData.find(s => s.roomId === roomId).floor,
-    //       ttl: phoneRoomMockData.find(s => s.roomId === roomId).ttl,
-    //       timestamp: phoneRoomMockData.find(s => s.roomId === roomId).timestamp
-    //     }
-    //   })
-    // console.log(result)
-    // this.setState({ phoneRoom: result })
   }
 
   fetchDataFromDDB = async (floor) => {
-    // making favorite api call
-    // await this.apiFavCall(null, 'GET')
-    //   .then(response => {
-    //     // console.log(response)
-    //     this.props.add(response, 'favorite') // adding to favorite list 
-    //     this.setState({ phoneRoomsAvailable: response })
-    //     // should call action --> reducer
-    //   })
-    //   .catch(error => {
-    //     console.log(error)
-    //   })
-    await this.apiGetCall(floor)
+    await this.apiGetCall()
       .then(response => {
-        console.log(response)
-        // console.log(response.returnRooms)
         this.props.add(response.favRooms, 'favorite')
         this.props.add(response.returnRooms)
-        // this.setState({ phoneRoomsAvailable: response })
-        // should call action --> reducer
       })
       .catch(error => {
         console.log(error)
       })
+    this.fetchByFloor(floor)
+  }
+
+  fetchByFloor = (floor) => {
+    var roomAvailable = []
+    var roomNotAvailable = []
+    // it is being done locally, no API call required
+    this.props.backData.map((item, index) => {
+      if (item.floor === floor) {
+        roomAvailable.push(item)
+      }
+    })
+    this.props.add(roomAvailable, 'available')
   }
 
   onValueChange(key) {
@@ -147,7 +130,8 @@ class HomeScreen extends Component {
         floor3: false
       })
       // Call api for floor1
-      this.fetchDataFromDDB(api_first_floor)
+      // this.fetchDataFromDDB(api_first_floor)
+      this.fetchByFloor(api_first_floor)
     } else if (key === 'floor2') {
       this.setState({
         floor1: false,
@@ -155,7 +139,8 @@ class HomeScreen extends Component {
         floor3: false
       })
       // Call api for floor2
-      this.fetchDataFromDDB(api_second_floor)
+      // this.fetchDataFromDDB(api_second_floor)
+      this.fetchByFloor(api_second_floor)
     } else if (key === 'floor3') {
       this.setState({
         floor1: false,
@@ -163,7 +148,8 @@ class HomeScreen extends Component {
         floor3: true
       })
       // Call api for floor3
-      this.fetchDataFromDDB(api_third_floor)
+      // this.fetchDataFromDDB(api_third_floor)
+      this.fetchByFloor(api_third_floor)
     }
   }
 
@@ -173,14 +159,11 @@ class HomeScreen extends Component {
       const favItem = {
         body: {
           username: this.props.username,
-          rooms: this.props.phoneRoomsAvailable,
+          rooms: this.props.backData, // contains the whole data
           favorites: this.props.favRooms // not going well since the this.props is async
         },
       };
       await this.apiFavCall(favItem)
-        .then(response => {
-          console.log(response)
-        })
         .catch(error => {
           console.log(error)
         })
@@ -189,13 +172,11 @@ class HomeScreen extends Component {
       const favItem = {
         body: {
           username: this.props.username,
-          rooms: this.props.phoneRoomsAvailable,
+          rooms: this.props.backData, // contains the whole data
           favorites: this.props.favRooms // not going well since the this.props is async
         },
       };
       await this.apiFavCall(favItem)
-        .then(() => {
-        })
         .catch(error => {
           console.log(error)
         })
@@ -212,6 +193,8 @@ class HomeScreen extends Component {
     )
   }
 
+
+  // this is going to determine availability
   handleRefresh = () => {
     this.setState({
       refreshing: true,
@@ -272,6 +255,7 @@ class HomeScreen extends Component {
             {/* title available */}
             <View style={container.contentContainer}>
               {/* {this.state.favPhoneRoom.length ? */}
+              {/* {this.props.favRooms !== null ? */}
               {this.props.favRooms.length > 0 ?
                 <View>
                   <View style={{ paddingLeft: 5 }}>
@@ -344,6 +328,7 @@ const mapStateToProps = state => {
     authenticated: state.auth.authenticated,
     username: state.auth.username,
     mockData: state.rooms.mockData,
+    backData: state.rooms.backData,
     phoneRoomsAvailable: state.rooms.phoneRoomsAvailable,
     phoneRoomsUnavailable: state.rooms.phoneRoomsUnavailable,
     favRooms: state.rooms.favRooms,

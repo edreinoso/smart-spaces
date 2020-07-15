@@ -1,7 +1,7 @@
-import { ADD_ROOMS_U, ADD_ROOMS_A, ADD_FAV_ROOMS, FAV_ROOM, UNFAV_ROOM, SHOW_PROPERTY } from './types';
+import { ADD_ROOMS_U, ADD_ROOMS_A, ADD_FAV_ROOMS, FAV_ROOM, UNFAV_ROOM, ADD_ROOMS } from './types';
 
 export const add = (item, type) => {
-    // console.log('line 15 rooms action - item and type', item, type)
+    console.log('line 15 rooms action - item and type', item, type)
     if (type === "unavailable") { // if type is room unavailable, then call the corresponding reducer
         return {
             type: ADD_ROOMS_U,
@@ -16,9 +16,16 @@ export const add = (item, type) => {
                 item: item
             }
         }
-    } else { // rooms available, just substitute by backData -- temporary
+    } else if (type === "available") { // rooms available, just substitute by backData -- temporary
         return {
             type: ADD_ROOMS_A,
+            payload: {
+                item: item
+            }
+        }
+    } else {
+        return {
+            type: ADD_ROOMS,
             payload: {
                 item: item
             }
@@ -40,16 +47,6 @@ export const favorite = (item, type) => {
             payload: {
                 item: item
             }
-        }
-    }
-}
-
-export const addRooms = (item) => {
-    console.log('line 48, rooms action:', item)
-    return{
-        type: ADD_ROOMS_A,
-        payload: {
-            item: item
         }
     }
 }

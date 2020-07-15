@@ -27,7 +27,7 @@ class PhoneRoom extends Component {
             {/* there is really no reference to the this.props.hide. It might hide all of the elements instead of a single one */}
             {!showStar ?
               <TouchableOpacity onPress={() => onStarPress()} style={[{ justifyContent: 'center', margin: 15, paddingHorizontal: 6 }]}>
-                {item.favorite ?
+                {item.favorite ? // this is why favorite is important in each component
                   <Icon
                     name={'star'} // empty
                     color={colors.yellow}

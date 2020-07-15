@@ -6,7 +6,6 @@ const AWS = require('aws-sdk')
 
 const PIR_TABLE = process.env.PIR_TABLE;
 const USER_TABLE = process.env.USER_TABLE;
-const FAVORITE_TABLE = process.env.FAVORITE_TABLE;
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
 app.use(bodyParser.json({ strict: false }))
@@ -28,7 +27,7 @@ app.get('/sensor/:floor', function (req, res) {
       res.status(400).json({ error: 'Could not retrieve data' })
     } else {
       // Sorting array by date descending
-      console.log(result)
+      // console.log(result)
       result.Items.sort(function (a, b) {
         var dateA = new Date(a.timestamp), dateB = new Date(b.timestamp);
         return dateB - dateA;
@@ -69,95 +68,6 @@ app.get('/sensor/:floor', function (req, res) {
   })
 })
 
-app.get('/phonerooms/:floor', function (req, res) {
-  // app.get('/phonerooms', function (req, res) {
-  const params = {
-    TableName: PHONE_ROOM_TABLE,
-    FilterExpression: 'floor = :floor',
-    ExpressionAttributeValues: { ':floor': req.params.floor }
-  }
-  // dynamoDB.get needs to have a key. GET request requiring a Key to proceed
-  dynamoDB.scan(params, (error, result) => {
-    if (error) {
-      console.log(error)
-      res.status(400).json({ error: 'Could not retrieve data' })
-    } else {
-      console.log(result.Items) // result.Item is undefined
-      res.json(result.Items)
-    }
-  })
-})
-
-app.get('/favorites', function (req, res) {
-  const params = {
-    TableName: FAVORITE_TABLE
-  }
-  dynamoDB.scan(params, (error, result) => {
-    if (error) {
-      console.log(error)
-      res.status(400).json({ error: 'Could not retrieve data' })
-    } else {
-      console.log(result.Items) // result.Item is undefined
-      res.json(result.Items)
-    }
-  })
-})
-
-app.post('/favorites', function (req, res) {
-  const { username, roomName, roomId, availability, timestamp, favorite } = req.body
-  console.log(req)
-
-  const params = {
-    TableName: FAVORITE_TABLE,
-    Item: {
-      roomId: roomId,
-      username: username,
-      roomName: roomName,
-      availability: availability,
-      timestamp: timestamp,
-      favorite: favorite
-    },
-  }
-
-  dynamoDB.put(params, (error) => {
-    if (error) {
-      console.log(error)
-      res.status(400).json({ error: 'Could not post data' })
-    } else {
-      res.send({ username, roomName, roomId, availability, timestamp, favorite })
-    }
-  })
-})
-
-// app.delete('/favorites/:username/:roomId', function (req, res) {
-app.delete('/favorites', function (req, res) {
-  console.log(req.body)
-
-  // const { username, roomName, roomId, availability, timestamp, favorite } = req.body
-  const { username, roomId } = req.body
-
-  const params = {
-    TableName: FAVORITE_TABLE,
-    Key: {
-      "roomId": roomId,
-    },
-    ConditionExpression: "username <= :val",
-    ExpressionAttributeValues: {
-      ":val": username
-    }
-  }
-
-  dynamoDB.delete(params, (error, result) => {
-    if (error) {
-      console.log(error)
-      res.status(400).json({ error: 'Could not delete data' })
-    } else {
-      console.log('response: ', result)
-      res.json(result)
-    }
-  })
-})
-
 app.post('/users', function (req, res) {
   const { username, rooms, favorites } = req.body
 
@@ -180,13 +90,15 @@ app.post('/users', function (req, res) {
   })
 })
 
-app.put('/users/', function (req, res) {
+app.put('/users', function (req, res) {
   const { username, rooms, favorites } = req.body
-  console.log('putting items', req.body)
+  console.log('putting items', req.body) // rooms is the object that's being passed as empty
+  // it has to be put for the specific floor !!
   const params = {
     TableName: USER_TABLE,
     Item: {
       username: username,
+      // for some reason, this is not being put properly
       rooms: rooms, // this will have other value
       favorites: favorites // this will have some value
     }
@@ -203,7 +115,7 @@ app.put('/users/', function (req, res) {
 })
 
 app.get('/users/:username', function (req, res) {
-  console.log(req.params)
+  // console.log(req.params)
 
   const params = {
     TableName: USER_TABLE,
@@ -219,25 +131,28 @@ app.get('/users/:username', function (req, res) {
       var returnRooms = []
       var favRooms = []
       result.Items.map((item, index) => {
-        item.rooms.map((item2, index) => {
-          if (item2.floor == req.query.floor) {
-            returnRooms.push(item2)
-          }
-        })
-        item.favorites.map((item3, index) => {
-          if (item3.floor == req.query.floor) {
-            favRooms.push(item3)
-          }
-        })
+        returnRooms = item.rooms
+        // returnRoomspush(item.rooms) // you are pushing the whole array, instead of indiv
+        favRooms = item.favorites
+        // favRooms.push(item.favorites)
+        // getting by floor
+        // item.rooms.map((item2, index) => {
+        //   if (item2.floor == req.query.floor) {
+        //     returnRooms.push(item2)
+        //   }
+        // })
+        // item.favorites.map((item3, index) => {
+        //   if (item3.floor == req.query.floor) {
+        //     favRooms.push(item3)
+        //   }
+        // })
       })
+      console.log(typeof (returnRooms), typeof (favRooms))
       console.log(returnRooms, favRooms)
-      res.json({returnRooms, favRooms})
+      res.json({ returnRooms, favRooms })
     }
   })
 })
 
-app.get('/users/:username', function (req, res){
-
-})
 
 module.exports.handler = serverless(app);

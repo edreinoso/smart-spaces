@@ -1,5 +1,6 @@
 export const AUTH = 'AUTH';
 export const LOGOUT = 'LOGOUT';
+export const ADD_ROOMS = 'ADD_ROOMS';
 export const ADD_ROOMS_A = 'ADD_ROOMS_A';
 export const ADD_ROOMS_U = 'ADD_ROOMS_U';
 export const ADD_FAV_ROOMS = 'ADD_FAV_ROOMS';

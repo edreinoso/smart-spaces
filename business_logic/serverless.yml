@@ -44,9 +44,9 @@ functions:
       - http:
           path: "/users/{proxy+}"
           method: get
-          request:
-            template:
-              application/json: '{ "floor": "$input.params(''floor'')" }'
+          # request:
+          #   template:
+          #     application/json: '{ "floor": "$input.params(''floor'')" }'
       - http: "POST /users"
       - http: "PUT /users"
   queueHandler:

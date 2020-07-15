@@ -10,7 +10,6 @@ import { phoneRoomMockData } from "../store/mockdata";
 
 class AuthScreen extends Component {
     state = {
-        newUser: null,
         forgotPass: null,
         confirmForgetPass: null,
     }
@@ -60,6 +59,7 @@ class AuthScreen extends Component {
             showLoginButton: true,
             showSignUpButton: true,
             confirmPass: false,
+            newUser: null
         })
     }
 
@@ -154,7 +154,7 @@ class AuthScreen extends Component {
             body: {
                 username: this.state.controls.email.value,
                 rooms: phoneRoomMockData,
-                favorites: "" // empty variable in the beginning
+                favorites: [] // empty variable in the beginning
             }
         }
         // console.log('auth line 113: item', item)
@@ -163,14 +163,14 @@ class AuthScreen extends Component {
             // populate redux variable for rooms
             // this.props.addRooms(response.rooms)
         }).catch(error => {
-            console.log('line 117 error:', error)
+            console.log(error)
         })
         await this.props.auth(
             this.state.controls.email.value,
             this.state.controls.password.value,
             'login'
         ).then(() => {
-            this.props.getUser(true)
+            this.props.getUser(this.state.controls.email.value, true)
             this.props.navigation.navigate('Home')
             this.reset()
         }).catch((err) => {
@@ -199,10 +199,9 @@ class AuthScreen extends Component {
                     .catch((err) => Alert.alert('Error found', err.message))
             }
         } else { // how do I make the logic to go here? // else, if it's true, then do opposite
-            console.log('authscreen, line 180: entering confirmPassword')
+            // console.log('authscreen, line 180: entering confirmPassword')
             if (this.state.controls.email.value != "" || this.state.controls.confirmCode.value != "" || this.state.controls.password.value != "") {
                 await this.props.confirmForgotPass(this.state.controls.email.value, this.state.controls.confirmCode.value, this.state.controls.password.value)
-                    .then(() => console.log('auth, confirmForgotPass method api call - line 181: success'))
                     .catch((err) => Alert.alert('Error found', err.message))
                 await this.props.auth(
                     this.state.controls.email.value,

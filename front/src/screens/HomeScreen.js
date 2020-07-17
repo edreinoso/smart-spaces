@@ -29,19 +29,17 @@ class HomeScreen extends Component {
     // showStar: true,
   }
 
-  // componentDidMount() {
-  //   this.state.interval = setInterval(() => {
-  //     // console.log(this.state.floor1, this.state.floor2, this.state.floor3)
-  //     if (this.state.floor1) this.fetchDataFromDDB(api_first_floor)
-  //     else if (this.state.floor2) this.fetchDataFromDDB(api_second_floor)
-  //     else if (this.state.floor3) this.fetchDataFromDDB(api_third_floor)
-  //     // console.log('Ed')
-  //   }, 30000);
-  // }
+  componentDidMount() {
+    this.state.interval = setInterval(() => {
+      if (this.state.floor1) this.fetchRoomsSensorData(api_first_floor)
+      else if (this.state.floor2) this.fetchRoomsSensorData(api_second_floor)
+      else if (this.state.floor3) this.fetchRoomsSensorData(api_third_floor)
+    }, 3000);
+  }
 
-  // componentWillUnmount() {
-  //   clearInterval(this.state.interval);
-  // }
+  componentWillUnmount() {
+    clearInterval(this.state.interval);
+  }
 
   componentWillMount() {
     if (this.props.authenticated) {
@@ -64,19 +62,16 @@ class HomeScreen extends Component {
     }
   }
 
-  // apiCall() {
   apiGetCall() { // API Gateway caller
-    // return API.get('motion', `/users/${this.props.username}?floor=${floor}`);
     return API.get('motion', `/users/${this.props.username}`);
   }
 
+  apiPostCall(item) {
+    return API.post('motion', '/sensor', item)
+  }
 
-  apiFavCall(item) {
-    // console.log(item, type)
+  apiPutCall(item) {
     return API.put('motion', '/users', item)
-    // if (type === "GET") return API.get('motion', '/favorites')
-    // else if (type === "POST") return API.post('motion', '/favorites', item)
-    // else if (type === "DELETE") return API.del('motion', '/favorites', item)
   }
 
   // testing purposes
@@ -98,10 +93,11 @@ class HomeScreen extends Component {
     })
   }
 
+  // this is happening before mounting
   fetchDataFromDDB = async (floor) => {
     await this.apiGetCall()
       .then(response => {
-        this.props.add(response.favRooms, 'favorite')
+        this.props.add(response.favRooms, 'backFavorite') // you're predetermined to choose favorite
         this.props.add(response.returnRooms)
       })
       .catch(error => {
@@ -111,15 +107,66 @@ class HomeScreen extends Component {
   }
 
   fetchByFloor = (floor) => {
+    var favRoom = []
     var roomAvailable = []
     var roomNotAvailable = []
     // it is being done locally, no API call required
     this.props.backData.map((item, index) => {
+      // logic for handling rooms available and not available
       if (item.floor === floor) {
-        roomAvailable.push(item)
+        if (item.availability) roomAvailable.push(item)
+        else roomNotAvailable.push(item)
       }
     })
+    // if I'm carrying individual items by the floor on the availability,
+    // then I should do the same for the favorite
+    this.props.backFavData.map((item, index) => {
+      if (item.floor === floor) {
+        favRoom.push(item)
+      }
+    })
+    this.props.add(favRoom, 'favorite')
     this.props.add(roomAvailable, 'available')
+    this.props.add(roomNotAvailable, 'unavailable')
+  }
+
+  fetchRoomsSensorData = async (floor) => {
+    const item = {
+      body: {
+        floor: floor,
+        rooms: this.props.backData,
+        favorites: this.props.favRooms
+      }
+    }
+    await this.apiPostCall(item)
+      .then(response => {
+        // console.log(response)
+        // this is not getting updated
+        // instead of adding, we should just replace it by the new object
+        this.props.add(response.favorites, 'favorite')
+        this.props.add(response.rooms)
+      })
+      .catch(error => {
+        console.log(error)
+      })
+    this.onUpdateSensorData()
+    this.fetchByFloor(floor)
+    this.setState({ refreshing: false })
+  }
+
+  onUpdateSensorData = async () => {
+    const item = {
+      body: {
+        username: this.props.username,
+        rooms: this.props.backData, // contains the whole data
+        favorites: this.props.backFavData // not going well since the this.props is async
+      },
+    };
+    // console.log('line 151, onUpdateSensorData', item)
+    await this.apiPutCall(item)
+      .catch(error => {
+        console.log(error)
+      })
   }
 
   onValueChange(key) {
@@ -130,7 +177,6 @@ class HomeScreen extends Component {
         floor3: false
       })
       // Call api for floor1
-      // this.fetchDataFromDDB(api_first_floor)
       this.fetchByFloor(api_first_floor)
     } else if (key === 'floor2') {
       this.setState({
@@ -139,7 +185,6 @@ class HomeScreen extends Component {
         floor3: false
       })
       // Call api for floor2
-      // this.fetchDataFromDDB(api_second_floor)
       this.fetchByFloor(api_second_floor)
     } else if (key === 'floor3') {
       this.setState({
@@ -148,39 +193,28 @@ class HomeScreen extends Component {
         floor3: true
       })
       // Call api for floor3
-      // this.fetchDataFromDDB(api_third_floor)
       this.fetchByFloor(api_third_floor)
     }
   }
 
   onStarPress = async (item) => {
     if (!this.props.favRooms.some(alreadyFavorite => alreadyFavorite.roomId == item.roomId)) {
-      await this.props.favorite(item, 'fav')
-      const favItem = {
-        body: {
-          username: this.props.username,
-          rooms: this.props.backData, // contains the whole data
-          favorites: this.props.favRooms // not going well since the this.props is async
-        },
-      };
-      await this.apiFavCall(favItem)
-        .catch(error => {
-          console.log(error)
-        })
+      await this.props.favorite(item, 'fav') // this redux call HAS to be executed first
     } else {
-      await this.props.favorite(item, 'unfav')
-      const favItem = {
-        body: {
-          username: this.props.username,
-          rooms: this.props.backData, // contains the whole data
-          favorites: this.props.favRooms // not going well since the this.props is async
-        },
-      };
-      await this.apiFavCall(favItem)
-        .catch(error => {
-          console.log(error)
-        })
+      await this.props.favorite(item, 'unfav') // this redux call HAS to be executed first
     }
+    const favItem = {
+      body: {
+        username: this.props.username,
+        rooms: this.props.backData, // contains the whole data
+        favorites: this.props.backFavData // not going well since the this.props is async
+      },
+    };
+    // console.log('line 213, homescreen: ', favItem)
+    await this.apiPutCall(favItem)
+      .catch(error => {
+        console.log(error)
+      })
   }
 
   renderPhoneRooms = ({ item }) => {
@@ -193,7 +227,6 @@ class HomeScreen extends Component {
     )
   }
 
-
   // this is going to determine availability
   handleRefresh = () => {
     this.setState({
@@ -201,9 +234,9 @@ class HomeScreen extends Component {
     }, () => {
       // refreshing according to the floor
       // console.log(this.state.floor1, this.state.floor2, this.state.floor3)
-      if (this.state.floor1) this.fetchDataFromDDB(api_first_floor)
-      else if (this.state.floor2) this.fetchDataFromDDB(api_second_floor)
-      else if (this.state.floor3) this.fetchDataFromDDB(api_third_floor)
+      if (this.state.floor1) this.fetchRoomsSensorData(api_first_floor)
+      else if (this.state.floor2) this.fetchRoomsSensorData(api_second_floor)
+      else if (this.state.floor3) this.fetchRoomsSensorData(api_third_floor)
       // this.fetchDataFromLocal()
     })
   }
@@ -273,38 +306,46 @@ class HomeScreen extends Component {
                       renderItem={this.renderPhoneRooms}
                     />
                   </View>
-                </View> : null}
-              <View style={{ paddingLeft: 5, paddingTop: 20 }}>
-                <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>
-                  Available
+                </View>
+                : null}
+              {this.props.phoneRoomsAvailable.length > 0 ?
+                <View>
+                  <View style={{ paddingLeft: 5, paddingTop: 20 }}>
+                    <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>
+                      Available
+                  </Text>
+                  </View>
+                  <View>
+                    <FlatList
+                      // data={this.props.mockData}
+                      // data={this.state.phoneRoomsAvailable} // this would be this.props.phoneRoomsAvailable
+                      data={this.props.phoneRoomsAvailable} // this would be this.props.phoneRoomsAvailable
+                      // data={this.state.phoneRoom}
+                      // data={phoneRoomMockData}
+                      keyExtractor={item => item.roomId}
+                      renderItem={this.renderPhoneRooms}
+                    />
+                  </View>
+                </View>
+                : null}
+              {this.props.phoneRoomsUnavailable.length > 0 ?
+                <View>
+                  <View style={{ paddingLeft: 5, paddingTop: 20 }}>
+                    <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>
+                      Not Available
                 </Text>
-              </View>
-              <View>
-                <FlatList
-                  // data={this.props.mockData}
-                  // data={this.state.phoneRoomsAvailable} // this would be this.props.phoneRoomsAvailable
-                  data={this.props.phoneRoomsAvailable} // this would be this.props.phoneRoomsAvailable
-                  // data={this.state.phoneRoom}
-                  // data={phoneRoomMockData}
-                  keyExtractor={item => item.roomId}
-                  renderItem={this.renderPhoneRooms}
-                />
-              </View>
-              <View style={{ paddingLeft: 5, paddingTop: 20 }}>
-                <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>
-                  Not Available
-                </Text>
-              </View>
-              <View>
-                <FlatList
-                  data={this.state.phoneRoomsUnavailable}  // this would be this.props.phoneRoomsAvailable
-                  // data={this.props.phoneRoomsUnavailable}  // this would be this.props.phoneRoomsAvailable
-                  // data={phoneRoomMockData}
-                  keyExtractor={item => item.roomId}
-                  renderItem={this.renderPhoneRooms}
-                />
-              </View>
-              {/* {this.renderFlatList()} */}
+                  </View>
+                  <View>
+                    <FlatList
+                      // data={this.state.phoneRoomsUnavailable}  // this would be this.props.phoneRoomsAvailable
+                      data={this.props.phoneRoomsUnavailable}  // this would be this.props.phoneRoomsAvailable
+                      // data={phoneRoomMockData}
+                      keyExtractor={item => item.roomId}
+                      renderItem={this.renderPhoneRooms}
+                    />
+                  </View>
+                </View>
+                : null}
             </View>
           </View>
         </ScrollView>
@@ -329,6 +370,7 @@ const mapStateToProps = state => {
     username: state.auth.username,
     mockData: state.rooms.mockData,
     backData: state.rooms.backData,
+    backFavData: state.rooms.backFavData,
     phoneRoomsAvailable: state.rooms.phoneRoomsAvailable,
     phoneRoomsUnavailable: state.rooms.phoneRoomsUnavailable,
     favRooms: state.rooms.favRooms,

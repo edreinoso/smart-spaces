@@ -40,15 +40,27 @@ functions:
   getPhoneRoomData:
     handler: motion.handler
     events:
-      - http: "GET /sensor/{proxy+}"
+      - http:
+          # path: "/sensor/{proxy+}"
+          # method: get
+          # request:
+          #   template:
+          #     application/json: '{ "floor": "$input.params(''floor'')" }'
+          path: "/sensor"
+          method: post
       - http:
           path: "/users/{proxy+}"
           method: get
           # request:
           #   template:
           #     application/json: '{ "floor": "$input.params(''floor'')" }'
-      - http: "POST /users"
-      - http: "PUT /users"
+      - http:
+          path: "/users"
+          method: post
+      - http:
+          path: "/users"
+          method: put
+
   queueHandler:
     handler: queue.handler
     events:

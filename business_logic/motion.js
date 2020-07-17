@@ -10,17 +10,25 @@ const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
 app.use(bodyParser.json({ strict: false }))
 
-app.get('/sensor/:floor', function (req, res) {
+// app.get('/sensor/:floor', function (req, res) {
+// app.get('/sensor/:items', function (req, res) {
+app.post('/sensor', function (req, res) {
   // console.log(typeof(parseInt(req.params.floor)))
   // console.log('value of floor: ', typeof(req.params.floor))
-  console.log('value of floor: ', req.params.floor)
+  
+  const { floor, rooms, favorites } = req.body // need to have the information from current rooms and favorites
+  // const { floor, rooms, favorites } = req.params // need to have the information from current rooms and favorites
+  console.log(req.body)
+  
   // Trying to sort by floor
   const params = {
     TableName: PIR_TABLE,
     FilterExpression: 'floor = :floor',
     // ExpressionAttributeValues: { ':floor': parseInt(req.params.floor) } // number instead of string: testing variable
-    ExpressionAttributeValues: { ':floor': req.params.floor } // string instead of number when reading data from SQS
+    ExpressionAttributeValues: { ':floor': floor } // string instead of number when reading data from SQS
   }
+  // post will not affect the change, because dynamoDB is scanning only
+  // it is not putting objects
   dynamoDB.scan(params, (error, result) => {
     if (error) {
       console.log(error)
@@ -33,7 +41,11 @@ app.get('/sensor/:floor', function (req, res) {
         return dateB - dateA;
       });
 
+      // result sorted
+      console.log('result sorted',result.Items)
+
       // Getting all unique room IDs
+      // Very powerful function
       const data = Array.from(new Set(result.Items.map(s => s.roomId)))
         .map(roomId => {
           return {
@@ -46,24 +58,59 @@ app.get('/sensor/:floor', function (req, res) {
           }
         })
 
-      // // Date Logic Calculation
+      // getting the first items
+      console.log('data', data)
+
+      // Date Logic Calculation
       const today = new Date()
-      // date for comparison whether sensor has 
-      // sensed something in the past X minutes      
       const todayMinus5 = new Date()
-      todayMinus5.setMinutes(today.getMinutes() - 2)
-      // console.log('today: ', today, 'todayMinus5: ', todayMinus5)
+      todayMinus5.setMinutes(today.getMinutes() - 5)
       data.map((item, index) => {
-        // console.log(item)
         let sensorData = new Date(item.timestamp)
-        // console.log(sensorData)
         // Plain english logic: if the sensor data is greater than 5 minutes.
         // this means that the room is not available. 
-        if (sensorData > todayMinus5) item['availability'] = false
-        else item['availability'] = true
+        // if (sensorData > todayMinus5) item['availability'] = false
+        console.log(sensorData, todayMinus5)
+        if (sensorData < todayMinus5) {
+          console.log('Room available rooms: ', typeof(rooms), 'favorites: ', typeof(favorites))
+          // we are itering through both of the arrays that were given
+          // from the req.body. Ideally, we would like change the item
+          // property availability for the specific rooms / favorites 
+  
+          rooms.map((room_items, index) => {
+            if (item.roomId == room_items.roomId) {
+              room_items['availability'] = true
+            }
+          })
+          favorites.map((favorites_item, index) => {
+            if (item.roomId == favorites_item.roomId) {
+              favorites_item['availability'] = true
+            }
+          })
+        }
+        else {
+          console.log('Room not available')
+          console.log('Room available rooms: ', typeof(rooms), 'favorites: ', typeof(favorites))
+          // we are itering through both of the arrays that were given
+          // from the req.body. Ideally, we would like change the item
+          // property availability for the specific rooms / favorites 
+  
+          rooms.map((room_items, index) => {
+            if (item.roomId == room_items.roomId) {
+              room_items['availability'] = false
+            }
+          })
+          favorites.map((favorites_item, index) => {
+            if (item.roomId == favorites_item.roomId) {
+              favorites_item['availability'] = false
+            }
+          })
+        }
+        // else item['availability'] = true
         console.log(item)
       })
-      res.json(data)
+      // res.json(data)
+      res.send({rooms, favorites})
     }
   })
 })
@@ -153,6 +200,5 @@ app.get('/users/:username', function (req, res) {
     }
   })
 })
-
 
 module.exports.handler = serverless(app);

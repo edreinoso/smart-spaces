@@ -10,7 +10,7 @@ class HomeButton extends Component {
       onButtonPress,
       value, // this would be the boolean value that is used in the home screen
     } = this.props;
-
+    // console.log(text,value)
     return (
       <TouchableOpacity onPress={onButtonPress}>
         <View style={

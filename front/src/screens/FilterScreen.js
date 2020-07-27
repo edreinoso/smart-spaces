@@ -16,8 +16,6 @@ class FilterScreen extends Component {
     blueSection: false,
     orangeSection: false,
     posY: new Animated.Value(-400),  //This is the initial position of the preferenceView
-    // bounceValue: new Animated.Value(400),  //This is the initial position of the preferenceView
-    buttonText: "Show preferenceView"
   }
 
   onValueChange(key) {
@@ -42,34 +40,39 @@ class FilterScreen extends Component {
     }
   }
 
-  _togglepreferenceView() {
-    this.setState({
-      buttonText: !isHidden ? "Show preferenceView" : "Hide preferenceView" // Hide preferenceView
-    });
-
-    var toValue = 400;
-
-    if (isHidden) {
-      toValue = 0;
+  onSectionChange(key) {
+    if (key === 'green') {
+      this.setState({
+        greenSection: true,
+        redSection: false,
+        blueSection: false,
+        orangeSection: false
+      })
+    } else if (key === 'red') {
+      this.setState({
+        greenSection: false,
+        redSection: true,
+        blueSection: false,
+        orangeSection: false
+      })
+    } else if (key === 'blue') {
+      this.setState({
+        greenSection: false,
+        redSection: false,
+        blueSection: true,
+        orangeSection: false
+      })
+    } else if (key === 'orange') {
+      this.setState({
+        greenSection: false,
+        redSection: false,
+        blueSection: false,
+        orangeSection: true
+      })
     }
-
-    //This will animate the transalteY of the preferenceView between 0 & 100 depending on its current state
-    //100 comes from the style below, which is the height of the preferenceView.
-    Animated.spring(
-      this.state.bounceValue,
-      {
-        toValue: toValue,
-        // toValue: 300,
-        velocity: 3,
-        tension: 2,
-        friction: 8,
-      }
-    ).start();
-
-    isHidden = !isHidden;
   }
 
-  moveBall = (yPos) => {
+  togglePanel = (yPos) => {
     Animated.timing(this.state.posY, {
       toValue: yPos,
       duration: 1000
@@ -77,35 +80,45 @@ class FilterScreen extends Component {
   };
 
   renderRectangle = () => {
-    const animatedStyle = { top: this.state.posY };
+    const animatedStyle = {
+      top: this.state.posY
+    };
     return (
       // <Animated.View style={[styles.rectangle]}>
       <Animated.View style={[styles.preferenceView, animatedStyle]}>
-        <View style={[{flex:1,marginHorizontal:20, justifyContent:'flex-end'}]}>
+        <View style={[{ flex: 1, marginHorizontal: 20, justifyContent: 'flex-end' }]}>
           <View style={[{ flex: .2, justifyContent: 'center', alignItems: 'flex-start', paddingLeft: 5 }]}>
-          {/* <View style={[borders.red, { flex: .2, justifyContent: 'flex-end', alignItems: 'flex-start', paddingLeft: 5 }]}> */}
+            {/* <View style={[borders.red, { flex: .2, justifyContent: 'flex-end', alignItems: 'flex-start', paddingLeft: 5 }]}> */}
             <Text>Preferred Section</Text>
           </View>
           <View style={[{ flex: .4, justifyContent: 'flex-start', alignItems: 'center', paddingHorizontal: 20 }]}>
-          {/* <View style={[borders.red, { flex: .6, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20 }]}> */}
-            <View style={[borders.darkGrey, { flexDirection: 'row', padding: 5, borderRadius: 5 }]}>
+            {/* <View style={[borders.red, { flex: .6, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20 }]}> */}
+            <View style={[borders.darkGrey, { flexDirection: 'row', borderRadius: 5 }]}>
               <ButtonFilters
+                onButtonPress={() => this.onSectionChange('green')}
                 text={'Green'}
+                value={this.state.greenSection}
               />
               <ButtonFilters
+                onButtonPress={() => this.onSectionChange('red')}
                 text={'Red'}
+                value={this.state.redSection}
               />
               <ButtonFilters
+                onButtonPress={() => this.onSectionChange('blue')}
                 text={'Blue'}
+                value={this.state.blueSection}
               />
               <ButtonFilters
+                onButtonPress={() => this.onSectionChange('orange')}
                 text={'Orange'}
+                value={this.state.orangeSection}
               />
             </View>
           </View>
           <View style={[{ flex: .2, justifyContent: 'flex-start', alignItems: 'flex-end', paddingRight: 15 }]}>
-          {/* <View style={[borders.red, { flex: .2, justifyContent: 'flex-start', alignItems: 'flex-end', paddingRight: 15 }]}> */}
-            <TouchableOpacity onPress={() => this.moveBall(-400)}>
+            {/* <View style={[borders.red, { flex: .2, justifyContent: 'flex-start', alignItems: 'flex-end', paddingRight: 15 }]}> */}
+            <TouchableOpacity onPress={() => this.togglePanel(-400)}>
               <Text>
                 Close
             </Text>
@@ -135,10 +148,7 @@ class FilterScreen extends Component {
             </View>
             <View style={[header.filterButtonStyle]}>
               <TouchableOpacity
-                onPress={() => this.moveBall(0)}
-                // onPress={() => this.moveBall(60)}
-                // onPress={() => { this._togglepreferenceView() }}
-                // onPress={() => { this._toggle2ndpreferenceView() }} 
+                onPress={() => this.togglePanel(0)}
                 style={[borders.grey, { height: 30, width: 30, borderRadius: 12, alignItems: 'center', justifyContent: 'center' }]}
               >
                 <Icon
@@ -178,22 +188,6 @@ class FilterScreen extends Component {
           </View>
         </ScrollView>
         {this.renderRectangle()}
-        {/* <Animated.View
-          style={
-            [
-              styles.preferenceView, 
-              { 
-                // // top: this.animatedHeaderHeight,
-                // position: 'absolute',
-                // backgroundColor: 'white', borderBottomWidth: 1, borderBottomColor: '#dddddd',
-                // height: this.animatedHeaderHeight,
-                transform: [{ translateY: this.state.bounceValue }],
-              }
-            ]
-          }
-        >
-          <Text>This is a sub view</Text>
-        </Animated.View> */}
       </View>
     );
   }
@@ -208,7 +202,7 @@ const styles = StyleSheet.create({
   preferenceView: {
     position: "absolute",
     backgroundColor: colors.white,
-    flex:1,
+    flex: 1,
     height: 200,
     width: "100%",
     shadowColor: "#000",

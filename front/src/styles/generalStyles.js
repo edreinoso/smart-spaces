@@ -55,6 +55,15 @@ export const colors = {
   darkGrey: '#6B6B6B',
   occupied: '#F0F0F0',
   occupiedBorders: '#DADADA',
+  // Filtering buttons
+  filterBackgroundRed: "rgba(192, 39, 39, 0.61)",
+  filterTextRed: "#590303",
+  filterBackgroundGreen: "rgba(69, 206, 83, 0.61)",
+  filterTextGreen: "#087005",
+  filterBackgroundBlue: "rgba(79, 158, 218, 0.70)",
+  filterTextBlue: "#024273",
+  filterBackgroundOrange: "rgba(255, 152, 83, 0.68)",
+  filterTextOrange: "#9E3F00",
   // legacy
   primary: '#7EB72E',
   darkGreen: '#5D8B1C',

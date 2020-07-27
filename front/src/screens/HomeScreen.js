@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { View, ScrollView, Text, StyleSheet, FlatList, RefreshControl, Alert } from 'react-native';
-import { container, text, colors, header } from '../styles/index';
+import { View, ScrollView, Text, StyleSheet, FlatList, RefreshControl, Alert, TouchableOpacity } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons'
+import { container, text, colors, header, borders } from '../styles/index';
 import { Picture, HomeButton, PhoneRoom } from '../components/index';
 import { connect } from 'react-redux';
 import { phoneRoomMockData } from "../store/mockdata";
@@ -34,7 +35,7 @@ class HomeScreen extends Component {
       if (this.state.floor1) this.fetchRoomsSensorData(api_first_floor)
       else if (this.state.floor2) this.fetchRoomsSensorData(api_second_floor)
       else if (this.state.floor3) this.fetchRoomsSensorData(api_third_floor)
-    }, 3000);
+    }, 30000);
   }
 
   componentWillUnmount() {
@@ -248,15 +249,24 @@ class HomeScreen extends Component {
         {/* header */}
         <View style={[styles.customHeader, header.customHeader]}>
           <View style={header.titleHeader}>
-            <View style={header.titleStyle}>
-              <Text style={{ fontSize: text.headerText, paddingLeft: 60, }}>SmartSpaces</Text>
-            </View>
-            <View style={header.pictureStyle}>
+            <View style={[header.pictureStyle]}>
               <Picture
                 image={{ uri: 'https://s3.amazonaws.com/visualization-images/ProfileImages/S3-avatar.JPG' }}
                 widthHeight={30}
                 radius={12}
               />
+            </View>
+            <View style={[header.titleStyle]}>
+              <Text style={{ fontSize: text.headerText, paddingLeft: 60, }}>SmartSpaces</Text>
+            </View>
+            <View style={[header.filterButtonStyle]}>
+              <TouchableOpacity style={[borders.grey, { height: 30, width: 30, borderRadius: 12, alignItems: 'center', justifyContent: 'center' }]}>
+                <Icon
+                  name={'filter-list'}
+                  color={colors.darkGrey}
+                  size={25}
+                />
+              </TouchableOpacity>
             </View>
           </View>
           <View style={header.tabsHeader}>

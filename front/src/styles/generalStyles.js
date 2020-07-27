@@ -52,6 +52,7 @@ export const colors = {
   purple: 'purple',
   yellow: '#FFCB00',
   grey: '#A3A3A3',
+  darkGrey: '#6B6B6B',
   occupied: '#F0F0F0',
   occupiedBorders: '#DADADA',
   // legacy
@@ -78,12 +79,19 @@ export const header = StyleSheet.create({
   },
   titleStyle: {
     flex: .8,
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'center',
   },
   pictureStyle: {
     flex: .2,
+    // alignItems: 'center',
     alignItems: 'flex-start',
+    justifyContent: 'center',
+  },
+  filterButtonStyle: {
+    flex: .2,
+    // alignItems: 'center',
+    alignItems: 'flex-end',
     justifyContent: 'center',
   },
   // Header B: - buttons and tabs
@@ -124,4 +132,24 @@ export const borders = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'red'
   },
+  blue: {
+    borderWidth: 1,
+    borderColor: '#4F9EDA'
+  },
+  orange: {
+    borderWidth: 1,
+    borderColor: '#FF9853'
+  },
+  red: {
+    borderWidth: 1,
+    borderColor: 'red'
+  },
+  grey: {
+    borderColor: '#A3A3A3',
+    borderWidth: 1,
+  },
+  darkGrey: {
+    borderColor: '#6B6B6B',
+    borderWidth: 1,
+  }
 })

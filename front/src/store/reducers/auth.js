@@ -1,8 +1,8 @@
 import { AUTH, LOGOUT } from '../actions/types';
 
 const initialState = {
-    username: "", // this is giving me undefined
-    authenticated: false,
+    username: "edgardo_16_@hotmail.com", // this is giving me undefined
+    authenticated: true,
     starState: false
 }
 

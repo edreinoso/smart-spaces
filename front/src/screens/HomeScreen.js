@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { View, ScrollView, Text, StyleSheet, FlatList, RefreshControl, Alert, TouchableOpacity } from 'react-native';
+import { View, ScrollView, Text, StyleSheet, FlatList, RefreshControl, Alert, TouchableOpacity, Animated } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import { container, text, colors, header, borders } from '../styles/index';
-import { Picture, HomeButton, PhoneRoom } from '../components/index';
+import { Picture, HomeButton, PhoneRoom, ButtonFilters } from '../components/index';
 import { connect } from 'react-redux';
 import { phoneRoomMockData } from "../store/mockdata";
 import { API } from 'aws-amplify';
@@ -18,6 +18,13 @@ class HomeScreen extends Component {
     floor2: false,
     floor3: false,
     initialStarState: false,
+    greenSection: false,
+    redSection: false,
+    blueSection: false,
+    orangeSection: false,
+    posY: new Animated.Value(-400),  //This is the initial position of the preferenceView
+    animatedValue: new Animated.Value(0),
+    opacity: false,
 
     favPhoneRoom: [],
     phoneRoomsAvailable: [],
@@ -26,8 +33,6 @@ class HomeScreen extends Component {
     refreshing: false,
 
     interval: null,
-
-    // showStar: true,
   }
 
   componentDidMount() {
@@ -198,6 +203,38 @@ class HomeScreen extends Component {
     }
   }
 
+  onSectionChange(key) {
+    if (key === 'green') {
+      this.setState({
+        greenSection: true,
+        redSection: false,
+        blueSection: false,
+        orangeSection: false
+      })
+    } else if (key === 'red') {
+      this.setState({
+        greenSection: false,
+        redSection: true,
+        blueSection: false,
+        orangeSection: false
+      })
+    } else if (key === 'blue') {
+      this.setState({
+        greenSection: false,
+        redSection: false,
+        blueSection: true,
+        orangeSection: false
+      })
+    } else if (key === 'orange') {
+      this.setState({
+        greenSection: false,
+        redSection: false,
+        blueSection: false,
+        orangeSection: true
+      })
+    }
+  }
+
   onStarPress = async (item) => {
     if (!this.props.favRooms.some(alreadyFavorite => alreadyFavorite.roomId == item.roomId)) {
       await this.props.favorite(item, 'fav') // this redux call HAS to be executed first
@@ -217,6 +254,88 @@ class HomeScreen extends Component {
         console.log(error)
       })
   }
+
+  openPanel(yPos) {
+    Animated.parallel([
+      Animated.timing(this.state.posY, {
+        toValue: yPos,
+        duration: 400,
+      }),
+      Animated.timing(
+        this.state.animatedValue,
+        {
+          toValue: this.state.animatedValue._value ? 0 : 1,
+          duration: 200,
+        }
+      )
+    ]).start()
+  }
+
+  closePanel(yPos) {
+    Animated.parallel([
+      Animated.timing(
+        this.state.animatedValue,
+        {
+          toValue: this.state.animatedValue._value ? 0 : 1,
+          duration: 200,
+        }
+      ),
+      Animated.timing(this.state.posY, {
+        toValue: yPos,
+        duration: 400,
+      }),
+    ]).start()
+  }
+
+  renderFilteringPanel = () => {
+    const animatedStyle = {
+      top: this.state.posY
+    };
+    // console.log(this.state.posY)
+    return (
+      // <Animated.View style={[styles.rectangle]}>
+      <Animated.View style={[styles.preferenceView, animatedStyle]}>
+        <View style={[{ flex: 1, marginHorizontal: 20, justifyContent: 'flex-end' }]}>
+          <View style={[{ flex: .2, justifyContent: 'center', alignItems: 'flex-start', paddingLeft: 5 }]}>
+            {/* <View style={[borders.red, { flex: .2, justifyContent: 'flex-end', alignItems: 'flex-start', paddingLeft: 5 }]}> */}
+            <Text>Preferred Section</Text>
+          </View>
+          <View style={[{ flex: .4, justifyContent: 'flex-start', alignItems: 'center', paddingHorizontal: 20 }]}>
+            {/* <View style={[borders.red, { flex: .6, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20 }]}> */}
+            <View style={[borders.darkGrey, { flexDirection: 'row', borderRadius: 5 }]}>
+              <ButtonFilters
+                onButtonPress={() => this.onSectionChange('green')}
+                text={'Green'}
+                value={this.state.greenSection}
+              />
+              <ButtonFilters
+                onButtonPress={() => this.onSectionChange('red')}
+                text={'Red'}
+                value={this.state.redSection}
+              />
+              <ButtonFilters
+                onButtonPress={() => this.onSectionChange('blue')}
+                text={'Blue'}
+                value={this.state.blueSection}
+              />
+              <ButtonFilters
+                onButtonPress={() => this.onSectionChange('orange')}
+                text={'Orange'}
+                value={this.state.orangeSection}
+              />
+            </View>
+          </View>
+          <View style={[{ flex: .2, justifyContent: 'flex-start', alignItems: 'flex-end', paddingRight: 15 }]}>
+            <TouchableOpacity onPress={() => this.closePanel(-400)}>
+              <Text>
+                Close
+            </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Animated.View>
+    );
+  };
 
   renderPhoneRooms = ({ item }) => {
     return (
@@ -243,6 +362,13 @@ class HomeScreen extends Component {
   }
 
   render() {
+    const opacityBackground = this.state.animatedValue.interpolate(
+      {
+        inputRange: [0, 2],
+        outputRange: [1, 0.2]
+        // outputRange: ['white', 'rgba(139, 139, 139, 0.15)']
+      });
+
     return (
       // this flex is necessary for persistency
       <View style={{ flex: 1 }}>
@@ -260,7 +386,10 @@ class HomeScreen extends Component {
               <Text style={{ fontSize: text.headerText, paddingLeft: 60, }}>SmartSpaces</Text>
             </View>
             <View style={[header.filterButtonStyle]}>
-              <TouchableOpacity style={[borders.grey, { height: 30, width: 30, borderRadius: 12, alignItems: 'center', justifyContent: 'center' }]}>
+              <TouchableOpacity 
+                onPress={() => this.openPanel(0)}
+                style={[borders.grey, { height: 30, width: 30, borderRadius: 12, alignItems: 'center', justifyContent: 'center' }]}
+              >
                 <Icon
                   name={'filter-list'}
                   color={colors.darkGrey}
@@ -288,77 +417,81 @@ class HomeScreen extends Component {
           </View>
         </View>
         {/* body */}
-        <ScrollView
-          style={container.bodyContainer}
-          refreshControl={
-            <RefreshControl refreshing={this.state.refreshing} onRefresh={this.handleRefresh} />
-          }
-        >
-          <View style={container.bodySubContainer}>
-            {/* title available */}
-            <View style={container.contentContainer}>
-              {/* {this.state.favPhoneRoom.length ? */}
-              {/* {this.props.favRooms !== null ? */}
-              {this.props.favRooms.length > 0 ?
-                <View>
-                  <View style={{ paddingLeft: 5 }}>
-                    <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>
-                      Favorites
-                  </Text>
-                  </View>
+        <Animated.View style={{ opacity: opacityBackground, flex: 1 }}>
+        {/* <Animated.View style={[this.state.opacity ? {opacity: 0.5} : null, { flex: 1 }]}> */}
+          <ScrollView
+            style={container.bodyContainer}
+            refreshControl={
+              <RefreshControl refreshing={this.state.refreshing} onRefresh={this.handleRefresh} />
+            }
+          >
+            <View style={container.bodySubContainer}>
+              {/* title available */}
+              <View style={container.contentContainer}>
+                {/* {this.state.favPhoneRoom.length ? */}
+                {/* {this.props.favRooms !== null ? */}
+                {this.props.favRooms.length > 0 ?
                   <View>
-                    {/* not showing with this.props.favoriteRooms */}
-                    <FlatList
-                      // data={favRoom} // this would be this.props.favoriteRooms
-                      // data={this.state.favPhoneRoom} // this would be this.props.favoriteRooms
-                      data={this.props.favRooms} // this would be this.props.favoriteRooms
-                      keyExtractor={item => item.roomId}
-                      renderItem={this.renderPhoneRooms}
-                    />
-                  </View>
-                </View>
-                : null}
-              {this.props.phoneRoomsAvailable.length > 0 ?
-                <View>
-                  <View style={{ paddingLeft: 5, paddingTop: 20 }}>
-                    <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>
-                      Available
+                    <View style={{ paddingLeft: 5 }}>
+                      <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>
+                        Favorites
                   </Text>
+                    </View>
+                    <View>
+                      {/* not showing with this.props.favoriteRooms */}
+                      <FlatList
+                        // data={favRoom} // this would be this.props.favoriteRooms
+                        // data={this.state.favPhoneRoom} // this would be this.props.favoriteRooms
+                        data={this.props.favRooms} // this would be this.props.favoriteRooms
+                        keyExtractor={item => item.roomId}
+                        renderItem={this.renderPhoneRooms}
+                      />
+                    </View>
                   </View>
+                  : null}
+                {this.props.phoneRoomsAvailable.length > 0 ?
                   <View>
-                    <FlatList
-                      // data={this.props.mockData}
-                      // data={this.state.phoneRoomsAvailable} // this would be this.props.phoneRoomsAvailable
-                      data={this.props.phoneRoomsAvailable} // this would be this.props.phoneRoomsAvailable
-                      // data={this.state.phoneRoom}
-                      // data={phoneRoomMockData}
-                      keyExtractor={item => item.roomId}
-                      renderItem={this.renderPhoneRooms}
-                    />
+                    <View style={{ paddingLeft: 5, paddingTop: 20 }}>
+                      <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>
+                        Available
+                  </Text>
+                    </View>
+                    <View>
+                      <FlatList
+                        // data={this.props.mockData}
+                        // data={this.state.phoneRoomsAvailable} // this would be this.props.phoneRoomsAvailable
+                        data={this.props.phoneRoomsAvailable} // this would be this.props.phoneRoomsAvailable
+                        // data={this.state.phoneRoom}
+                        // data={phoneRoomMockData}
+                        keyExtractor={item => item.roomId}
+                        renderItem={this.renderPhoneRooms}
+                      />
+                    </View>
                   </View>
-                </View>
-                : null}
-              {this.props.phoneRoomsUnavailable.length > 0 ?
-                <View>
-                  <View style={{ paddingLeft: 5, paddingTop: 20 }}>
-                    <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>
-                      Not Available
+                  : null}
+                {this.props.phoneRoomsUnavailable.length > 0 ?
+                  <View>
+                    <View style={{ paddingLeft: 5, paddingTop: 20 }}>
+                      <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>
+                        Not Available
                 </Text>
+                    </View>
+                    <View>
+                      <FlatList
+                        // data={this.state.phoneRoomsUnavailable}  // this would be this.props.phoneRoomsAvailable
+                        data={this.props.phoneRoomsUnavailable}  // this would be this.props.phoneRoomsAvailable
+                        // data={phoneRoomMockData}
+                        keyExtractor={item => item.roomId}
+                        renderItem={this.renderPhoneRooms}
+                      />
+                    </View>
                   </View>
-                  <View>
-                    <FlatList
-                      // data={this.state.phoneRoomsUnavailable}  // this would be this.props.phoneRoomsAvailable
-                      data={this.props.phoneRoomsUnavailable}  // this would be this.props.phoneRoomsAvailable
-                      // data={phoneRoomMockData}
-                      keyExtractor={item => item.roomId}
-                      renderItem={this.renderPhoneRooms}
-                    />
-                  </View>
-                </View>
-                : null}
+                  : null}
+              </View>
             </View>
-          </View>
-        </ScrollView>
+          </ScrollView>
+        </Animated.View>
+        {this.renderFilteringPanel()}
       </View>
     );
   }
@@ -369,6 +502,21 @@ const styles = StyleSheet.create({
   customHeader: {
     backgroundColor: colors.white, // need to have a background, otherwise it would be a different outcome
     shadowColor: colors.grey,
+  },
+  preferenceView: {
+    position: "absolute",
+    backgroundColor: colors.white,
+    flex: 1,
+    height: 200,
+    width: "100%",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.30,
+    shadowRadius: 4.65,
+    elevation: 8,
   },
 });
 

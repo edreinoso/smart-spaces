@@ -7,5 +7,5 @@ export {
   HomeScreen,
   FilterScreen,
   AuthScreen,
-  ProfileScreen
+  ProfileScreen,
 };

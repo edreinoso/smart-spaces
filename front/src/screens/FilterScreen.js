@@ -4,8 +4,6 @@ import Icon from 'react-native-vector-icons/MaterialIcons'
 import { container, text, colors, header, borders } from '../styles/index';
 import { Picture, HomeButton, ButtonFilters } from '../components/index';
 
-var isHidden = true;
-
 class FilterScreen extends Component {
   state = {
     floor1: true,
@@ -16,6 +14,8 @@ class FilterScreen extends Component {
     blueSection: false,
     orangeSection: false,
     posY: new Animated.Value(-400),  //This is the initial position of the preferenceView
+    // opacity: new Animated.Value(0),
+    animatedValue: new Animated.Value(0)
   }
 
   onValueChange(key) {
@@ -72,17 +72,43 @@ class FilterScreen extends Component {
     }
   }
 
-  togglePanel = (yPos) => {
-    Animated.timing(this.state.posY, {
-      toValue: yPos,
-      duration: 1000
-    }).start()
-  };
+  openPanel(yPos) {
+    Animated.sequence([
+      Animated.timing(this.state.posY, {
+        toValue: yPos,
+        duration: 400,
+      }),
+      Animated.timing(
+        this.state.animatedValue,
+        {
+          toValue: this.state.animatedValue._value ? 0 : 1,
+          duration: 350,
+        }
+      )
+    ]).start()
+  }
 
-  renderRectangle = () => {
+  closePanel(yPos) {
+    Animated.sequence([
+      Animated.timing(
+        this.state.animatedValue,
+        {
+          toValue: this.state.animatedValue._value ? 0 : 1,
+          duration: 350,
+        }
+      ),
+      Animated.timing(this.state.posY, {
+        toValue: yPos,
+        duration: 400,
+      }),
+    ]).start()
+  }
+
+  renderFilteringPanel = () => {
     const animatedStyle = {
       top: this.state.posY
     };
+    // console.log(this.state.posY)
     return (
       // <Animated.View style={[styles.rectangle]}>
       <Animated.View style={[styles.preferenceView, animatedStyle]}>
@@ -117,8 +143,7 @@ class FilterScreen extends Component {
             </View>
           </View>
           <View style={[{ flex: .2, justifyContent: 'flex-start', alignItems: 'flex-end', paddingRight: 15 }]}>
-            {/* <View style={[borders.red, { flex: .2, justifyContent: 'flex-start', alignItems: 'flex-end', paddingRight: 15 }]}> */}
-            <TouchableOpacity onPress={() => this.togglePanel(-400)}>
+            <TouchableOpacity onPress={() => this.closePanel(-400)}>
               <Text>
                 Close
             </Text>
@@ -130,6 +155,13 @@ class FilterScreen extends Component {
   };
 
   render() {
+    const backgroundColorVar = this.state.animatedValue.interpolate(
+      {
+        inputRange: [0, 2],
+        // outputRange: ["rgba(255, 255, 255, 0)", 'rgba(139, 139, 139, 0.15)']
+        outputRange: ['white', 'rgba(139, 139, 139, 0.15)']
+      });
+
     return (
       // this flex is necessary for persistency
       <View style={{ flex: 1 }}>
@@ -148,7 +180,7 @@ class FilterScreen extends Component {
             </View>
             <View style={[header.filterButtonStyle]}>
               <TouchableOpacity
-                onPress={() => this.togglePanel(0)}
+                onPress={() => this.openPanel(0)}
                 style={[borders.grey, { height: 30, width: 30, borderRadius: 12, alignItems: 'center', justifyContent: 'center' }]}
               >
                 <Icon
@@ -179,15 +211,17 @@ class FilterScreen extends Component {
           </View>
         </View>
         {/* body */}
-        <ScrollView>
+        {/* FFFFF will change the property of the above panel */}
+        <Animated.View style={{ backgroundColor: backgroundColorVar, flex: 1 }}>
+          <ScrollView>
           <View style={container.bodySubContainer}>
-            {/* title available */}
             <View style={container.contentContainer}>
               <Text>FilterScreen</Text>
             </View>
           </View>
-        </ScrollView>
-        {this.renderRectangle()}
+          </ScrollView>
+        </Animated.View>
+        {this.renderFilteringPanel()}
       </View>
     );
   }

@@ -71,14 +71,19 @@ export const colors = {
 
 export const header = StyleSheet.create({
   customHeader: {
-    height: 120,
+    flex:.17,
     paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 5,
+    marginBottom: 10,
+    // borderColor: 'red',
+    // borderWidth: 1,
     justifyContent: 'center',
-    borderBottomWidth: 0,
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.2,
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+    shadowOpacity: 0.20,
     elevation: 5,
   },
   // Header A: - title and picture

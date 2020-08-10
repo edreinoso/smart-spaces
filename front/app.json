@@ -1,9 +1,9 @@
 {
   "expo": {
-    "name": "react-native-project-template",
-    "slug": "react-native-project-template",
+    "slug": "smart_spaces",
+    "name": "smart_spaces",
     "privacy": "public",
-    "sdkVersion": "35.0.0",
+    "sdkVersion": "38.0.0",
     "platforms": [
       "ios",
       "android",

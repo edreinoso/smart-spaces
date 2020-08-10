@@ -1,0 +1,7 @@
+removed 6 packages and updated 3 packages in 4.003s
+
+2 packages are looking for funding
+  run `npm fund` for details
+
+fixed 2176 of 2229 vulnerabilities in 1026 scanned packages
+  53 vulnerabilities required manual review and could not be updated

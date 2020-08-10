@@ -75,7 +75,7 @@ export const header = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 5,
-    marginBottom: 10,
+    // marginBottom: 10,
     // borderColor: 'red',
     // borderWidth: 1,
     justifyContent: 'center',

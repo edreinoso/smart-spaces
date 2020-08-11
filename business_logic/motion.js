@@ -15,11 +15,11 @@ app.use(bodyParser.json({ strict: false }))
 app.post('/sensor', function (req, res) {
   // console.log(typeof(parseInt(req.params.floor)))
   // console.log('value of floor: ', typeof(req.params.floor))
-  
+
   const { floor, rooms, favorites } = req.body // need to have the information from current rooms and favorites
   // const { floor, rooms, favorites } = req.params // need to have the information from current rooms and favorites
   console.log(req.body)
-  
+
   // Trying to sort by floor
   const params = {
     TableName: PIR_TABLE,
@@ -42,7 +42,7 @@ app.post('/sensor', function (req, res) {
       });
 
       // result sorted
-      console.log('result sorted',result.Items)
+      console.log('result sorted', result.Items)
 
       // Getting all unique room IDs
       // Very powerful function
@@ -72,11 +72,11 @@ app.post('/sensor', function (req, res) {
         // if (sensorData > todayMinus5) item['availability'] = false
         console.log(sensorData, todayMinus5)
         if (sensorData < todayMinus5) {
-          console.log('Room available rooms: ', typeof(rooms), 'favorites: ', typeof(favorites))
+          console.log('Room available rooms: ', typeof (rooms), 'favorites: ', typeof (favorites))
           // we are itering through both of the arrays that were given
           // from the req.body. Ideally, we would like change the item
           // property availability for the specific rooms / favorites 
-  
+
           rooms.map((room_items, index) => {
             if (item.roomId == room_items.roomId) {
               room_items['availability'] = true
@@ -90,11 +90,11 @@ app.post('/sensor', function (req, res) {
         }
         else {
           console.log('Room not available')
-          console.log('Room available rooms: ', typeof(rooms), 'favorites: ', typeof(favorites))
+          console.log('Room available rooms: ', typeof (rooms), 'favorites: ', typeof (favorites))
           // we are itering through both of the arrays that were given
           // from the req.body. Ideally, we would like change the item
           // property availability for the specific rooms / favorites 
-  
+
           rooms.map((room_items, index) => {
             if (item.roomId == room_items.roomId) {
               room_items['availability'] = false
@@ -110,7 +110,7 @@ app.post('/sensor', function (req, res) {
         console.log(item)
       })
       // res.json(data)
-      res.send({rooms, favorites})
+      res.send({ rooms, favorites })
     }
   })
 })
@@ -197,6 +197,41 @@ app.get('/users/:username', function (req, res) {
       console.log(typeof (returnRooms), typeof (favRooms))
       console.log(returnRooms, favRooms)
       res.json({ returnRooms, favRooms })
+    }
+  })
+})
+
+// there are two variables that need to be passed
+// username- to know which specific row to get
+// section- to know which section to get.
+// query -- need to be specified
+
+app.get('/sections/:username', function (req, res) {
+  // const { username, section } = req.body
+  const params = {
+    TableName: USER_TABLE,
+    FilterExpression: 'username = :username',
+    ExpressionAttributeValues: { ':username': req.params.username }
+  }
+  dynamoDB.scan(params, (error, result) => {
+    if (error) {
+      console.log(error)
+      res.status(400).json({ error: 'Could not retrieve data' })
+    } else {
+      // might have to filter response here by section   
+      var returnRooms = []
+      console.log('fitlering by section', result.Items)
+      // var favRooms = []
+      result.Items.map((item, index) => {
+        item.rooms.map((item2, index) => {
+          console.log(item2.section, req.query.section)
+          if(item2.section == req.query.section) {
+            returnRooms.push(item2)
+          }
+        })
+      })
+      console.log(returnRooms)
+      res.json({ returnRooms })
     }
   })
 })

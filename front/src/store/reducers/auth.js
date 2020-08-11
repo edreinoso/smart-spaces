@@ -1,9 +1,8 @@
 import { AUTH, LOGOUT } from '../actions/types';
 
 const initialState = {
-    username: "edgardo_16_@hotmail.com", // this is giving me undefined
+    username: "edgardo_16_@hotmail.com", // hardcoded for the sake of testing
     authenticated: true,
-    starState: false
 }
 
 const reducer = (state = initialState, action) => {

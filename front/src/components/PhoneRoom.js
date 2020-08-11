@@ -21,9 +21,20 @@ class PhoneRoom extends Component {
           style={{ borderRadius: 5 }}
         >
           <View style={[item.availability ? styles.avRoomContainer : styles.ocRoomContainer, { flexDirection: 'row', justifyContent: 'space-between' }]}>
-            <Text style={[item.availability ? styles.avRoomText : styles.ocRoomText]}>
-              {item.roomName}
-            </Text>
+            <View style={{ flexDirection: 'row' }}>
+              <View style={[{paddingHorizontal: 10, justifyContent:'center'}]}>
+                <View
+                  style={[
+                    (item.section === "green" ? { width: 13, height: 13, borderRadius: 100, backgroundColor: "#6DD400" } : null) || (item.section === "blue" ? { width: 13, height: 13, borderRadius: 100, backgroundColor: "#0091FF" } : null) || (item.section === "red" ? { width: 13, height: 13, borderRadius: 100, backgroundColor: "#E02020" } : null) || (item.section === "orange" ? { width: 13, height: 13, borderRadius: 100, backgroundColor: "#FA6400" } : null) 
+                  
+                  ]}
+                  // style={[{ width: 13, height: 13, borderRadius: 100, backgroundColor: item.section }]}
+                />
+              </View>
+              <Text style={[item.availability ? styles.avRoomText : styles.ocRoomText]}>
+                {item.roomName}
+              </Text>
+            </View>
             {/* there is really no reference to the this.props.hide. It might hide all of the elements instead of a single one */}
             {!showStar ?
               <TouchableOpacity onPress={() => onStarPress()} style={[{ justifyContent: 'center', margin: 15, paddingHorizontal: 6 }]}>
@@ -61,23 +72,25 @@ const styles = StyleSheet.create({
   avRoomContainer: {
     margin: 2,
     backgroundColor: colors.white,
-    borderRadius: 5
-  },
-  avRoomText: {
-    margin: 15,
-    paddingHorizontal: 6,
-    backgroundColor: colors.white,
-    color: colors.black,
-    fontSize: text.normalText
+    borderRadius: 5,
+    alignItems: 'center'
   },
   ocRoomContainer: {
     backgroundColor: colors.occupied,
     borderColor: colors.occupiedBorders,
     borderWidth: 1,
-    borderRadius: 5
+    borderRadius: 5,
+    alignItems: 'center'
+  },
+  avRoomText: {
+    // margin: 15,
+    // paddingHorizontal: 6,
+    backgroundColor: colors.white,
+    color: colors.black,
+    fontSize: text.normalText,
   },
   ocRoomText: {
-    margin: 15,
+    // margin: 15,
     paddingHorizontal: 6,
     color: colors.black,
     fontSize: text.normalText

@@ -18,7 +18,7 @@ class AuthScreen extends Component {
         return API.post('motion', '/users', item)
     }
 
-    componentWillMount() {
+    componentDidMount() {
         // console.log('do I enter auth?')
         this.reset()
     }

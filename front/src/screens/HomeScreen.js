@@ -18,10 +18,6 @@ class HomeScreen extends Component {
     floor2: false,
     floor3: false,
     initialStarState: false,
-    greenSection: false,
-    redSection: false,
-    blueSection: false,
-    orangeSection: false,
     posY: new Animated.Value(-400),  //This is the initial position of the preferenceView
     animatedValue: new Animated.Value(0),
     opacity: false,
@@ -41,18 +37,16 @@ class HomeScreen extends Component {
       else if (this.state.floor2) this.fetchRoomsSensorData(api_second_floor)
       else if (this.state.floor3) this.fetchRoomsSensorData(api_third_floor)
     }, 30000);
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.state.interval);
-  }
-
-  componentWillMount() {
+    this.setState({
+      greenSection: false,
+      redSection: false,
+      blueSection: false,
+      orangeSection: false,
+    })
     if (this.props.authenticated) {
       // Local
       // this.fetchDataFromLocal()
       // API
-      // this.fetchDataFromDDB()
       this.fetchDataFromDDB(api_first_floor)
     } else {
       Alert.alert(
@@ -68,12 +62,31 @@ class HomeScreen extends Component {
     }
   }
 
-  apiGetCall() { // API Gateway caller
-    return API.get('motion', `/users/${this.props.username}`);
+  componentWillUnmount() {
+    clearInterval(this.state.interval);
+  }
+
+  resetState = () => {
+    this.setState({
+      greenSection: false,
+      redSection: false,
+      blueSection: false,
+      orangeSection: false,
+    })
   }
 
   apiPostCall(item) {
     return API.post('motion', '/sensor', item)
+  }
+
+  apiGetCall() { // API Gateway caller
+    return API.get('motion', `/users/${this.props.username}`);
+  }
+
+  apiGetSection(section) {
+    // item would come to be the section
+    return API.get('motion', `/sections/${this.props.username}?section=${section}`)
+    // return API.get('motion', `/sections/${this.props.username}?section=${section}?floor=${floor}`)
   }
 
   apiPutCall(item) {
@@ -101,10 +114,22 @@ class HomeScreen extends Component {
 
   // this is happening before mounting
   fetchDataFromDDB = async (floor) => {
-    await this.apiGetCall()
+    await this.apiGetCall() //fetch the whole data
       .then(response => {
-        this.props.add(response.favRooms, 'backFavorite') // you're predetermined to choose favorite
-        this.props.add(response.returnRooms)
+        this.props.add(response.favRooms, 'backFavorite') // store favRooms in backFav
+        this.props.add(response.returnRooms) // store returnRooms into backData
+      })
+      .catch(error => {
+        console.log(error)
+      })
+    this.fetchByFloor(floor) // then call fetching by floor
+  }
+
+  fetchDataBySection = async (floor) => {
+    await this.apiGetSection()
+      .then(response => {
+        this.props.add(response.returnRooms) // store returnRooms in backData
+        // gonna have to test what the response with favRooms looke like
       })
       .catch(error => {
         console.log(error)
@@ -112,7 +137,7 @@ class HomeScreen extends Component {
     this.fetchByFloor(floor)
   }
 
-  fetchByFloor = (floor) => {
+  fetchByFloor = (floor) => { // this function will be responsible to fetch by floors
     var favRoom = []
     var roomAvailable = []
     var roomNotAvailable = []
@@ -120,15 +145,15 @@ class HomeScreen extends Component {
     this.props.backData.map((item, index) => {
       // logic for handling rooms available and not available
       if (item.floor === floor) {
-        if (item.availability) roomAvailable.push(item)
-        else roomNotAvailable.push(item)
+        if (item.availability) roomAvailable.push(item) // roomAvailable are going to be pushed
+        else roomNotAvailable.push(item) // roomNotAvailable are going to be pushed
       }
     })
     // if I'm carrying individual items by the floor on the availability,
     // then I should do the same for the favorite
     this.props.backFavData.map((item, index) => {
       if (item.floor === floor) {
-        favRoom.push(item)
+        favRoom.push(item) // favRooms are going to be pushed
       }
     })
     this.props.add(favRoom, 'favorite')
@@ -136,7 +161,7 @@ class HomeScreen extends Component {
     this.props.add(roomNotAvailable, 'unavailable')
   }
 
-  fetchRoomsSensorData = async (floor) => {
+  fetchRoomsSensorData = async (floor) => { // comparing sensor data with user data on rooms
     const item = {
       body: {
         floor: floor,
@@ -160,7 +185,7 @@ class HomeScreen extends Component {
     this.setState({ refreshing: false })
   }
 
-  onUpdateSensorData = async () => {
+  onUpdateSensorData = async () => { // updating user data with the current updates from the sensor data
     const item = {
       body: {
         username: this.props.username,
@@ -285,6 +310,11 @@ class HomeScreen extends Component {
         duration: 400,
       }),
     ]).start()
+    // here should provide the API back call to GET 
+    // the items that
+    if (this.state.floor1) this.fetchDataBySection(api_first_floor)
+    else if (this.state.floor2) this.fetchDataBySection(api_second_floor)
+    else if (this.state.floor3) this.fetchDataBySection(api_third_floor)
   }
 
   renderFilteringPanel = () => {
@@ -325,7 +355,13 @@ class HomeScreen extends Component {
               />
             </View>
           </View>
-          <View style={[{ flex: .2, justifyContent: 'flex-start', alignItems: 'flex-end', paddingRight: 15 }]}>
+          <View style={[{ flex: .2, flexDirection: "row", justifyContent: 'flex-end', alignItems: 'flex-start', paddingRight: 15 }]}>
+            <TouchableOpacity style={styles.horizontalPaddingClearCancel} onPress={() => this.resetState()}>
+              <Text>
+                Clear
+              </Text>
+            </TouchableOpacity>
+            {/* there has to be some other logic here for filtering */}
             <TouchableOpacity onPress={() => this.closePanel(-400)}>
               <Text>
                 Close
@@ -386,7 +422,7 @@ class HomeScreen extends Component {
               <Text style={{ fontSize: text.headerText, paddingLeft: 60, }}>SmartSpaces</Text>
             </View>
             <View style={[header.filterButtonStyle]}>
-              <TouchableOpacity 
+              <TouchableOpacity
                 onPress={() => this.openPanel(0)}
                 style={[borders.grey, { height: 30, width: 30, borderRadius: 12, alignItems: 'center', justifyContent: 'center' }]}
               >
@@ -418,7 +454,7 @@ class HomeScreen extends Component {
         </View>
         {/* body */}
         <Animated.View style={{ opacity: opacityBackground, flex: 1 }}>
-        {/* <Animated.View style={[this.state.opacity ? {opacity: 0.5} : null, { flex: 1 }]}> */}
+          {/* <Animated.View style={[this.state.opacity ? {opacity: 0.5} : null, { flex: 1 }]}> */}
           <ScrollView
             style={container.bodyContainer}
             refreshControl={
@@ -518,6 +554,9 @@ const styles = StyleSheet.create({
     shadowRadius: 4.65,
     elevation: 8,
   },
+  horizontalPaddingClearCancel: {
+    paddingHorizontal: 30
+  }
 });
 
 

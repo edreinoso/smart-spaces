@@ -8,7 +8,6 @@ service: motion-detection-service
 custom:
   pirTableName: "PIR-table"
   userTableName: "User-table"
-  favoriteTableName: "Favorite-table"
   queueName: "PIR-queue"
   cognitoName: "PIR-cognito"
   application: "smart-spaces"
@@ -29,12 +28,10 @@ provider:
         - dynamodb:DeleteItem
       Resource:
         - { "Fn::GetAtt": ["PIRSensor", "Arn"] }
-        - { "Fn::GetAtt": ["FavoriteTable", "Arn"] }
         - { "Fn::GetAtt": ["UserTable", "Arn"] }
   environment:
     PIR_TABLE: ${self:custom.pirTableName}
     USER_TABLE: ${self:custom.userTableName}
-    FAVORITE_TABLE: ${self:custom.favoriteTableName}
 
 functions:
   getPhoneRoomData:
@@ -55,9 +52,16 @@ functions:
           #   template:
           #     application/json: '{ "floor": "$input.params(''floor'')" }'
       - http:
+          path: "/sections/{proxy+}"
+          # method: get # need to have post if want to pass body
+          method: get
+          request:
+            template:
+              application/json: '{ "section": "$input.params(''section'')" }'
+      - http:
           path: "/users"
           method: post
-      - http:
+      - http: # I am using this one
           path: "/users"
           method: put
 

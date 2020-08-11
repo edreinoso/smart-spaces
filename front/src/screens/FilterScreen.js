@@ -9,13 +9,23 @@ class FilterScreen extends Component {
     floor1: true,
     floor2: false,
     floor3: false,
-    greenSection: false,
-    redSection: false,
-    blueSection: false,
-    orangeSection: false,
     posY: new Animated.Value(-400),  //This is the initial position of the preferenceView
     // opacity: new Animated.Value(0),
     animatedValue: new Animated.Value(0)
+  }
+
+  componentDidMount() {
+    // console.log('do I enter auth?')
+    this.resetState()
+  }
+
+  resetState = () => {
+    this.setState({
+      greenSection: false,
+      redSection: false,
+      blueSection: false,
+      orangeSection: false,
+    })
   }
 
   onValueChange(key) {
@@ -142,11 +152,16 @@ class FilterScreen extends Component {
               />
             </View>
           </View>
-          <View style={[{ flex: .2, justifyContent: 'flex-start', alignItems: 'flex-end', paddingRight: 15 }]}>
-            <TouchableOpacity onPress={() => this.closePanel(-400)}>
+          <View style={[{ flex: .2, flexDirection: "row", justifyContent: 'flex-end', alignItems: 'flex-start', paddingRight: 15 }]}>
+            <TouchableOpacity style={styles.horizontalPaddingClearCancel} onPress={() => this.resetState()}>
+              <Text>
+                Clear
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.horizontalPaddingClearCancel} onPress={() => this.closePanel(-400)}>
               <Text>
                 Close
-            </Text>
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -255,6 +270,9 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     position: 'absolute'
   },
+  horizontalPaddingClearCancel: {
+    paddingHorizontal: 10
+  }
 });
 
 export default FilterScreen;

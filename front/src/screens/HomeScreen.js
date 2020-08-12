@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, ScrollView, Text, StyleSheet, FlatList, RefreshControl, Alert, TouchableOpacity, Animated } from 'react-native';
+import { View, ScrollView, Text, StyleSheet, FlatList, RefreshControl, Alert, TouchableOpacity, Animated, YellowBox } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import { container, text, colors, header, borders } from '../styles/index';
 import { Picture, HomeButton, PhoneRoom, ButtonFilters } from '../components/index';
@@ -17,6 +17,7 @@ class HomeScreen extends Component {
     floor1: true,
     floor2: false,
     floor3: false,
+    floor: '1',
     initialStarState: false,
     posY: new Animated.Value(-400),  //This is the initial position of the preferenceView
     animatedValue: new Animated.Value(0),
@@ -32,16 +33,21 @@ class HomeScreen extends Component {
   }
 
   componentDidMount() {
-    this.state.interval = setInterval(() => {
-      if (this.state.floor1) this.fetchRoomsSensorData(api_first_floor)
-      else if (this.state.floor2) this.fetchRoomsSensorData(api_second_floor)
-      else if (this.state.floor3) this.fetchRoomsSensorData(api_third_floor)
-    }, 30000);
+    // there has been no fix for this issue as of now
+    // https://github.com/GeekyAnts/NativeBase/issues/3109
+    YellowBox.ignoreWarnings(['Animated: `useNativeDriver`']);
+
+    // this.state.interval = setInterval(() => {
+    //   if (this.state.floor1) this.fetchRoomsSensorData(api_first_floor)
+    //   else if (this.state.floor2) this.fetchRoomsSensorData(api_second_floor)
+    //   else if (this.state.floor3) this.fetchRoomsSensorData(api_third_floor)
+    // }, 30000);
     this.setState({
       greenSection: false,
       redSection: false,
       blueSection: false,
       orangeSection: false,
+      section: ''
     })
     if (this.props.authenticated) {
       // Local
@@ -62,9 +68,9 @@ class HomeScreen extends Component {
     }
   }
 
-  componentWillUnmount() {
-    clearInterval(this.state.interval);
-  }
+  // componentWillUnmount() {
+  //   clearInterval(this.state.interval);
+  // }
 
   resetState = () => {
     this.setState({
@@ -73,10 +79,7 @@ class HomeScreen extends Component {
       blueSection: false,
       orangeSection: false,
     })
-  }
-
-  apiPostCall(item) {
-    return API.post('motion', '/sensor', item)
+    this.fetchDataFromDDB(this.state.floor)
   }
 
   apiGetCall() { // API Gateway caller
@@ -91,6 +94,10 @@ class HomeScreen extends Component {
 
   apiPutCall(item) {
     return API.put('motion', '/users', item)
+  }
+
+  apiPostCall(item) {
+    return API.post('motion', '/sensor', item)
   }
 
   // testing purposes
@@ -116,6 +123,7 @@ class HomeScreen extends Component {
   fetchDataFromDDB = async (floor) => {
     await this.apiGetCall() //fetch the whole data
       .then(response => {
+        console.log(response.returnRooms, response.favRooms)
         this.props.add(response.favRooms, 'backFavorite') // store favRooms in backFav
         this.props.add(response.returnRooms) // store returnRooms into backData
       })
@@ -125,9 +133,14 @@ class HomeScreen extends Component {
     this.fetchByFloor(floor) // then call fetching by floor
   }
 
-  fetchDataBySection = async (floor) => {
-    await this.apiGetSection()
+  fetchDataBySection = async (section, floor) => {
+    console.log('HomeScreen - line 135', section, floor)
+    // you can simply 
+    await this.apiGetSection(section) // is it really necessary to do an API call for this? 
       .then(response => {
+        // console.log('HomeScreen - line 138', response)
+        // this might not necessarily work because you are literally replacing the current backData
+        // by the incoming green room section
         this.props.add(response.returnRooms) // store returnRooms in backData
         // gonna have to test what the response with favRooms looke like
       })
@@ -205,26 +218,29 @@ class HomeScreen extends Component {
       this.setState({
         floor1: true,
         floor2: false,
-        floor3: false
+        floor3: false,
+        floor: '1'
       })
       // Call api for floor1
-      this.fetchByFloor(api_first_floor)
+      this.fetchByFloor(api_first_floor) // fetching data locally
     } else if (key === 'floor2') {
       this.setState({
         floor1: false,
         floor2: true,
-        floor3: false
+        floor3: false,
+        floor: '2'
       })
       // Call api for floor2
-      this.fetchByFloor(api_second_floor)
+      this.fetchByFloor(api_second_floor) // fetching data locally
     } else if (key === 'floor3') {
       this.setState({
         floor1: false,
         floor2: false,
-        floor3: true
+        floor3: true,
+        floor: '3'
       })
       // Call api for floor3
-      this.fetchByFloor(api_third_floor)
+      this.fetchByFloor(api_third_floor) // fetching data locally
     }
   }
 
@@ -234,28 +250,32 @@ class HomeScreen extends Component {
         greenSection: true,
         redSection: false,
         blueSection: false,
-        orangeSection: false
+        orangeSection: false,
+        section: 'green'
       })
     } else if (key === 'red') {
       this.setState({
         greenSection: false,
         redSection: true,
         blueSection: false,
-        orangeSection: false
+        orangeSection: false,
+        section: 'red'
       })
     } else if (key === 'blue') {
       this.setState({
         greenSection: false,
         redSection: false,
         blueSection: true,
-        orangeSection: false
+        orangeSection: false,
+        section: 'blue'
       })
     } else if (key === 'orange') {
       this.setState({
         greenSection: false,
         redSection: false,
         blueSection: false,
-        orangeSection: true
+        orangeSection: true,
+        section: 'orange'
       })
     }
   }
@@ -286,24 +306,20 @@ class HomeScreen extends Component {
         toValue: yPos,
         duration: 400,
       }),
-      Animated.timing(
-        this.state.animatedValue,
-        {
-          toValue: this.state.animatedValue._value ? 0 : 1,
-          duration: 200,
-        }
+      Animated.timing(this.state.animatedValue, {
+        toValue: this.state.animatedValue._value ? 0 : 1,
+        duration: 200,
+      }
       )
     ]).start()
   }
 
   closePanel(yPos) {
     Animated.parallel([
-      Animated.timing(
-        this.state.animatedValue,
-        {
-          toValue: this.state.animatedValue._value ? 0 : 1,
-          duration: 200,
-        }
+      Animated.timing(this.state.animatedValue, {
+        toValue: this.state.animatedValue._value ? 0 : 1,
+        duration: 200,
+      }
       ),
       Animated.timing(this.state.posY, {
         toValue: yPos,
@@ -312,9 +328,11 @@ class HomeScreen extends Component {
     ]).start()
     // here should provide the API back call to GET 
     // the items that
-    if (this.state.floor1) this.fetchDataBySection(api_first_floor)
-    else if (this.state.floor2) this.fetchDataBySection(api_second_floor)
-    else if (this.state.floor3) this.fetchDataBySection(api_third_floor)
+    // console.log('section', this.state.section, 'floor', this.state.floor)
+    this.fetchDataBySection(this.state.section, this.state.floor)
+    // if (this.state.floor1) this.fetchDataBySection(this.state.section, api_first_floor)
+    // else if (this.state.floor2) this.fetchDataBySection(this.state.section, api_second_floor)
+    // else if (this.state.floor3) this.fetchDataBySection(this.state.section, api_third_floor)
   }
 
   renderFilteringPanel = () => {
@@ -455,77 +473,77 @@ class HomeScreen extends Component {
         {/* body */}
         <Animated.View style={{ opacity: opacityBackground, flex: 1 }}>
           {/* <Animated.View style={[this.state.opacity ? {opacity: 0.5} : null, { flex: 1 }]}> */}
-          <ScrollView
+          {/* <ScrollView
             style={container.bodyContainer}
             refreshControl={
               <RefreshControl refreshing={this.state.refreshing} onRefresh={this.handleRefresh} />
             }
-          >
-            <View style={container.bodySubContainer}>
-              {/* title available */}
-              <View style={container.contentContainer}>
-                {/* {this.state.favPhoneRoom.length ? */}
-                {/* {this.props.favRooms !== null ? */}
-                {this.props.favRooms.length > 0 ?
-                  <View>
-                    <View style={{ paddingLeft: 5 }}>
-                      <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>
-                        Favorites
+          > */}
+          <View style={container.bodySubContainer}>
+            {/* title available */}
+            <View style={container.contentContainer}>
+              {/* {this.state.favPhoneRoom.length ? */}
+              {/* {this.props.favRooms !== null ? */}
+              {this.props.favRooms.length > 0 ?
+                <View>
+                  <View style={{ paddingLeft: 5 }}>
+                    <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>
+                      Favorites
                   </Text>
-                    </View>
-                    <View>
-                      {/* not showing with this.props.favoriteRooms */}
-                      <FlatList
-                        // data={favRoom} // this would be this.props.favoriteRooms
-                        // data={this.state.favPhoneRoom} // this would be this.props.favoriteRooms
-                        data={this.props.favRooms} // this would be this.props.favoriteRooms
-                        keyExtractor={item => item.roomId}
-                        renderItem={this.renderPhoneRooms}
-                      />
-                    </View>
                   </View>
-                  : null}
-                {this.props.phoneRoomsAvailable.length > 0 ?
                   <View>
-                    <View style={{ paddingLeft: 5, paddingTop: 20 }}>
-                      <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>
-                        Available
+                    {/* not showing with this.props.favoriteRooms */}
+                    <FlatList
+                      // data={favRoom} // this would be this.props.favoriteRooms
+                      // data={this.state.favPhoneRoom} // this would be this.props.favoriteRooms
+                      data={this.props.favRooms} // this would be this.props.favoriteRooms
+                      keyExtractor={item => item.roomId}
+                      renderItem={this.renderPhoneRooms}
+                    />
+                  </View>
+                </View>
+                : null}
+              {this.props.phoneRoomsAvailable.length > 0 ?
+                <View>
+                  <View style={{ paddingLeft: 5, paddingTop: 20 }}>
+                    <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>
+                      Available
                   </Text>
-                    </View>
-                    <View>
-                      <FlatList
-                        // data={this.props.mockData}
-                        // data={this.state.phoneRoomsAvailable} // this would be this.props.phoneRoomsAvailable
-                        data={this.props.phoneRoomsAvailable} // this would be this.props.phoneRoomsAvailable
-                        // data={this.state.phoneRoom}
-                        // data={phoneRoomMockData}
-                        keyExtractor={item => item.roomId}
-                        renderItem={this.renderPhoneRooms}
-                      />
-                    </View>
                   </View>
-                  : null}
-                {this.props.phoneRoomsUnavailable.length > 0 ?
                   <View>
-                    <View style={{ paddingLeft: 5, paddingTop: 20 }}>
-                      <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>
-                        Not Available
+                    <FlatList
+                      // data={this.props.mockData}
+                      // data={this.state.phoneRoomsAvailable} // this would be this.props.phoneRoomsAvailable
+                      data={this.props.phoneRoomsAvailable} // this would be this.props.phoneRoomsAvailable
+                      // data={this.state.phoneRoom}
+                      // data={phoneRoomMockData}
+                      keyExtractor={item => item.roomId}
+                      renderItem={this.renderPhoneRooms}
+                    />
+                  </View>
+                </View>
+                : null}
+              {this.props.phoneRoomsUnavailable.length > 0 ?
+                <View>
+                  <View style={{ paddingLeft: 5, paddingTop: 20 }}>
+                    <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>
+                      Not Available
                 </Text>
-                    </View>
-                    <View>
-                      <FlatList
-                        // data={this.state.phoneRoomsUnavailable}  // this would be this.props.phoneRoomsAvailable
-                        data={this.props.phoneRoomsUnavailable}  // this would be this.props.phoneRoomsAvailable
-                        // data={phoneRoomMockData}
-                        keyExtractor={item => item.roomId}
-                        renderItem={this.renderPhoneRooms}
-                      />
-                    </View>
                   </View>
-                  : null}
-              </View>
+                  <View>
+                    <FlatList
+                      // data={this.state.phoneRoomsUnavailable}  // this would be this.props.phoneRoomsAvailable
+                      data={this.props.phoneRoomsUnavailable}  // this would be this.props.phoneRoomsAvailable
+                      // data={phoneRoomMockData}
+                      keyExtractor={item => item.roomId}
+                      renderItem={this.renderPhoneRooms}
+                    />
+                  </View>
+                </View>
+                : null}
             </View>
-          </ScrollView>
+          </View>
+          {/* </ScrollView> */}
         </Animated.View>
         {this.renderFilteringPanel()}
       </View>

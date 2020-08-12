@@ -65,10 +65,10 @@ const reducer = (state = initialState, action) => {
                         return item
                     }),
                     phoneRoomsAvailable: state.phoneRoomsAvailable.filter(item => {
-                        return item.roomId !== action.payload.item.roomId // is this filtering out all other rooms?
+                        return item.roomId !== action.payload.item.roomId
                     }),
                     backData: state.backData.filter(item => {
-                        return item.roomId !== action.payload.item.roomId // is this filtering out all other rooms?
+                        return item.roomId !== action.payload.item.roomId
                     }),
                 }
             } else {

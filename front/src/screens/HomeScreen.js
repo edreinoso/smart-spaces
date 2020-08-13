@@ -86,9 +86,10 @@ class HomeScreen extends Component {
     return API.get('motion', `/users/${this.props.username}`);
   }
 
-  apiGetSection(section) {
+  apiGetSection(section, floor) {
     // item would come to be the section
-    return API.get('motion', `/sections/${this.props.username}?section=${section}`)
+    console.log('line 91 -', section, floor)
+    return API.get('motion', `/sections/${this.props.username}?section=${section}&floor=${floor}`)
     // return API.get('motion', `/sections/${this.props.username}?section=${section}?floor=${floor}`)
   }
 
@@ -123,7 +124,7 @@ class HomeScreen extends Component {
   fetchDataFromDDB = async (floor) => {
     await this.apiGetCall() //fetch the whole data
       .then(response => {
-        console.log(response.returnRooms, response.favRooms)
+        // console.log(response.returnRooms, response.favRooms)
         this.props.add(response.favRooms, 'backFavorite') // store favRooms in backFav
         this.props.add(response.returnRooms) // store returnRooms into backData
       })
@@ -134,20 +135,28 @@ class HomeScreen extends Component {
   }
 
   fetchDataBySection = async (section, floor) => {
-    console.log('HomeScreen - line 135', section, floor)
-    // you can simply 
-    await this.apiGetSection(section) // is it really necessary to do an API call for this? 
+    // is there an option to aggregate these variables with the ones from fetch by floor
+    var roomAvailable = []
+    var roomNotAvailable = []
+    await this.apiGetSection(section, floor) // is it really necessary to do an API call for this? 
       .then(response => {
-        // console.log('HomeScreen - line 138', response)
+        // console.log('HomeScreen - line 141', typeof (response))
+        // console.log('HomeScreen - line 142', response)
+        response.returnRooms.map((item, index) => {
+          if (item.availability) roomAvailable.push(item)
+          else roomNotAvailable.push(item)
+        })
         // this might not necessarily work because you are literally replacing the current backData
         // by the incoming green room section
-        this.props.add(response.returnRooms) // store returnRooms in backData
+        // this.props.add(response.returnRooms) // store returnRooms in backData
         // gonna have to test what the response with favRooms looke like
       })
       .catch(error => {
         console.log(error)
       })
-    this.fetchByFloor(floor)
+    this.props.add(roomAvailable, 'available')
+    this.props.add(roomNotAvailable, 'unavailable')
+    // this.fetchByFloor(floor)
   }
 
   fetchByFloor = (floor) => { // this function will be responsible to fetch by floors

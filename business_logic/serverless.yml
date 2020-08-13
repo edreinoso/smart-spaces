@@ -57,7 +57,11 @@ functions:
           method: get
           request:
             template:
-              application/json: '{ "section": "$input.params(''section'')" }'
+              application/json: >
+               {
+                 "section": "$input.params('section')",
+                 "floor": "$input.params('floor')"
+               }
       - http:
           path: "/users"
           method: post

@@ -222,11 +222,12 @@ app.get('/sections/:username', function (req, res) {
       var returnRooms = []
       console.log('fitlering by section', result.Items)
       // var favRooms = []
-      result.Items.map((item, index) => {
-        item.rooms.map((item2, index) => {
-          console.log(item2.section, req.query.section)
-          if(item2.section == req.query.section) {
-            returnRooms.push(item2)
+      result.Items.map((resultItems, index) => {
+        resultItems.rooms.map((roomItems, index) => {
+          console.log('sections: ', roomItems.section, req.query.section)
+          console.log('floors: ', roomItems.floor, req.query.floor)
+          if(roomItems.floor == req.query.floor && roomItems.section == req.query.section) {
+            returnRooms.push(roomItems)
           }
         })
       })

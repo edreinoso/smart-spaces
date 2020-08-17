@@ -40,11 +40,11 @@ class HomeScreen extends Component {
     // https://github.com/GeekyAnts/NativeBase/issues/3109
     YellowBox.ignoreWarnings(['Animated: `useNativeDriver`', 'VirtualizedLists should never be nested']); // should get rid of VirtualizedList
 
-    // this.state.interval = setInterval(() => {
-    //   if (this.state.floor1) this.fetchRoomsSensorData(api_first_floor)
-    //   else if (this.state.floor2) this.fetchRoomsSensorData(api_second_floor)
-    //   else if (this.state.floor3) this.fetchRoomsSensorData(api_third_floor)
-    // }, 5000);
+    this.state.interval = setInterval(() => {
+      if (this.state.floor1) this.fetchRoomsSensorData(api_first_floor)
+      else if (this.state.floor2) this.fetchRoomsSensorData(api_second_floor)
+      else if (this.state.floor3) this.fetchRoomsSensorData(api_third_floor)
+    }, 10000);
     this.setState({
       greenSection: false,
       redSection: false,
@@ -71,9 +71,9 @@ class HomeScreen extends Component {
     }
   }
 
-  // componentWillUnmount() {
-  //   clearInterval(this.state.interval);
-  // }
+  componentWillUnmount() {
+    clearInterval(this.state.interval);
+  }
 
   resetState = (closeIsDoneByAnimation) => {
     this.setState({
@@ -181,16 +181,16 @@ class HomeScreen extends Component {
     var favRoom = []
     var roomAvailable = []
     var roomNotAvailable = []
-    console.log('line 186: ', this.state.section)
+    // console.log('line 186: ', this.state.section)  
     // it is being done locally, no API call required
     this.props.backData.map((item, index) => {
       // logic for handling rooms available and not available
       if (item.floor === floor && this.state.section != "") { // this is applied for filtering
-        console.log('selecting rooms by filter', item.roomName)
+        // console.log('selecting rooms by filter', item.roomName)
         if (item.availability && item.section == this.state.section) roomAvailable.push(item) // roomAvailable are going to be pushed with section included
         else if (!item.availability && item.section == this.state.section) roomNotAvailable.push(item) // roomNotAvailable are going to be pushed with section included
       } else if (item.floor === floor) { // this is applied per floor
-        console.log('not selecting rooms by filter', item.roomName)
+        // console.log('not selecting rooms by filter', item.roomName)
         if (item.availability) roomAvailable.push(item) // roomAvailable are going to be pushed
         else roomNotAvailable.push(item) // roomNotAvailable are going to be pushed
       }
@@ -201,7 +201,7 @@ class HomeScreen extends Component {
       if (item.floor === floor && this.state.section != "") {
         if (item.floor === floor && item.section === this.state.section) favRoom.push(item) // favRooms are going to be pushed
       }
-      else if (item.floor) favRoom.push(item) // favRooms are going to be pushed
+      else if (item.floor === floor) favRoom.push(item) // favRooms are going to be pushed
 
     })
     this.props.add(favRoom, 'favorite') // this is where favorites is getting used
@@ -221,6 +221,7 @@ class HomeScreen extends Component {
       }
     }
     // console.log('line 208-', item)
+    // console.log('line 224- item on fetchRoomsSensorData', item)
     await this.apiPostCall(item) //data returning is coming as availability true
       .then(response => {
         // console.log('fetching from sensor, line 211', response)
@@ -244,20 +245,19 @@ class HomeScreen extends Component {
       body: {
         username: this.props.username,
         rooms: this.props.backData, // contains the whole data
-        // favorites: this.props.backFavData // this is giving undefined
-        favorites: this.props.favRooms // this is giving undefined
+        favorites: this.props.backFavData // need to send the backFavData, not the favRooms
       },
     };
     // console.log('line 151, onUpdateSensorData', item)
     // console.log('line 237, onUpdateSensorData', item)
-    console.log('line 253, onUpdateSensorData', item)
+    // console.log('line 253, onUpdateSensorData', item)
     await this.apiPutCall(item)
       .catch(error => {
         console.log(error)
       })
   }
 
-  onValueChange(key) {
+  onFloorChange(key) {
     if (key === 'floor1') {
       this.setState({
         floor1: true,
@@ -503,17 +503,17 @@ class HomeScreen extends Component {
           <View style={header.tabsHeader}>
             <HomeButton
               text={'Floor 1'}
-              onButtonPress={() => this.onValueChange('floor1')}
+              onButtonPress={() => this.onFloorChange('floor1')}
               value={this.state.floor1}
             />
             <HomeButton
               text={'Floor 2'}
-              onButtonPress={() => this.onValueChange('floor2')}
+              onButtonPress={() => this.onFloorChange('floor2')}
               value={this.state.floor2}
             />
             <HomeButton
               text={'Floor 3'}
-              onButtonPress={() => this.onValueChange('floor3')}
+              onButtonPress={() => this.onFloorChange('floor3')}
               value={this.state.floor3}
             />
           </View>

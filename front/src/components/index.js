@@ -6,6 +6,7 @@ import Input from './Input';
 import Cards from './Cards'
 import PhoneRoom from './PhoneRoom';
 import Logo from './Logo';
+import Tags from './Tags';
 
 export {
   HomeButton,
@@ -15,5 +16,6 @@ export {
   Input,
   Cards,
   PhoneRoom,
-  Logo
+  Logo,
+  Tags
 }

@@ -94,13 +94,12 @@ const reducer = (state = initialState, action) => {
                         return item
                     }),
                     phoneRoomsUnavailable: state.phoneRoomsUnavailable.filter(item => {
-                        return item.roomId !== action.payload.item.roomId // is this filtering out all other rooms?
+                        return item.roomId !== action.payload.item.roomId
                     }),
                     backData: state.backData.filter(item => {
-                        return item.roomId !== action.payload.item.roomId // is this filtering out all other rooms?
+                        return item.roomId !== action.payload.item.roomId 
                     }),
                 }
-                // do everything with the non available rooms
             }
         case UNFAV_ROOM:
             if (action.payload.item.availability) {

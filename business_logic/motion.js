@@ -10,8 +10,6 @@ const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
 app.use(bodyParser.json({ strict: false }))
 
-// app.get('/sensor/:floor', function (req, res) {
-// app.get('/sensor/:items', function (req, res) {
 app.post('/sensor', function (req, res) {
   // console.log(typeof(parseInt(req.params.floor)))
   // console.log('value of floor: ', typeof(req.params.floor))
@@ -59,6 +57,8 @@ app.post('/sensor', function (req, res) {
         })
 
       // getting the first items
+      // 08/16: data is returning dates from June and July
+      // so it will definitely be available based on this
       console.log('data', data)
 
       // Date Logic Calculation
@@ -90,7 +90,6 @@ app.post('/sensor', function (req, res) {
         }
         else {
           console.log('Room not available')
-          console.log('Room available rooms: ', typeof (rooms), 'favorites: ', typeof (favorites))
           // we are itering through both of the arrays that were given
           // from the req.body. Ideally, we would like change the item
           // property availability for the specific rooms / favorites 
@@ -220,19 +219,20 @@ app.get('/sections/:username', function (req, res) {
     } else {
       // might have to filter response here by section   
       var returnRooms = []
-      console.log('fitlering by section', result.Items)
-      // var favRooms = []
+      var favRooms = [] // NEED TO CONSTRUCT FAVROOMS
       result.Items.map((resultItems, index) => {
         resultItems.rooms.map((roomItems, index) => {
-          console.log('sections: ', roomItems.section, req.query.section)
-          console.log('floors: ', roomItems.floor, req.query.floor)
-          if(roomItems.floor == req.query.floor && roomItems.section == req.query.section) {
+          if (roomItems.floor == req.query.floor && roomItems.section == req.query.section) {
             returnRooms.push(roomItems)
           }
         })
+        resultItems.favorites.map((favoriteItems, index) => {
+          if (favoriteItems.floor == req.query.floor && favoriteItems.section == req.query.section) {
+            favRooms.push(favoriteItems)
+          }
+        })
       })
-      console.log(returnRooms)
-      res.json({ returnRooms })
+      res.json({ returnRooms, favRooms })
     }
   })
 })

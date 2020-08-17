@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { View, ScrollView, Text, StyleSheet, FlatList, RefreshControl, Alert, TouchableOpacity, Animated, YellowBox } from 'react-native';
+import { View, ScrollView, Text, StyleSheet, FlatList, RefreshControl, Alert, TouchableOpacity, Animated, YellowBox, Image, DevSettings } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import { container, text, colors, header, borders } from '../styles/index';
-import { Picture, HomeButton, PhoneRoom, ButtonFilters } from '../components/index';
+import { Picture, HomeButton, PhoneRoom, ButtonFilters, Tags } from '../components/index';
 import { connect } from 'react-redux';
 import { phoneRoomMockData } from "../store/mockdata";
 import { API } from 'aws-amplify';
@@ -17,7 +17,10 @@ class HomeScreen extends Component {
     floor1: true,
     floor2: false,
     floor3: false,
-    floor: '1',
+    floor: '1', // this floor is used by the filtering capability
+    emptyFilteredData: false, // this variable will be in place in case no phone rooms has been found filtered
+    showTagSection: "",
+    section: "",
     initialStarState: false,
     posY: new Animated.Value(-400),  //This is the initial position of the preferenceView
     animatedValue: new Animated.Value(0),
@@ -35,13 +38,13 @@ class HomeScreen extends Component {
   componentDidMount() {
     // there has been no fix for this issue as of now
     // https://github.com/GeekyAnts/NativeBase/issues/3109
-    YellowBox.ignoreWarnings(['Animated: `useNativeDriver`']);
+    YellowBox.ignoreWarnings(['Animated: `useNativeDriver`', 'VirtualizedLists should never be nested']); // should get rid of VirtualizedList
 
     // this.state.interval = setInterval(() => {
     //   if (this.state.floor1) this.fetchRoomsSensorData(api_first_floor)
     //   else if (this.state.floor2) this.fetchRoomsSensorData(api_second_floor)
     //   else if (this.state.floor3) this.fetchRoomsSensorData(api_third_floor)
-    // }, 30000);
+    // }, 5000);
     this.setState({
       greenSection: false,
       redSection: false,
@@ -72,12 +75,19 @@ class HomeScreen extends Component {
   //   clearInterval(this.state.interval);
   // }
 
-  resetState = () => {
+  resetState = (closeIsDoneByAnimation) => {
     this.setState({
       greenSection: false,
       redSection: false,
       blueSection: false,
       orangeSection: false,
+      emptyFilteredData: false,
+      showTagSection: "", // this variable will be responsible to show and hide tag sections
+      section: '',
+    }, () => {
+      if (closeIsDoneByAnimation) { // if the close function is done by animation, then close the panel
+        this.closePanel(-400)
+      }
     })
     this.fetchDataFromDDB(this.state.floor)
   }
@@ -88,7 +98,7 @@ class HomeScreen extends Component {
 
   apiGetSection(section, floor) {
     // item would come to be the section
-    console.log('line 91 -', section, floor)
+    // console.log('line 91 -', section, floor)
     return API.get('motion', `/sections/${this.props.username}?section=${section}&floor=${floor}`)
     // return API.get('motion', `/sections/${this.props.username}?section=${section}?floor=${floor}`)
   }
@@ -136,37 +146,51 @@ class HomeScreen extends Component {
 
   fetchDataBySection = async (section, floor) => {
     // is there an option to aggregate these variables with the ones from fetch by floor
+    var favRoom = []
     var roomAvailable = []
     var roomNotAvailable = []
     await this.apiGetSection(section, floor) // is it really necessary to do an API call for this? 
       .then(response => {
-        // console.log('HomeScreen - line 141', typeof (response))
-        // console.log('HomeScreen - line 142', response)
-        response.returnRooms.map((item, index) => {
-          if (item.availability) roomAvailable.push(item)
-          else roomNotAvailable.push(item)
+        if (response.returnRooms.length == 0 && response.favRooms.length == 0) {
+          this.setState({
+            emptyFilteredData: true
+          })
+        } else {
+          this.setState({
+            emptyFilteredData: false
+          })
+        }
+        response.returnRooms.map((returnRoomsItem, index) => {
+          if (returnRoomsItem.availability) roomAvailable.push(returnRoomsItem)
+          else roomNotAvailable.push(returnRoomsItem)
         })
-        // this might not necessarily work because you are literally replacing the current backData
-        // by the incoming green room section
-        // this.props.add(response.returnRooms) // store returnRooms in backData
-        // gonna have to test what the response with favRooms looke like
+        response.favRooms.map((favRoomsItem, index) => {
+          favRoom.push(favRoomsItem)
+        })
+        this.props.add(favRoom, 'favorite')
+        this.props.add(roomAvailable, 'available')
+        this.props.add(roomNotAvailable, 'unavailable')
       })
       .catch(error => {
         console.log(error)
       })
-    this.props.add(roomAvailable, 'available')
-    this.props.add(roomNotAvailable, 'unavailable')
-    // this.fetchByFloor(floor)
   }
 
+  //====== HEART OF THE CLASS ======//
   fetchByFloor = (floor) => { // this function will be responsible to fetch by floors
     var favRoom = []
     var roomAvailable = []
     var roomNotAvailable = []
+    console.log('line 186: ', this.state.section)
     // it is being done locally, no API call required
     this.props.backData.map((item, index) => {
       // logic for handling rooms available and not available
-      if (item.floor === floor) {
+      if (item.floor === floor && this.state.section != "") { // this is applied for filtering
+        console.log('selecting rooms by filter', item.roomName)
+        if (item.availability && item.section == this.state.section) roomAvailable.push(item) // roomAvailable are going to be pushed with section included
+        else if (!item.availability && item.section == this.state.section) roomNotAvailable.push(item) // roomNotAvailable are going to be pushed with section included
+      } else if (item.floor === floor) { // this is applied per floor
+        console.log('not selecting rooms by filter', item.roomName)
         if (item.availability) roomAvailable.push(item) // roomAvailable are going to be pushed
         else roomNotAvailable.push(item) // roomNotAvailable are going to be pushed
       }
@@ -174,29 +198,36 @@ class HomeScreen extends Component {
     // if I'm carrying individual items by the floor on the availability,
     // then I should do the same for the favorite
     this.props.backFavData.map((item, index) => {
-      if (item.floor === floor) {
-        favRoom.push(item) // favRooms are going to be pushed
+      if (item.floor === floor && this.state.section != "") {
+        if (item.floor === floor && item.section === this.state.section) favRoom.push(item) // favRooms are going to be pushed
       }
+      else if (item.floor) favRoom.push(item) // favRooms are going to be pushed
+
     })
-    this.props.add(favRoom, 'favorite')
+    this.props.add(favRoom, 'favorite') // this is where favorites is getting used
     this.props.add(roomAvailable, 'available')
     this.props.add(roomNotAvailable, 'unavailable')
   }
+  //====== HEART OF THE CLASS ======//
 
   fetchRoomsSensorData = async (floor) => { // comparing sensor data with user data on rooms
+    // console.log('199 -', this.props.backData, this.props.backFavData)
     const item = {
       body: {
         floor: floor,
         rooms: this.props.backData,
-        favorites: this.props.favRooms
+        favorites: this.props.backFavData
+        // favorites: this.props.favRooms
       }
     }
-    await this.apiPostCall(item)
+    // console.log('line 208-', item)
+    await this.apiPostCall(item) //data returning is coming as availability true
       .then(response => {
-        // console.log(response)
+        // console.log('fetching from sensor, line 211', response)
         // this is not getting updated
         // instead of adding, we should just replace it by the new object
-        this.props.add(response.favorites, 'favorite')
+        // 08/16: why is this favorite instead of backFavorite
+        this.props.add(response.favorites, 'backFavorite') // getting a response with the favorite
         this.props.add(response.rooms)
       })
       .catch(error => {
@@ -208,14 +239,18 @@ class HomeScreen extends Component {
   }
 
   onUpdateSensorData = async () => { // updating user data with the current updates from the sensor data
+    // console.log('line 227- ',this.props.backFavData, this.props.favRooms)
     const item = {
       body: {
         username: this.props.username,
         rooms: this.props.backData, // contains the whole data
-        favorites: this.props.backFavData // not going well since the this.props is async
+        // favorites: this.props.backFavData // this is giving undefined
+        favorites: this.props.favRooms // this is giving undefined
       },
     };
     // console.log('line 151, onUpdateSensorData', item)
+    // console.log('line 237, onUpdateSensorData', item)
+    console.log('line 253, onUpdateSensorData', item)
     await this.apiPutCall(item)
       .catch(error => {
         console.log(error)
@@ -320,7 +355,11 @@ class HomeScreen extends Component {
         duration: 200,
       }
       )
-    ]).start()
+    ]).start(() => {
+      this.setState({
+        emptyFilteredData: false
+      })
+    })
   }
 
   closePanel(yPos) {
@@ -334,14 +373,14 @@ class HomeScreen extends Component {
         toValue: yPos,
         duration: 400,
       }),
-    ]).start()
-    // here should provide the API back call to GET 
-    // the items that
-    // console.log('section', this.state.section, 'floor', this.state.floor)
-    this.fetchDataBySection(this.state.section, this.state.floor)
-    // if (this.state.floor1) this.fetchDataBySection(this.state.section, api_first_floor)
-    // else if (this.state.floor2) this.fetchDataBySection(this.state.section, api_second_floor)
-    // else if (this.state.floor3) this.fetchDataBySection(this.state.section, api_third_floor)
+    ]).start(() => {
+      this.setState({ showTagSection: "showTag" })
+    })
+    // if any of the secitons have been selected during panel opening, then display the filter
+    // if not, then don't do anything
+    if (this.state.greenSection || this.state.redSection || this.state.orangeSection || this.state.blueSection) {
+      this.fetchDataBySection(this.state.section, this.state.floor)
+    }
   }
 
   renderFilteringPanel = () => {
@@ -383,7 +422,7 @@ class HomeScreen extends Component {
             </View>
           </View>
           <View style={[{ flex: .2, flexDirection: "row", justifyContent: 'flex-end', alignItems: 'flex-start', paddingRight: 15 }]}>
-            <TouchableOpacity style={styles.horizontalPaddingClearCancel} onPress={() => this.resetState()}>
+            <TouchableOpacity style={styles.horizontalPaddingClearCancel} onPress={() => this.resetState(true)}>
               <Text>
                 Clear
               </Text>
@@ -391,7 +430,7 @@ class HomeScreen extends Component {
             {/* there has to be some other logic here for filtering */}
             <TouchableOpacity onPress={() => this.closePanel(-400)}>
               <Text>
-                Close
+                Filter
             </Text>
             </TouchableOpacity>
           </View>
@@ -482,77 +521,95 @@ class HomeScreen extends Component {
         {/* body */}
         <Animated.View style={{ opacity: opacityBackground, flex: 1 }}>
           {/* <Animated.View style={[this.state.opacity ? {opacity: 0.5} : null, { flex: 1 }]}> */}
-          {/* <ScrollView
+          <ScrollView
             style={container.bodyContainer}
             refreshControl={
               <RefreshControl refreshing={this.state.refreshing} onRefresh={this.handleRefresh} />
             }
-          > */}
-          <View style={container.bodySubContainer}>
-            {/* title available */}
-            <View style={container.contentContainer}>
-              {/* {this.state.favPhoneRoom.length ? */}
-              {/* {this.props.favRooms !== null ? */}
-              {this.props.favRooms.length > 0 ?
-                <View>
-                  <View style={{ paddingLeft: 5 }}>
-                    <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>
-                      Favorites
-                  </Text>
-                  </View>
-                  <View>
-                    {/* not showing with this.props.favoriteRooms */}
-                    <FlatList
-                      // data={favRoom} // this would be this.props.favoriteRooms
-                      // data={this.state.favPhoneRoom} // this would be this.props.favoriteRooms
-                      data={this.props.favRooms} // this would be this.props.favoriteRooms
-                      keyExtractor={item => item.roomId}
-                      renderItem={this.renderPhoneRooms}
+          >
+            <View style={container.bodySubContainer}>
+              {/* title available */}
+              <View style={container.contentContainer}>
+                {/* {this.state.showTagSection != "" ? */}
+                {this.state.section != "" ?
+                  <View style={{ marginBottom: 5 }}>
+                    <Tags
+                      section={this.state.section}
+                      onButtonPress={() => this.resetState(false)}
                     />
                   </View>
-                </View>
-                : null}
-              {this.props.phoneRoomsAvailable.length > 0 ?
-                <View>
-                  <View style={{ paddingLeft: 5, paddingTop: 20 }}>
-                    <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>
-                      Available
-                  </Text>
+                  :
+                  // <View style={[borders.black]}><Text>Hello</Text></View>
+                  null
+                }
+                {this.state.emptyFilteredData ?
+                  <View style={[{ justifyContent: 'center', alignItems: 'center', marginBottom: 5 }]}>
+                    <Image source={require('../../assets/message_in_bottle.png')} />
+                    <Text>No rooms found with this filter </Text>
                   </View>
+                  :
+                  null
+                }
+                {this.props.favRooms.length > 0 ?
                   <View>
-                    <FlatList
-                      // data={this.props.mockData}
-                      // data={this.state.phoneRoomsAvailable} // this would be this.props.phoneRoomsAvailable
-                      data={this.props.phoneRoomsAvailable} // this would be this.props.phoneRoomsAvailable
-                      // data={this.state.phoneRoom}
-                      // data={phoneRoomMockData}
-                      keyExtractor={item => item.roomId}
-                      renderItem={this.renderPhoneRooms}
-                    />
+                    <View style={{ paddingLeft: 5, paddingTop: 20 }}>
+                      <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>
+                        Favorites
+                  </Text>
+                    </View>
+                    <View>
+                      {/* not showing with this.props.favoriteRooms */}
+                      <FlatList
+                        // data={favRoom} // this would be this.props.favoriteRooms
+                        // data={this.state.favPhoneRoom} // this would be this.props.favoriteRooms
+                        data={this.props.favRooms} // this would be this.props.favoriteRooms
+                        keyExtractor={item => item.roomId}
+                        renderItem={this.renderPhoneRooms}
+                      />
+                    </View>
                   </View>
-                </View>
-                : null}
-              {this.props.phoneRoomsUnavailable.length > 0 ?
-                <View>
-                  <View style={{ paddingLeft: 5, paddingTop: 20 }}>
-                    <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>
-                      Not Available
+                  : null}
+                {this.props.phoneRoomsAvailable.length > 0 ?
+                  <View>
+                    <View style={{ paddingLeft: 5, paddingTop: 20 }}>
+                      <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>
+                        Available
+                  </Text>
+                    </View>
+                    <View>
+                      <FlatList
+                        // data={this.props.mockData}
+                        // data={this.state.phoneRoomsAvailable} // this would be this.props.phoneRoomsAvailable
+                        data={this.props.phoneRoomsAvailable} // this would be this.props.phoneRoomsAvailable
+                        // data={this.state.phoneRoom}
+                        // data={phoneRoomMockData}
+                        keyExtractor={item => item.roomId}
+                        renderItem={this.renderPhoneRooms}
+                      />
+                    </View>
+                  </View>
+                  : null}
+                {this.props.phoneRoomsUnavailable.length > 0 ?
+                  <View>
+                    <View style={{ paddingLeft: 5, paddingTop: 20 }}>
+                      <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>
+                        Not Available
                 </Text>
+                    </View>
+                    <View>
+                      <FlatList
+                        // data={this.state.phoneRoomsUnavailable}  // this would be this.props.phoneRoomsAvailable
+                        data={this.props.phoneRoomsUnavailable}  // this would be this.props.phoneRoomsAvailable
+                        // data={phoneRoomMockData}
+                        keyExtractor={item => item.roomId}
+                        renderItem={this.renderPhoneRooms}
+                      />
+                    </View>
                   </View>
-                  <View>
-                    <FlatList
-                      // data={this.state.phoneRoomsUnavailable}  // this would be this.props.phoneRoomsAvailable
-                      data={this.props.phoneRoomsUnavailable}  // this would be this.props.phoneRoomsAvailable
-                      // data={phoneRoomMockData}
-                      keyExtractor={item => item.roomId}
-                      renderItem={this.renderPhoneRooms}
-                    />
-                  </View>
-                </View>
-                : null}
+                  : null}
+              </View>
             </View>
-          </View>
-          {/* </ScrollView> */}
+          </ScrollView>
         </Animated.View>
         {this.renderFilteringPanel()}
       </View>

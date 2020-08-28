@@ -1,12 +1,16 @@
 import React, { Component } from 'react';
 import { View, ScrollView, Text, StyleSheet, FlatList, RefreshControl, Alert, TouchableOpacity, Animated, YellowBox, Image, DevSettings } from 'react-native';
+// import { Permissions, Notifications, Constants } from 'expo';
+import Constants from 'expo-constants';
+import * as Notifications from 'expo-notifications';
+import * as Permissions from 'expo-permissions';
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import { container, text, colors, header, borders } from '../styles/index';
 import { Picture, HomeButton, PhoneRoom, ButtonFilters, Tags } from '../components/index';
 import { connect } from 'react-redux';
 import { phoneRoomMockData } from "../store/mockdata";
 import { API } from 'aws-amplify';
-import { stars, add, favorite } from '../store/actions/index'
+import { stars, add, favorite, notifications } from '../store/actions/index'
 
 var api_first_floor = '1'
 var api_second_floor = '2'
@@ -25,6 +29,7 @@ class HomeScreen extends Component {
     posY: new Animated.Value(-400),  //This is the initial position of the preferenceView
     animatedValue: new Animated.Value(0),
     opacity: false,
+    expoPushToken: null,
 
     favPhoneRoom: [],
     phoneRoomsAvailable: [],
@@ -35,23 +40,24 @@ class HomeScreen extends Component {
     interval: null,
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     // there has been no fix for this issue as of now
     // https://github.com/GeekyAnts/NativeBase/issues/3109
     YellowBox.ignoreWarnings(['Animated: `useNativeDriver`', 'VirtualizedLists should never be nested']); // should get rid of VirtualizedList
+    // this.registerForPushNotificationsAsync() // this requires async calls from componentDidMount
 
-    this.state.interval = setInterval(() => {
-      if (this.state.floor1) this.fetchRoomsSensorData(api_first_floor)
-      else if (this.state.floor2) this.fetchRoomsSensorData(api_second_floor)
-      else if (this.state.floor3) this.fetchRoomsSensorData(api_third_floor)
-    }, 10000);
-    this.setState({
-      greenSection: false,
-      redSection: false,
-      blueSection: false,
-      orangeSection: false,
-      section: ''
-    })
+    // this.state.interval = setInterval(() => {
+    //   if (this.state.floor1) this.fetchRoomsSensorData(api_first_floor)
+    //   else if (this.state.floor2) this.fetchRoomsSensorData(api_second_floor)
+    //   else if (this.state.floor3) this.fetchRoomsSensorData(api_third_floor)
+    // }, 10000);
+    // this.setState({
+    //   greenSection: false,
+    //   redSection: false,
+    //   blueSection: false,
+    //   orangeSection: false,
+    //   section: ''
+    // })
     if (this.props.authenticated) {
       // Local
       // this.fetchDataFromLocal()
@@ -71,9 +77,9 @@ class HomeScreen extends Component {
     }
   }
 
-  componentWillUnmount() {
-    clearInterval(this.state.interval);
-  }
+  // componentWillUnmount() {
+  //   clearInterval(this.state.interval);
+  // }
 
   resetState = (closeIsDoneByAnimation) => {
     this.setState({
@@ -344,6 +350,75 @@ class HomeScreen extends Component {
       })
   }
 
+  registerForPushNotificationsAsync = async () => {
+    if (Constants.isDevice) {
+      console.log('inside function')
+      const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
+      let finalStatus = existingStatus;
+      if (existingStatus !== 'granted') {
+        console.log('permissions granted')
+        const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+        finalStatus = status;
+      }
+      if (finalStatus !== 'granted') {
+        console.log('permissions not granted')
+        alert('Failed to get push token for push notification!');
+        return;
+      }
+      const token = await Notifications.getExpoPushTokenAsync();
+      console.log('testing tokens',token);
+      // this part should be dealt with DynamoDB, there should be a
+      // column to store the token obtained
+      this.setState({ expoPushToken: token.data }); // have to engineer this part
+    } else {
+      alert('Must use physical device for Push Notifications');
+    }
+  };
+
+  sendPushNotification = () => {
+    console.log('send push notifiaction', this.state.expoPushToken)
+    let response = fetch('https://exp.host/--/api/v2/push/send', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        to: 'ExponentPushToken[iJokGCEYtEcHKnB52OqCS6]',
+        sound: 'default',
+        title: 'Demo',
+        body: 'Hello World'
+      })
+    })
+    console.log(response)
+  }
+
+  onNotificationPress = async (item) => {
+    // I have to change this in store
+    // then I have to make the API to make the change
+    console.log(item)
+    if (item.favorite) {
+      console.log('doing favorite notification')
+      await this.props.notifications(item, 'favorite') // this redux call HAS to be executed first
+    } else {
+      console.log('not doing favorite')
+      await this.props.notifications(item) // this redux call HAS to be executed first
+    }
+    const notificationItem = {
+      body: {
+        username: this.props.username,
+        rooms: this.props.backData, // contains the whole data
+        favorites: this.props.backFavData // not going well since the this.props is async
+      },
+    };
+    console.log('line 414, homescreen: ', notificationItem)
+    await this.apiPutCall(notificationItem)
+      .catch(error => {
+        console.log(error)
+      })
+    this.fetchByFloor(this.state.floor)
+  }
+
   openPanel(yPos) {
     Animated.parallel([
       Animated.timing(this.state.posY, {
@@ -443,8 +518,9 @@ class HomeScreen extends Component {
     return (
       <PhoneRoom
         item={item}
-        // showStar={this.state.showStar}
         onStarPress={() => this.onStarPress(item)}
+        // onNotificationPress={() => this.sendPushNotification()}
+        onNotificationPress={() => this.onNotificationPress(item)}
       />
     )
   }
@@ -663,7 +739,7 @@ const mapDispatchToProps = dispatch => {
     stars: (starring) => dispatch(stars(starring)),
     add: (item, type) => dispatch(add(item, type)),
     favorite: (item, type) => dispatch(favorite(item, type)),
-    // addItemToFav: (item, state) => dispatch(addItemToFav(item, state)),
+    notifications: (item, type) => dispatch(notifications(item, type))
   }
 }
 

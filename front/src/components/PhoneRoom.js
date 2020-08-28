@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import Icon from 'react-native-vector-icons/AntDesign'
+import AntDesignIcon from 'react-native-vector-icons/AntDesign'
+import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { text, colors, borders } from '../styles/index';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -10,7 +11,7 @@ class PhoneRoom extends Component {
     const {
       item,
       onStarPress,
-      showStar
+      onNotificationPress
     } = this.props;
     return (
       <View style={styles.roomContainer}>
@@ -22,38 +23,53 @@ class PhoneRoom extends Component {
         >
           <View style={[item.availability ? styles.avRoomContainer : styles.ocRoomContainer, { flexDirection: 'row', justifyContent: 'space-between' }]}>
             <View style={{ flexDirection: 'row' }}>
-              <View style={[{paddingHorizontal: 10, justifyContent:'center'}]}>
+              <View style={[{ paddingHorizontal: 10, justifyContent: 'center' }]}>
                 <View
                   style={[
-                    (item.section === "green" ? { width: 13, height: 13, borderRadius: 100, backgroundColor: "#6DD400" } : null) || (item.section === "blue" ? { width: 13, height: 13, borderRadius: 100, backgroundColor: "#0091FF" } : null) || (item.section === "red" ? { width: 13, height: 13, borderRadius: 100, backgroundColor: "#E02020" } : null) || (item.section === "orange" ? { width: 13, height: 13, borderRadius: 100, backgroundColor: "#FA6400" } : null) 
-                  
+                    (item.section === "green" ? { width: 13, height: 13, borderRadius: 100, backgroundColor: "#6DD400" } : null) || (item.section === "blue" ? { width: 13, height: 13, borderRadius: 100, backgroundColor: "#0091FF" } : null) || (item.section === "red" ? { width: 13, height: 13, borderRadius: 100, backgroundColor: "#E02020" } : null) || (item.section === "orange" ? { width: 13, height: 13, borderRadius: 100, backgroundColor: "#FA6400" } : null)
+
                   ]}
-                  // style={[{ width: 13, height: 13, borderRadius: 100, backgroundColor: item.section }]}
+                // style={[{ width: 13, height: 13, borderRadius: 100, backgroundColor: item.section }]}
                 />
               </View>
               <Text style={[item.availability ? styles.avRoomText : styles.ocRoomText]}>
                 {item.roomName}
               </Text>
             </View>
-            {/* there is really no reference to the this.props.hide. It might hide all of the elements instead of a single one */}
-            {!showStar ?
-              <TouchableOpacity onPress={() => onStarPress()} style={[{ justifyContent: 'center', margin: 15, paddingHorizontal: 6 }]}>
+            <View style={[{ flexDirection: 'row', marginVertical: 15, marginLeft: 15, paddingHorizontal: 6 }]}>
+              <TouchableOpacity onPress={() => onStarPress()} style={[{ justifyContent: 'center', marginHorizontal: 3 }]}>
                 {item.favorite ? // this is why favorite is important in each component
-                  <Icon
+                  <AntDesignIcon
                     name={'star'} // empty
                     color={colors.yellow}
                     size={20}
                   />
                   :
-                  <Icon
+                  <AntDesignIcon
                     name={'staro'} // filled
                     color={colors.yellow}
                     size={20}
                   />
                 }
               </TouchableOpacity>
-              : null
-            }
+              <TouchableOpacity onPress={() => onNotificationPress()} style={[{ justifyContent: 'center', marginHorizontal: 3 }]}>
+                {
+                  item.notifications ?
+                  <FontAwesomeIcon
+                    name={'bell-o'} // empty
+                    color={colors.darkGrey}
+                    size={19}
+                  />
+                  :
+                  <FontAwesomeIcon
+                    name={'bell-slash-o'} // empty
+                    color={colors.darkGrey}
+                    size={19}
+                  />
+                }
+              </TouchableOpacity>
+            </View>
+            {/* there is really no reference to the this.props.hide. It might hide all of the elements instead of a single one */}
           </View>
         </LinearGradient>
       </View>

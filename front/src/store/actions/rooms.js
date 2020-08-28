@@ -1,4 +1,4 @@
-import { ADD_ROOMS_U, ADD_ROOMS_A, ADD_FAV_ROOMS, FAV_ROOM, UNFAV_ROOM, ADD_ROOMS } from './types';
+import { ADD_ROOMS_U, ADD_ROOMS_A, ADD_FAV_ROOMS, FAV_ROOM, UNFAV_ROOM, ADD_ROOMS, CHANGE_NOTIFICATION_BACK_OBJ, CHANGE_NOTIFICATION_FAV_OBJ } from './types';
 
 export const add = (item, type) => {
     // console.log('line 15 rooms action - item and type', item, type)
@@ -55,6 +55,27 @@ export const favorite = (item, type) => {
             type: UNFAV_ROOM,
             payload: {
                 item: item
+            }
+        }
+    }
+}
+
+
+export const notifications = (item, type) => {
+    if (type === "favorite") {
+        console.log('going to favorite', type)
+        return {
+            type: CHANGE_NOTIFICATION_FAV_OBJ,
+            payload: {
+                item: item,
+            }
+        }
+    } else {
+        console.log('going to back room data', type)
+        return {
+            type: CHANGE_NOTIFICATION_BACK_OBJ,
+            payload: {
+                item: item,
             }
         }
     }

@@ -1,10 +1,11 @@
-import { ADD_ROOMS_A, ADD_ROOMS_U, ADD_FAV_ROOMS, FAV_ROOM, UNFAV_ROOM, ADD_ROOMS } from '../actions/types';
+import { ADD_ROOMS_A, ADD_ROOMS_U, ADD_FAV_ROOMS, FAV_ROOM, UNFAV_ROOM, ADD_ROOMS, CHANGE_NOTIFICATION_BACK_OBJ, CHANGE_NOTIFICATION_FAV_OBJ } from '../actions/types';
 // import { phoneRoomMockData } from "../mockdata";
 
 const initialState = {
-    // mockData: phoneRoomMockData,
+    // back variables
     backData: [],
     backFavData: [],
+    // front variables
     favRooms: [],
     phoneRoomsAvailable: [],
     phoneRoomsUnavailable: [],
@@ -97,7 +98,7 @@ const reducer = (state = initialState, action) => {
                         return item.roomId !== action.payload.item.roomId
                     }),
                     backData: state.backData.filter(item => {
-                        return item.roomId !== action.payload.item.roomId 
+                        return item.roomId !== action.payload.item.roomId
                     }),
                 }
             }
@@ -171,6 +172,19 @@ const reducer = (state = initialState, action) => {
                         // return item.roomId !== action.payload.item.roomId
                     })
                 }
+            }
+        case CHANGE_NOTIFICATION_BACK_OBJ:
+            return {
+                ...state,
+                backData: state.backData.map((item, index) => {
+                    if (item.roomId === action.payload.item.roomId) {
+                        return {
+                            ...item,
+                            notifications: !item.notifications,
+                        }
+                    }
+                    return item
+                }),
             }
         default:
             return state;

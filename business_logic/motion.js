@@ -106,9 +106,10 @@ app.post('/sensor', function (req, res) {
           })
         }
         // else item['availability'] = true
-        console.log(item)
+        console.log('line 109- each individual item',item)
       })
       // res.json(data)
+      console.log('line 112- getting rooms and favorites', rooms, favorites)
       res.send({ rooms, favorites })
     }
   })

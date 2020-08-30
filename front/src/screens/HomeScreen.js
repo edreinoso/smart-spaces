@@ -44,13 +44,17 @@ class HomeScreen extends Component {
     // there has been no fix for this issue as of now
     // https://github.com/GeekyAnts/NativeBase/issues/3109
     YellowBox.ignoreWarnings(['Animated: `useNativeDriver`', 'VirtualizedLists should never be nested']); // should get rid of VirtualizedList
-    this.registerForPushNotificationsAsync() // this requires async calls from componentDidMount
+    // this.registerForPushNotificationsAsync() // this requires async calls from componentDidMount
 
-    this.state.interval = setInterval(() => {
-      if (this.state.floor1) this.fetchRoomsSensorData(api_first_floor)
-      else if (this.state.floor2) this.fetchRoomsSensorData(api_second_floor)
-      else if (this.state.floor3) this.fetchRoomsSensorData(api_third_floor)
-    }, 10000);
+
+    // this.state.interval = setInterval(() => {
+    //   if (this.state.floor1) {
+    //     // console.log('Hello World')
+    //     this.fetchRoomsSensorData(api_first_floor)
+    //   }
+    //   else if (this.state.floor2) this.fetchRoomsSensorData(api_second_floor)
+    //   else if (this.state.floor3) this.fetchRoomsSensorData(api_third_floor)
+    // }, 10000);
     this.setState({
       greenSection: false,
       redSection: false,
@@ -77,9 +81,9 @@ class HomeScreen extends Component {
     }
   }
 
-  componentWillUnmount() {
-    clearInterval(this.state.interval);
-  }
+  // componentWillUnmount() {
+  //   clearInterval(this.state.interval);
+  // }
 
   resetState = (closeIsDoneByAnimation) => {
     this.setState({
@@ -226,7 +230,7 @@ class HomeScreen extends Component {
         // favorites: this.props.favRooms
       }
     }
-    // console.log('line 208-', item)
+    // console.log('line 233')
     // console.log('line 224- item on fetchRoomsSensorData', item)
     await this.apiPostCall(item) //data returning is coming as availability true
       .then(response => {
@@ -234,6 +238,7 @@ class HomeScreen extends Component {
         // this is not getting updated
         // instead of adding, we should just replace it by the new object
         // 08/16: why is this favorite instead of backFavorite
+        // console.log('221 - why is this not showing?')
         this.props.add(response.favorites, 'backFavorite') // getting a response with the favorite
         this.props.add(response.rooms)
       })
@@ -261,15 +266,17 @@ class HomeScreen extends Component {
       .then(response => {
         // console.log('line 262',response)
         response.favorites.map((favoriteItem, index) => {
-          console.log('in room name:', favoriteItem.roomName, ' notification is set to true')
-          // send the message to the user that the room is available
-          // this.sendPushNotification()
+          if (favoriteItem.notifications && favoriteItem.availability) {
+            console.log('in room name:', favoriteItem.roomName, ' notification is set to true')
+            // send the message to the user that the room is available
+            this.sendPushNotification()
+          }
         })
         response.rooms.map((roomItem, index) => {
           if (roomItem.notifications && roomItem.availability) {
-            console.log('in room name:', roomItem.roomName, ' notification is set to true')
+            // console.log('in room name:', roomItem.roomName, ' notification is set to true')
             // send the message to the user that the room is available
-            // this.sendPushNotification()
+            this.sendPushNotification()
           }
         })
       }) // send nofitication to users about the meetings
@@ -405,7 +412,7 @@ class HomeScreen extends Component {
         body: 'Hello World'
       })
     })
-    console.log(response)
+    // console.log(response)
   }
 
   onNotificationPress = async (item) => {
@@ -431,6 +438,7 @@ class HomeScreen extends Component {
       .catch(error => {
         console.log(error)
       })
+    this.sendPushNotification()
     this.fetchByFloor(this.state.floor)
   }
 

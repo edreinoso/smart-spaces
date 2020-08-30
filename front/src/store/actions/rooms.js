@@ -63,7 +63,7 @@ export const favorite = (item, type) => {
 
 export const notifications = (item, type) => {
     if (type === "favorite") {
-        console.log('going to favorite', type)
+        // console.log('going to favorite', type)
         return {
             type: CHANGE_NOTIFICATION_FAV_OBJ,
             payload: {
@@ -71,7 +71,7 @@ export const notifications = (item, type) => {
             }
         }
     } else {
-        console.log('going to back room data', type)
+        // console.log('going to back room data', type)
         return {
             type: CHANGE_NOTIFICATION_BACK_OBJ,
             payload: {

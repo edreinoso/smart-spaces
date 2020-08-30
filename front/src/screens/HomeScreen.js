@@ -44,20 +44,20 @@ class HomeScreen extends Component {
     // there has been no fix for this issue as of now
     // https://github.com/GeekyAnts/NativeBase/issues/3109
     YellowBox.ignoreWarnings(['Animated: `useNativeDriver`', 'VirtualizedLists should never be nested']); // should get rid of VirtualizedList
-    // this.registerForPushNotificationsAsync() // this requires async calls from componentDidMount
+    this.registerForPushNotificationsAsync() // this requires async calls from componentDidMount
 
-    // this.state.interval = setInterval(() => {
-    //   if (this.state.floor1) this.fetchRoomsSensorData(api_first_floor)
-    //   else if (this.state.floor2) this.fetchRoomsSensorData(api_second_floor)
-    //   else if (this.state.floor3) this.fetchRoomsSensorData(api_third_floor)
-    // }, 10000);
-    // this.setState({
-    //   greenSection: false,
-    //   redSection: false,
-    //   blueSection: false,
-    //   orangeSection: false,
-    //   section: ''
-    // })
+    this.state.interval = setInterval(() => {
+      if (this.state.floor1) this.fetchRoomsSensorData(api_first_floor)
+      else if (this.state.floor2) this.fetchRoomsSensorData(api_second_floor)
+      else if (this.state.floor3) this.fetchRoomsSensorData(api_third_floor)
+    }, 10000);
+    this.setState({
+      greenSection: false,
+      redSection: false,
+      blueSection: false,
+      orangeSection: false,
+      section: ''
+    })
     if (this.props.authenticated) {
       // Local
       // this.fetchDataFromLocal()
@@ -77,9 +77,9 @@ class HomeScreen extends Component {
     }
   }
 
-  // componentWillUnmount() {
-  //   clearInterval(this.state.interval);
-  // }
+  componentWillUnmount() {
+    clearInterval(this.state.interval);
+  }
 
   resetState = (closeIsDoneByAnimation) => {
     this.setState({
@@ -258,6 +258,21 @@ class HomeScreen extends Component {
     // console.log('line 237, onUpdateSensorData', item)
     // console.log('line 253, onUpdateSensorData', item)
     await this.apiPutCall(item)
+      .then(response => {
+        // console.log('line 262',response)
+        response.favorites.map((favoriteItem, index) => {
+          console.log('in room name:', favoriteItem.roomName, ' notification is set to true')
+          // send the message to the user that the room is available
+          // this.sendPushNotification()
+        })
+        response.rooms.map((roomItem, index) => {
+          if (roomItem.notifications && roomItem.availability) {
+            console.log('in room name:', roomItem.roomName, ' notification is set to true')
+            // send the message to the user that the room is available
+            // this.sendPushNotification()
+          }
+        })
+      }) // send nofitication to users about the meetings
       .catch(error => {
         console.log(error)
       })
@@ -352,21 +367,21 @@ class HomeScreen extends Component {
 
   registerForPushNotificationsAsync = async () => {
     if (Constants.isDevice) {
-      console.log('inside function')
+      // console.log('inside function')
       const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
       let finalStatus = existingStatus;
       if (existingStatus !== 'granted') {
-        console.log('permissions granted')
+        // console.log('permissions granted')
         const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
         finalStatus = status;
       }
       if (finalStatus !== 'granted') {
-        console.log('permissions not granted')
+        // console.log('permissions not granted')
         alert('Failed to get push token for push notification!');
         return;
       }
       const token = await Notifications.getExpoPushTokenAsync();
-      console.log('testing tokens',token);
+      // console.log('testing tokens',token);
       // this part should be dealt with DynamoDB, there should be a
       // column to store the token obtained
       this.setState({ expoPushToken: token.data }); // have to engineer this part
@@ -396,12 +411,12 @@ class HomeScreen extends Component {
   onNotificationPress = async (item) => {
     // I have to change this in store
     // then I have to make the API to make the change
-    console.log(item)
+    // console.log(item)
     if (item.favorite) {
-      console.log('doing favorite notification')
+      // console.log('doing favorite notification')
       await this.props.notifications(item, 'favorite') // this redux call HAS to be executed first
     } else {
-      console.log('not doing favorite')
+      // console.log('not doing favorite')
       await this.props.notifications(item) // this redux call HAS to be executed first
     }
     const notificationItem = {
@@ -411,7 +426,7 @@ class HomeScreen extends Component {
         favorites: this.props.backFavData // not going well since the this.props is async
       },
     };
-    console.log('line 414, homescreen: ', notificationItem)
+    // console.log('line 414, homescreen: ', notificationItem)
     await this.apiPutCall(notificationItem)
       .catch(error => {
         console.log(error)

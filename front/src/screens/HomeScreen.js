@@ -226,27 +226,43 @@ class HomeScreen extends Component {
       body: {
         floor: floor,
         rooms: this.props.backData,
-        favorites: this.props.backFavData
+        favorites: this.props.backFavData,
+        expoPushToken: this.props.expoPushToken
         // favorites: this.props.favRooms
       }
     }
     // console.log('line 233')
-    // console.log('line 224- item on fetchRoomsSensorData', item)
+    // console.log('line 235- item on fetchRoomsSensorData', item)
     await this.apiPostCall(item) //data returning is coming as availability true
       .then(response => {
         // console.log('fetching from sensor, line 211', response)
+        console.log('fetching from sensor, line 238', response)
+        response.nodeRoomAvailable.map((item, index) => {
+          console.log('line 241- ',item)
+          if (item.Availability) {
+            console.log('Available')
+            this.props.backData.map((backDataItem, index) => {
+              if (backDataItem.roomId == item.RoomId) {
+                // perform the change in the store.
+              }
+            })
+          } else {
+            console.log('Not available')
+          }
+        })
+        
         // this is not getting updated
         // instead of adding, we should just replace it by the new object
         // 08/16: why is this favorite instead of backFavorite
         // console.log('221 - why is this not showing?')
-        this.props.add(response.favorites, 'backFavorite') // getting a response with the favorite
-        this.props.add(response.rooms)
+        // this.props.add(response.favorites, 'backFavorite') // getting a response with the favorite
+        // this.props.add(response.rooms)
       })
       .catch(error => {
         console.log(error)
       })
-    this.onUpdateSensorData()
-    this.fetchByFloor(floor)
+    // this.onUpdateSensorData()
+    this.fetchByFloor(floor) // would not necessarily have to do this!
     this.setState({ refreshing: false })
   }
 
@@ -263,23 +279,23 @@ class HomeScreen extends Component {
     // console.log('line 237, onUpdateSensorData', item)
     // console.log('line 253, onUpdateSensorData', item)
     await this.apiPutCall(item)
-      .then(response => {
-        // console.log('line 262',response)
-        response.favorites.map((favoriteItem, index) => {
-          if (favoriteItem.notifications && favoriteItem.availability) {
-            console.log('in room name:', favoriteItem.roomName, ' notification is set to true')
-            // send the message to the user that the room is available
-            this.sendPushNotification()
-          }
-        })
-        response.rooms.map((roomItem, index) => {
-          if (roomItem.notifications && roomItem.availability) {
-            // console.log('in room name:', roomItem.roomName, ' notification is set to true')
-            // send the message to the user that the room is available
-            this.sendPushNotification()
-          }
-        })
-      }) // send nofitication to users about the meetings
+      // .then(response => {
+      //   // console.log('line 262',response)
+      //   response.favorites.map((favoriteItem, index) => {
+      //     if (favoriteItem.notifications && favoriteItem.availability) {
+      //       console.log('in room name:', favoriteItem.roomName, ' notification is set to true')
+      //       // send the message to the user that the room is available
+      //       // this.sendPushNotification()
+      //     }
+      //   })
+      //   response.rooms.map((roomItem, index) => {
+      //     if (roomItem.notifications && roomItem.availability) {
+      //       // console.log('in room name:', roomItem.roomName, ' notification is set to true')
+      //       // send the message to the user that the room is available
+      //       // this.sendPushNotification()
+      //     }
+      //   })
+      // }) // send nofitication to users about the meetings
       .catch(error => {
         console.log(error)
       })
@@ -398,7 +414,7 @@ class HomeScreen extends Component {
   };
 
   sendPushNotification = () => {
-    console.log('send push notifiaction', this.state.expoPushToken)
+    console.log('send push notifiaction', this.props.expoPushToken)
     let response = fetch('https://exp.host/--/api/v2/push/send', {
       method: 'POST',
       headers: {
@@ -748,6 +764,7 @@ const mapStateToProps = state => {
   return {
     authenticated: state.auth.authenticated,
     username: state.auth.username,
+    expoPushToken: state.auth.expoPushToken,
     mockData: state.rooms.mockData,
     backData: state.rooms.backData,
     backFavData: state.rooms.backFavData,

@@ -11,7 +11,7 @@ export const confirmCodeSignUp = (username, code) => {
     }
 }
 
-export const auth = (username, password, authMode) => {
+export const auth = (username, password, pushToken, authMode) => {
     // export const auth = async (username, password, authMode) => {
     // console.log(username, password, authMode)
     //actions are plain objects. use a middleware for async functions
@@ -22,6 +22,7 @@ export const auth = (username, password, authMode) => {
             const response = await Auth.signUp({
                 username,
                 password,
+                pushToken
             })
             // console.log('sign up response:', response)
         } else if (authMode === 'login') {

@@ -3,9 +3,14 @@ import random
 import string
 import time
 from datetime import datetime
+from datetime import timedelta
+from dateutil.tz import *
 
 # table_name = "PIR-sensor-2"
 table_name = "PIR-table"
+
+tomorrow = datetime.now(tzutc()) + timedelta(minutes=15)
+expires = int(tomorrow.strftime('%s'))
 
 room_name_array = ["Ed's Room", "Kairis' Room",
                    "Luisana's Room", "Darlyn's Room"]
@@ -35,7 +40,7 @@ for x in range(10):
             'roomId': room[randomNum]['roomId'],
             'floor': room[randomNum]['floor'],
             'timestamp':  str(currentTime.strftime("%Y-%m-%dT%H:%M:%SZ")),
-            'ttl': int(now.strftime('%s')),
+            'ttl': expires,
             # 'favorite': false,
         }
     )

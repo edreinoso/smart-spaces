@@ -13,7 +13,7 @@ custom:
   application: "smart-spaces"
 
 provider:
-  name: aws
+  name: aws # gcloud, azure
   runtime: nodejs12.x
   stage: dev
   region: us-east-1
@@ -26,14 +26,14 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-      Resource:
+      Resource: 
         - { "Fn::GetAtt": ["PIRSensor", "Arn"] }
         - { "Fn::GetAtt": ["UserTable", "Arn"] }
   environment:
     PIR_TABLE: ${self:custom.pirTableName}
     USER_TABLE: ${self:custom.userTableName}
 
-functions:
+functions: # this is going to be your server, e.g. Lambda Function, Google Cloud Function
   getPhoneRoomData:
     handler: motion.handler
     events:

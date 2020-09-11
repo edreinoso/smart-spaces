@@ -3,6 +3,7 @@ import { AUTH, LOGOUT } from '../actions/types';
 const initialState = {
     username: "edgardo_16_@hotmail.com", // hardcoded for the sake of testing
     authenticated: true,
+    expoPushToken: "ExponentPushToken[iJokGCEYtEcHKnB52OqCS6]" // hardcoded token for the sake of testing
 }
 
 const reducer = (state = initialState, action) => {
@@ -15,7 +16,8 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 // authenticated: true  
                 authenticated: action.payload.authenticatedUser,
-                username: action.payload.user
+                username: action.payload.user,
+                expoPushToken: action.payload.pushToken
                 // authenticated: action.authenticatedUser
             }
         case LOGOUT:

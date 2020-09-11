@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const express = require('express')
 const app = express()
 const AWS = require('aws-sdk')
+const { Expo } = require('expo-server-sdk')
 
 const PIR_TABLE = process.env.PIR_TABLE;
 const USER_TABLE = process.env.USER_TABLE;
@@ -14,9 +15,13 @@ app.post('/sensor', function (req, res) {
   // console.log(typeof(parseInt(req.params.floor)))
   // console.log('value of floor: ', typeof(req.params.floor))
 
-  const { floor, rooms, favorites } = req.body // need to have the information from current rooms and favorites
+  const nodeRoomAvailable = []
+  const nodeRoomUnavailable = []
+
+  // const { floor, rooms, favorites } = req.body // need to have the information from current rooms and favorites
+  const { floor, rooms, favorites, expoPushToken } = req.body // need to have the information from current rooms and favorites
   // const { floor, rooms, favorites } = req.params // need to have the information from current rooms and favorites
-  console.log(req.body)
+  // console.log('line 20- request body', req.body)
 
   // Trying to sort by floor
   const params = {
@@ -59,7 +64,7 @@ app.post('/sensor', function (req, res) {
       // getting the first items
       // 08/16: data is returning dates from June and July
       // so it will definitely be available based on this
-      console.log('data', data)
+      console.log('line 63- data', data)
 
       // Date Logic Calculation
       const today = new Date()
@@ -72,21 +77,53 @@ app.post('/sensor', function (req, res) {
         // if (sensorData > todayMinus5) item['availability'] = false
         console.log(sensorData, todayMinus5)
         if (sensorData < todayMinus5) {
-          console.log('Room available rooms: ', typeof (rooms), 'favorites: ', typeof (favorites))
+          // console.log('Room available rooms: ', typeof (rooms), 'favorites: ', typeof (favorites))
           // we are itering through both of the arrays that were given
           // from the req.body. Ideally, we would like change the item
           // property availability for the specific rooms / favorites 
 
-          rooms.map((room_items, index) => {
-            if (item.roomId == room_items.roomId) {
-              room_items['availability'] = true
-            }
-          })
-          favorites.map((favorites_item, index) => {
-            if (item.roomId == favorites_item.roomId) {
-              favorites_item['availability'] = true
-            }
-          })
+          var foo = {
+            "RoomId": item.roomId,
+            "Availability": true
+          }
+
+          nodeRoomAvailable.push(foo)
+
+
+          // rooms.map((room_items, index) => {
+          //   if (item.roomId == room_items.roomId) {
+          //     room_items['availability'] = true
+          //     if (room_items.notifications) {
+          //       // LOGIC FOR PUSH TOKEN: NEEDS TO BE DONE HERE //
+          //       console.log('86, should send notification for rooms:', expoPushToken)
+          //       // send api to the expo server
+          //       //   let response = fetch('https://exp.host/--/api/v2/push/send', {
+          //       //     method: 'POST',
+          //       //     headers: {
+          //       //       'Accept': 'application/json',
+          //       //       'Content-Type': 'application/json'
+          //       //     },
+          //       //     body: JSON.stringify({
+          //       //       to: expoPushToken,
+          //       //       sound: 'default',
+          //       //       title: 'Demo',
+          //       //       body: 'Hello World'
+          //       //     })
+          //       //   })
+          //       //   console.log(response)
+          //     }
+          //   }
+          // })
+          // favorites.map((favorites_item, index) => {
+          //   if (item.roomId == favorites_item.roomId) {
+          //     favorites_item['availability'] = true
+          //     if (favorites_item.notifications) {
+          //       // LOGIC FOR PUSH TOKEN: NEEDS TO BE DONE HERE //
+          //       console.log('95, should send notification for favorite rooms', expoPushToken)
+          //       // send api to the expo server
+          //     }
+          //   }
+          // })
         }
         else {
           console.log('Room not available')
@@ -94,23 +131,32 @@ app.post('/sensor', function (req, res) {
           // from the req.body. Ideally, we would like change the item
           // property availability for the specific rooms / favorites 
 
-          rooms.map((room_items, index) => {
-            if (item.roomId == room_items.roomId) {
-              room_items['availability'] = false
-            }
-          })
-          favorites.map((favorites_item, index) => {
-            if (item.roomId == favorites_item.roomId) {
-              favorites_item['availability'] = false
-            }
-          })
+          var bar = [{
+            "RoomId": item.roomId,
+            "Availability": false
+          }]
+
+          nodeRoomUnavailable.push(bar)
+
+          // rooms.map((room_items, index) => {
+          //   if (item.roomId == room_items.roomId) {
+          //     room_items['availability'] = false
+          //   }
+          // })
+          // favorites.map((favorites_item, index) => {
+          //   if (item.roomId == favorites_item.roomId) {
+          //     favorites_item['availability'] = false
+          //   }
+          // })
         }
         // else item['availability'] = true
-        console.log('line 109- each individual item',item)
+        console.log('line 109- each individual item', item)
       })
+
+      console.log('line 156- new structure', nodeRoomUnavailable, nodeRoomAvailable)
       // res.json(data)
-      console.log('line 112- getting rooms and favorites', rooms, favorites)
-      res.send({ rooms, favorites })
+      // console.log('line 112- getting rooms and favorites', rooms, favorites)
+      res.send({ nodeRoomAvailable, nodeRoomUnavailable })
     }
   })
 })

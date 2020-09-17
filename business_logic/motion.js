@@ -11,13 +11,11 @@ const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
 app.use(bodyParser.json({ strict: false }))
 
+// If I am not using the other variables: rooms and favorites, mind as well get rid of them
+// however, I am going to put it off after the notification task, just in case I may use the
+// push token in this function
 app.post('/sensor', function (req, res) {
-  // console.log(typeof(parseInt(req.params.floor)))
-  // console.log('value of floor: ', typeof(req.params.floor))
-
-  const nodeRoomAvailable = []
-  const nodeRoomUnavailable = []
-
+  const phoneRoom = [] // variable which will be returned
   // const { floor, rooms, favorites } = req.body // need to have the information from current rooms and favorites
   const { floor, rooms, favorites, expoPushToken } = req.body // need to have the information from current rooms and favorites
   // const { floor, rooms, favorites } = req.params // need to have the information from current rooms and favorites
@@ -45,7 +43,7 @@ app.post('/sensor', function (req, res) {
       });
 
       // result sorted
-      console.log('result sorted', result.Items)
+      console.log('line 47 - result sorted', result.Items)
 
       // Getting all unique room IDs
       // Very powerful function
@@ -64,7 +62,7 @@ app.post('/sensor', function (req, res) {
       // getting the first items
       // 08/16: data is returning dates from June and July
       // so it will definitely be available based on this
-      console.log('line 63- data', data)
+      console.log('line 66 - data', data)
 
       // Date Logic Calculation
       const today = new Date()
@@ -78,89 +76,37 @@ app.post('/sensor', function (req, res) {
         console.log(sensorData, todayMinus5)
         if (sensorData < todayMinus5) {
           // console.log('Room available rooms: ', typeof (rooms), 'favorites: ', typeof (favorites))
-          // we are itering through both of the arrays that were given
-          // from the req.body. Ideally, we would like change the item
-          // property availability for the specific rooms / favorites 
+          console.log('line 80 - Room not available')
 
-          var foo = {
+          var object = {
             "RoomId": item.roomId,
             "Availability": true
           }
 
-          nodeRoomAvailable.push(foo)
-
-
-          // rooms.map((room_items, index) => {
-          //   if (item.roomId == room_items.roomId) {
-          //     room_items['availability'] = true
-          //     if (room_items.notifications) {
-          //       // LOGIC FOR PUSH TOKEN: NEEDS TO BE DONE HERE //
-          //       console.log('86, should send notification for rooms:', expoPushToken)
-          //       // send api to the expo server
-          //       //   let response = fetch('https://exp.host/--/api/v2/push/send', {
-          //       //     method: 'POST',
-          //       //     headers: {
-          //       //       'Accept': 'application/json',
-          //       //       'Content-Type': 'application/json'
-          //       //     },
-          //       //     body: JSON.stringify({
-          //       //       to: expoPushToken,
-          //       //       sound: 'default',
-          //       //       title: 'Demo',
-          //       //       body: 'Hello World'
-          //       //     })
-          //       //   })
-          //       //   console.log(response)
-          //     }
-          //   }
-          // })
-          // favorites.map((favorites_item, index) => {
-          //   if (item.roomId == favorites_item.roomId) {
-          //     favorites_item['availability'] = true
-          //     if (favorites_item.notifications) {
-          //       // LOGIC FOR PUSH TOKEN: NEEDS TO BE DONE HERE //
-          //       console.log('95, should send notification for favorite rooms', expoPushToken)
-          //       // send api to the expo server
-          //     }
-          //   }
-          // })
+          phoneRoom.push(object)
         }
         else {
-          console.log('Room not available')
-          // we are itering through both of the arrays that were given
-          // from the req.body. Ideally, we would like change the item
-          // property availability for the specific rooms / favorites 
-
-          var bar = [{
+          console.log('line 90 - Room not available')
+          var object = {
             "RoomId": item.roomId,
             "Availability": false
-          }]
+          }
 
-          nodeRoomUnavailable.push(bar)
-
-          // rooms.map((room_items, index) => {
-          //   if (item.roomId == room_items.roomId) {
-          //     room_items['availability'] = false
-          //   }
-          // })
-          // favorites.map((favorites_item, index) => {
-          //   if (item.roomId == favorites_item.roomId) {
-          //     favorites_item['availability'] = false
-          //   }
-          // })
+          phoneRoom.push(object)
         }
         // else item['availability'] = true
-        console.log('line 109- each individual item', item)
+        // console.log('line 109- each individual item', item)
       })
 
-      console.log('line 156- new structure', nodeRoomUnavailable, nodeRoomAvailable)
+      // console.log('line 156- new structure', phoneRoom)
       // res.json(data)
       // console.log('line 112- getting rooms and favorites', rooms, favorites)
-      res.send({ nodeRoomAvailable, nodeRoomUnavailable })
+      res.send({ phoneRoom })
     }
   })
 })
 
+// creating users
 app.post('/users', function (req, res) {
   const { username, rooms, favorites } = req.body
 
@@ -183,6 +129,7 @@ app.post('/users', function (req, res) {
   })
 })
 
+// updating user information once the sensor logic has been sorted out
 app.put('/users', function (req, res) {
   const { username, rooms, favorites } = req.body
   console.log('putting items', req.body) // rooms is the object that's being passed as empty
@@ -207,6 +154,9 @@ app.put('/users', function (req, res) {
   })
 })
 
+// getting the user information in the home screen.
+// this is the first function that is called once the user
+// logs into the main screen
 app.get('/users/:username', function (req, res) {
   // console.log(req.params)
 
@@ -250,8 +200,7 @@ app.get('/users/:username', function (req, res) {
 // there are two variables that need to be passed
 // username- to know which specific row to get
 // section- to know which section to get.
-// query -- need to be specified
-
+// floor- which floor it's going to pulled
 app.get('/sections/:username', function (req, res) {
   // const { username, section } = req.body
   const params = {

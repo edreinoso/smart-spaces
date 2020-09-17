@@ -8,9 +8,8 @@ import Icon from 'react-native-vector-icons/MaterialIcons'
 import { container, text, colors, header, borders } from '../styles/index';
 import { Picture, HomeButton, PhoneRoom, ButtonFilters, Tags } from '../components/index';
 import { connect } from 'react-redux';
-import { phoneRoomMockData } from "../store/mockdata";
 import { API } from 'aws-amplify';
-import { stars, add, favorite, notifications } from '../store/actions/index'
+import { stars, add, favorite, notifications, availability } from '../store/actions/index'
 
 var api_first_floor = '1'
 var api_second_floor = '2'
@@ -121,25 +120,6 @@ class HomeScreen extends Component {
     return API.post('motion', '/sensor', item)
   }
 
-  // testing purposes
-  fetchDataFromLocal = () => {
-    var roomAvailable = []
-    var roomNotAvailable = []
-    phoneRoomMockData.map((item, index) => {
-      if (item.availability) {
-        roomAvailable.push(item)
-        // this.props.add(roomAvailable, 'available')
-      } else {
-        roomNotAvailable.push(item)
-        // this.props.add(roomNotAvailable, 'unavailable')
-      }
-    })
-    this.setState({
-      phoneRoomsAvailable: roomAvailable,
-      phoneRoomsUnavailable: roomNotAvailable
-    })
-  }
-
   // this is happening before mounting
   fetchDataFromDDB = async (floor) => {
     await this.apiGetCall() //fetch the whole data
@@ -196,11 +176,11 @@ class HomeScreen extends Component {
     this.props.backData.map((item, index) => {
       // logic for handling rooms available and not available
       if (item.floor === floor && this.state.section != "") { // this is applied for filtering
-        // console.log('selecting rooms by filter', item.roomName)
+        // console.log('homescreen line 199 - selecting rooms by filter', item.roomName)
         if (item.availability && item.section == this.state.section) roomAvailable.push(item) // roomAvailable are going to be pushed with section included
         else if (!item.availability && item.section == this.state.section) roomNotAvailable.push(item) // roomNotAvailable are going to be pushed with section included
       } else if (item.floor === floor) { // this is applied per floor
-        // console.log('not selecting rooms by filter', item.roomName)
+        // console.log('line 203 - not selecting rooms by filter', item.roomName)
         if (item.availability) roomAvailable.push(item) // roomAvailable are going to be pushed
         else roomNotAvailable.push(item) // roomNotAvailable are going to be pushed
       }
@@ -214,6 +194,7 @@ class HomeScreen extends Component {
       else if (item.floor === floor) favRoom.push(item) // favRooms are going to be pushed
 
     })
+    // console.log('line 198 - backData, backFavData', this.props.backData, this.props.backFavData)
     this.props.add(favRoom, 'favorite') // this is where favorites is getting used
     this.props.add(roomAvailable, 'available')
     this.props.add(roomNotAvailable, 'unavailable')
@@ -222,13 +203,19 @@ class HomeScreen extends Component {
 
   fetchRoomsSensorData = async (floor) => { // comparing sensor data with user data on rooms
     // console.log('199 -', this.props.backData, this.props.backFavData)
+    await this.apiGetCall() //fetch the whole data
+      .then(response => {
+        // console.log(response.returnRooms, response.favRooms)
+        this.props.add(response.favRooms, 'backFavorite') // store favRooms in backFav
+        this.props.add(response.returnRooms) // store returnRooms into backData
+      })
+      .catch(error => {
+        console.log(error)
+      })
+
     const item = {
       body: {
         floor: floor,
-        rooms: this.props.backData,
-        favorites: this.props.backFavData,
-        expoPushToken: this.props.expoPushToken
-        // favorites: this.props.favRooms
       }
     }
     // console.log('line 233')
@@ -236,32 +223,16 @@ class HomeScreen extends Component {
     await this.apiPostCall(item) //data returning is coming as availability true
       .then(response => {
         // console.log('fetching from sensor, line 211', response)
-        console.log('fetching from sensor, line 238', response)
-        response.nodeRoomAvailable.map((item, index) => {
-          console.log('line 241- ',item)
-          if (item.Availability) {
-            console.log('Available')
-            this.props.backData.map((backDataItem, index) => {
-              if (backDataItem.roomId == item.RoomId) {
-                // perform the change in the store.
-              }
-            })
-          } else {
-            console.log('Not available')
-          }
+        // console.log('fetching from sensor, line 238', response)
+        response.phoneRoom.map((item, index) => {
+          // console.log('line 241- ',item)
+          this.props.availability(item) // changing the backData with availability input
         })
-        
-        // this is not getting updated
-        // instead of adding, we should just replace it by the new object
-        // 08/16: why is this favorite instead of backFavorite
-        // console.log('221 - why is this not showing?')
-        // this.props.add(response.favorites, 'backFavorite') // getting a response with the favorite
-        // this.props.add(response.rooms)
       })
       .catch(error => {
         console.log(error)
       })
-    // this.onUpdateSensorData()
+    this.onUpdateSensorData()
     this.fetchByFloor(floor) // would not necessarily have to do this!
     this.setState({ refreshing: false })
   }
@@ -278,24 +249,8 @@ class HomeScreen extends Component {
     // console.log('line 151, onUpdateSensorData', item)
     // console.log('line 237, onUpdateSensorData', item)
     // console.log('line 253, onUpdateSensorData', item)
+    // console.log('line 296, onUpdateSensorData', item)
     await this.apiPutCall(item)
-      // .then(response => {
-      //   // console.log('line 262',response)
-      //   response.favorites.map((favoriteItem, index) => {
-      //     if (favoriteItem.notifications && favoriteItem.availability) {
-      //       console.log('in room name:', favoriteItem.roomName, ' notification is set to true')
-      //       // send the message to the user that the room is available
-      //       // this.sendPushNotification()
-      //     }
-      //   })
-      //   response.rooms.map((roomItem, index) => {
-      //     if (roomItem.notifications && roomItem.availability) {
-      //       // console.log('in room name:', roomItem.roomName, ' notification is set to true')
-      //       // send the message to the user that the room is available
-      //       // this.sendPushNotification()
-      //     }
-      //   })
-      // }) // send nofitication to users about the meetings
       .catch(error => {
         console.log(error)
       })
@@ -779,7 +734,8 @@ const mapDispatchToProps = dispatch => {
     stars: (starring) => dispatch(stars(starring)),
     add: (item, type) => dispatch(add(item, type)),
     favorite: (item, type) => dispatch(favorite(item, type)),
-    notifications: (item, type) => dispatch(notifications(item, type))
+    notifications: (item, type) => dispatch(notifications(item, type)),
+    availability: (item) => dispatch(availability(item))
   }
 }
 

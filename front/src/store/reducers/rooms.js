@@ -1,4 +1,5 @@
-import { ADD_ROOMS_A, ADD_ROOMS_U, ADD_FAV_ROOMS, FAV_ROOM, UNFAV_ROOM, ADD_ROOMS, CHANGE_NOTIFICATION_BACK_OBJ, CHANGE_NOTIFICATION_FAV_OBJ } from '../actions/types';
+import { ADD_ROOMS_A, ADD_ROOMS_U, ADD_FAV_ROOMS, FAV_ROOM, UNFAV_ROOM, ADD_ROOMS, CHANGE_NOTIFICATION_BACK_OBJ, CHANGE_NOTIFICATION_FAV_OBJ, AVAILABILITY } from '../actions/types';
+import { availability } from '../actions/rooms';
 // import { phoneRoomMockData } from "../mockdata";
 
 const initialState = {
@@ -185,6 +186,20 @@ const reducer = (state = initialState, action) => {
                     }
                     return item
                 }),
+            }
+        case AVAILABILITY:
+            return {
+                ...state,
+                backData: state.backData.map((item, index) => {
+                    if (item.roomId == action.payload.item.RoomId) {
+                        // console.log('store - reducer: line 195', item) // this is undefined
+                        return {
+                            ...item,
+                            availability: action.payload.item.Availability
+                        }
+                    }
+                    return item
+                })
             }
         default:
             return state;

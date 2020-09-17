@@ -1,4 +1,4 @@
-import { ADD_ROOMS_U, ADD_ROOMS_A, ADD_FAV_ROOMS, FAV_ROOM, UNFAV_ROOM, ADD_ROOMS, CHANGE_NOTIFICATION_BACK_OBJ, CHANGE_NOTIFICATION_FAV_OBJ } from './types';
+import { ADD_ROOMS_U, ADD_ROOMS_A, ADD_FAV_ROOMS, FAV_ROOM, UNFAV_ROOM, ADD_ROOMS, CHANGE_NOTIFICATION_BACK_OBJ, CHANGE_NOTIFICATION_FAV_OBJ, AVAILABILITY } from './types';
 
 export const add = (item, type) => {
     // console.log('line 15 rooms action - item and type', item, type)
@@ -77,6 +77,16 @@ export const notifications = (item, type) => {
             payload: {
                 item: item,
             }
+        }
+    }
+}
+
+export const availability = (item) => {
+    // console.log('store - action: ', item)
+    return {
+        type: AVAILABILITY,
+        payload: {
+            item: item
         }
     }
 }

@@ -2,7 +2,7 @@
 export const phoneRoomMockData = [
   {
     "roomId": "4",
-    "notifications": false,
+      
     "favorite": false,
     "roomName": "Ed's Room",
     "floor": "1",

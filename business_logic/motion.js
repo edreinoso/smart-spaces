@@ -76,7 +76,7 @@ app.post('/sensor', function (req, res) {
         console.log(sensorData, todayMinus5)
         if (sensorData < todayMinus5) {
           // console.log('Room available rooms: ', typeof (rooms), 'favorites: ', typeof (favorites))
-          console.log('line 80 - Room not available')
+          console.log('line 80 - Room available')
 
           var object = {
             "RoomId": item.roomId,

@@ -2,8 +2,10 @@ import React, { Component } from 'react';
 import { View, ScrollView, Text, StyleSheet, FlatList, RefreshControl, Alert, TouchableOpacity, Animated, YellowBox, Image, DevSettings } from 'react-native';
 // import { Permissions, Notifications, Constants } from 'expo';
 import Constants from 'expo-constants';
+
 import * as Notifications from 'expo-notifications';
 import * as Permissions from 'expo-permissions';
+
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import { container, text, colors, header, borders } from '../styles/index';
 import { Picture, HomeButton, PhoneRoom, ButtonFilters, Tags } from '../components/index';
@@ -362,7 +364,9 @@ class HomeScreen extends Component {
       // console.log('testing tokens',token);
       // this part should be dealt with DynamoDB, there should be a
       // column to store the token obtained
-      this.setState({ expoPushToken: token.data }); // have to engineer this part
+       // have to engineer this part
+       // Oct 9 - what do I mean by engineer this part?
+      this.setState({ expoPushToken: token.data });
     } else {
       alert('Must use physical device for Push Notifications');
     }

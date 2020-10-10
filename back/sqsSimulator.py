@@ -3,12 +3,17 @@ import random
 import string
 import time
 from datetime import datetime
+from datetime import timedelta
+from dateutil.tz import *
 
 # variable generators
 room_name_array = ["Ed's Room", "Kairis' Room",
                    "Luisana's Room", "Darlyn's Room"]
-room = [{"roomName": "Ed's Room", "roomId": 1, "floor": 1}, {"roomName": "Kairis' Room", "roomId": 2, "floor": 1}, {
-    "roomName": "Luisana's Room", "roomId": 3, "floor": 2}, {"roomName": "Darlyn's Room", "roomId": 4, "floor": 3}]
+room = [{"roomName": "Ed's Room", "roomId": "1", "floor": "1"}, {"roomName": "Kairis' Room", "roomId": "2", "floor": "1"}, {
+    "roomName": "Luisana's Room", "roomId": "3", "floor": "2"}, {"roomName": "Darlyn's Room", "roomId": "4", "floor": "3"}]
+
+tomorrow = datetime.now(tzutc()) + timedelta(minutes=15)
+expires = int(tomorrow.strftime('%s'))
 
 client = boto3.client('sqs')
 # queueUrl = "https://sqs.us-east-1.amazonaws.com/130193131803/myfirstqueue"
@@ -24,8 +29,6 @@ for x in range(10):  # this is going to run only 10 times
     randomVariable = ''.join(
         [random.choice(string.ascii_letters + string.digits) for n in range(10)])
     currentTime = datetime.utcnow()
-    now = datetime.utcnow()
-    ttl_number = int(now.strftime('%s'))
     print('id: ' + randomVariable + ' roomName: ' +
           room[randomNum]['roomName'] + ' roomId: ' + str(room[randomNum]['roomId']) + ' floor: ' + str(room[randomNum]['floor']) + ' time: ' + str(currentTime))
 
@@ -35,8 +38,8 @@ for x in range(10):  # this is going to run only 10 times
 
     response = client.send_message(
         QueueUrl=queueUrl,
-        MessageBody="Hello World, first Queue",
-        MessageAttributes={
+        MessageBody="Sensor data coming to the queue",
+        MessageAttributes= {
             'id': {
                 'StringValue': randomVariable,
                 'DataType': 'String'
@@ -50,15 +53,15 @@ for x in range(10):  # this is going to run only 10 times
                 'DataType': 'String'
             },
             'roomId': {
-                'StringValue': str(room[randomNum]["roomId"]),
-                'DataType': 'Number'
+                'StringValue': room[randomNum]["roomId"],
+                'DataType': 'String'
             },
             'floor': {
-                'StringValue': str(room[randomNum]["floor"]),
-                'DataType': 'Number'
+                'StringValue': room[randomNum]["floor"],
+                'DataType': 'String'
             },
             'ttl': {
-                'StringValue': str(int(now.strftime("%s"))),
+                'StringValue': str(expires)},
                 'DataType': 'Number'
             }
         }

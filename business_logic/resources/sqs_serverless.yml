@@ -3,17 +3,13 @@ Resources:
     Type: AWS::SQS::Queue
     Properties:
       QueueName: PIR-queue
-      # QueueName: ${self:custom.queueName}
       Tags:
         - Key: "Name"
           Value: PIR-queue
-          # Value: ${self:custom.queueName}
         - Key: "Template"
           Value: smart_spaces
-          # Value: ${self:custom.application}
         - Key: "Environment"
           Value: dev
-          # Value: ${self:provider.stage}
         - Key: "Purpose"
           Value: "PIR queue to offload massive data injection to DynamoDB"
         - Key: "Creation_Date"

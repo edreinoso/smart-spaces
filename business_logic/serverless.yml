@@ -33,27 +33,18 @@ provider:
     PIR_TABLE: ${self:custom.pirTableName}
     USER_TABLE: ${self:custom.userTableName}
 
-functions: # this is going to be your server, e.g. Lambda Function, Google Cloud Function
+functions:
   getPhoneRoomData:
     handler: motion.handler
     events:
       - http:
-          # path: "/sensor/{proxy+}"
-          # method: get
-          # request:
-          #   template:
-          #     application/json: '{ "floor": "$input.params(''floor'')" }'
           path: "/sensor"
           method: post
       - http:
           path: "/users/{proxy+}"
           method: get
-          # request:
-          #   template:
-          #     application/json: '{ "floor": "$input.params(''floor'')" }'
       - http:
           path: "/sections/{proxy+}"
-          # method: get # need to have post if want to pass body
           method: get
           request:
             template:
@@ -65,7 +56,7 @@ functions: # this is going to be your server, e.g. Lambda Function, Google Cloud
       - http:
           path: "/users"
           method: post
-      - http: # I am using this one
+      - http:
           path: "/users"
           method: put
 
@@ -75,6 +66,9 @@ functions: # this is going to be your server, e.g. Lambda Function, Google Cloud
       - sqs:
           arn: arn:aws:sqs:us-east-1:130193131803:${self:custom.queueName}
           batchSize: 10
+
+  notificationHandler:
+    handler: notifications.handler
 
 resources:
   # DDB

@@ -12,16 +12,12 @@ Resources:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
       TableName: PIR-table
-      # TableName: ${self:custom.tableName}
       Tags:
         - Key: "Name"
           Value: PIR-table
-          # Value: ${self:custom.tableName}
         - Key: "Template"
-          # Value: ${self:custom.application}
           Value: smart_spaces
         - Key: "Environment"
-          # Value: ${self:provider.stage}
           Value: dev
         - Key: "Purpose"
           Value: "PIR sensor table to hold data about sensor data on each phone room"
@@ -40,16 +36,12 @@ Resources:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
       TableName: User-table
-      # TableName: ${self:custom.tableName}
       Tags:
         - Key: "Name"
           Value: User-table
-          # Value: ${self:custom.tableName}
         - Key: "Template"
-          # Value: ${self:custom.application}
           Value: smart_spaces
         - Key: "Environment"
-          # Value: ${self:provider.stage}
           Value: dev
         - Key: "Purpose"
           Value: "Phone room table to hold data about specific phone rooms"

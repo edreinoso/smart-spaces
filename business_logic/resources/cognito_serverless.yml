@@ -3,7 +3,7 @@ Resources:
     Type: AWS::Cognito::UserPool
     Properties:
       # Generate a name based on the stage
-      UserPoolName: PIR-cognito-user-pool
+      UserPoolName: smart_spaces_user_pool
       # UserPoolName: ${self:custom.cognitoName}-user-pool
       # Set email as an alias
       UsernameAttributes:
@@ -13,9 +13,8 @@ Resources:
       UserPoolTags:
         Name: "PIR-cognito"
         Template: "smart_spaces"
-        Environment: "dev"
-        Purpose: "PIR queue to offload massive data injection to DynamoDB"
-        Creation_Date: "Wed_June_24"
+        Purpose: "User pool for user authentication to the app"
+        Creation_Date: "Wed_June_24_20"
   CognitoUserPoolClient:
     Type: AWS::Cognito::UserPoolClient
     Properties:
@@ -49,7 +48,7 @@ Resources:
   CognitoAuthRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: appAuthRole
+      RoleName: smart_spaces_auth_role
       Path: /
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
@@ -84,7 +83,7 @@ Resources:
   CognitoUnauthRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: appUnauthRole
+      RoleName: smart_spaces_unauth_role
       Path: /
       AssumeRolePolicyDocument:
         Version: "2012-10-17"

@@ -2,15 +2,13 @@ Resources:
   SQSPIRSensor:
     Type: AWS::SQS::Queue
     Properties:
-      QueueName: PIR-queue
+      QueueName: SensorQueue
       Tags:
         - Key: "Name"
-          Value: PIR-queue
+          Value: SensorQueue
         - Key: "Template"
           Value: smart_spaces
-        - Key: "Environment"
-          Value: dev
         - Key: "Purpose"
           Value: "PIR queue to offload massive data injection to DynamoDB"
         - Key: "Creation_Date"
-          Value: "Tue_June_23"
+          Value: "Tue_June_23_20"

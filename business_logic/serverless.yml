@@ -6,16 +6,15 @@ plugins:
 service: motion-detection-service
 
 custom:
-  pirTableName: "PIR-table"
-  userTableName: "User-table"
-  queueName: "PIR-queue"
-  cognitoName: "PIR-cognito"
-  application: "smart-spaces"
+  sensorTableName: "SensorTable"
+  roomTableName: "RoomTable"
+  userTableName: "UserTable"
+  queueName: "SensorQueue"
 
 provider:
-  name: aws # gcloud, azure
+  name: aws
   runtime: nodejs12.x
-  stage: dev
+  stage: new
   region: us-east-1
   iamRoleStatements:
     - Effect: Allow
@@ -27,38 +26,31 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource: 
-        - { "Fn::GetAtt": ["PIRSensor", "Arn"] }
+        - { "Fn::GetAtt": ["SensorTable", "Arn"] }
+        - { "Fn::GetAtt": ["RoomTable", "Arn"] }
         - { "Fn::GetAtt": ["UserTable", "Arn"] }
   environment:
-    PIR_TABLE: ${self:custom.pirTableName}
+    SENSOR_TABLE: ${self:custom.sensorTableName}
+    ROOM_TABLE: ${self:custom.sensorTableName}
     USER_TABLE: ${self:custom.userTableName}
 
 functions:
-  getPhoneRoomData:
-    handler: motion.handler
+  roomData:
+    handler: room.handler
     events:
       - http:
-          path: "/sensor"
-          method: post
-      - http:
-          path: "/users/{proxy+}"
+          path: "/getRooms"
           method: get
       - http:
-          path: "/sections/{proxy+}"
-          method: get
-          request:
-            template:
-              application/json: >
-               {
-                 "section": "$input.params('section')",
-                 "floor": "$input.params('floor')"
-               }
-      - http:
-          path: "/users"
+          path: "/postRooms"
           method: post
-      - http:
-          path: "/users"
-          method: put
+
+  # sensor:
+  #   handler: sensor.handler
+  #   events:
+  #     - http:
+  #         path: "/sensor"
+  #         method: post
 
   queueHandler:
     handler: queue.handler
@@ -67,9 +59,6 @@ functions:
           arn: arn:aws:sqs:us-east-1:130193131803:${self:custom.queueName}
           batchSize: 10
 
-  notificationHandler:
-    handler: notifications.handler
-
 resources:
   # DDB
   - ${file(resources/ddb_serverless.yml)}
@@ -77,3 +66,4 @@ resources:
   - ${file(resources/sqs_serverless.yml)}
   # Cognito
   - ${file(resources/cognito_serverless.yml)}
+

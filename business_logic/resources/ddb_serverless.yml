@@ -1,5 +1,5 @@
 Resources:
-  PIRSensor:
+  SensorTable:
     Type: "AWS::DynamoDB::Table"
     Properties:
       AttributeDefinitions:
@@ -11,18 +11,38 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
-      TableName: PIR-table
+      TableName: SensorTable
       Tags:
         - Key: "Name"
-          Value: PIR-table
+          Value: SensorTable
         - Key: "Template"
           Value: smart_spaces
-        - Key: "Environment"
-          Value: dev
         - Key: "Purpose"
           Value: "PIR sensor table to hold data about sensor data on each phone room"
         - Key: "Creation_Date"
-          Value: "Tue_June_23"
+          Value: "Tue_June_23_20"
+  RoomTable:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      TableName: RoomTable
+      Tags:
+        - Key: "Name"
+          Value: RoomTable
+        - Key: "Template"
+          Value: smart_spaces
+        - Key: "Purpose"
+          Value: "Room table that would hold data about specific rooms"
+        - Key: "Creation_Date"
+          Value: "Tue_Jan_26_21"
   UserTable:
     Type: "AWS::DynamoDB::Table"
     Properties:
@@ -35,15 +55,13 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
-      TableName: User-table
+      TableName: UserTable
       Tags:
         - Key: "Name"
-          Value: User-table
+          Value: UserTable
         - Key: "Template"
           Value: smart_spaces
-        - Key: "Environment"
-          Value: dev
         - Key: "Purpose"
-          Value: "Phone room table to hold data about specific phone rooms"
+          Value: "User table that would hold the information for each user"
         - Key: "Creation_Date"
-          Value: "Tue_July_07"
+          Value: "Tue_July_07_20"

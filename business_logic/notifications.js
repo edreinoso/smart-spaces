@@ -1,6 +1,7 @@
 // Load the AWS SDK for Node.js
 // AWAIT function is giving some issues when it comes to scan the DDB
 const AWS = require('aws-sdk');
+const fetch = require('node-fetch');
 
 module.exports.handler = async (event) => {
     // initializing 
@@ -54,16 +55,22 @@ module.exports.handler = async (event) => {
             };
         });
 
+    console.log('line 57- sensorData:', data)
+
     data.map((item, index) => {
         let sensorData = new Date(item.timestamp);
-        // console.log('rooId: ', item.roomId, 'timestamp:', item.timestamp);
+        console.log('roomId: ', item.roomId, 'timestamp:', item.timestamp);
         // this is going to check whether rooms are available
+        console.log('sensorData < todayMinus5: ', sensorData < todayMinus5, 'sensorData: ', sensorData, 'todayMinus5:', todayMinus5);
         if (sensorData < todayMinus5) {
             usersData.map((userItem, index) => {
+                // room
+                // favorites -- such case is not even considered
                 userItem.rooms.map((roomItem, index) => {
                     // this is going to check:
                     // a) whether a certain room has been starred by the user
                     // b) whether the the roomItem.roomId is equal to the item.roomId
+                    console.log('roomItem.name', roomItem.roomName, 'roomItem.notifications', roomItem.notifications, 'roomItem.roomId', roomItem.roomId, 'item.roomId', item.roomId)
                     if (roomItem.notifications && roomItem.roomId == item.roomId) {
                         // send notification
                         console.log('send notifiaction for room:', roomItem.roomName)

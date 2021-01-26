@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { View, ScrollView, Text, StyleSheet, FlatList, RefreshControl, Alert, TouchableOpacity, Animated, YellowBox, Image, DevSettings } from 'react-native';
-// import { Permissions, Notifications, Constants } from 'expo';
 import Constants from 'expo-constants';
 
 import * as Notifications from 'expo-notifications';
@@ -82,6 +81,7 @@ class HomeScreen extends Component {
     }
   }
 
+  // this is done when making an api call every certain time
   // componentWillUnmount() {
   //   clearInterval(this.state.interval);
   // }
@@ -124,6 +124,7 @@ class HomeScreen extends Component {
 
   // this is happening before mounting
   fetchDataFromDDB = async (floor) => {
+    // console.log(floor)
     await this.apiGetCall() //fetch the whole data
       .then(response => {
         // console.log(response.returnRooms, response.favRooms)
@@ -207,7 +208,6 @@ class HomeScreen extends Component {
     // console.log('199 -', this.props.backData, this.props.backFavData)
     await this.apiGetCall() //fetch the whole data
       .then(response => {
-        // console.log(response.returnRooms, response.favRooms)
         this.props.add(response.favRooms, 'backFavorite') // store favRooms in backFav
         this.props.add(response.returnRooms) // store returnRooms into backData
       })
@@ -408,13 +408,13 @@ class HomeScreen extends Component {
         favorites: this.props.backFavData // not going well since the this.props is async
       },
     };
-    // console.log('line 414, homescreen: ', notificationItem)
+    // console.log('line 413, homescreen: ', notificationItem)
     await this.apiPutCall(notificationItem)
       .catch(error => {
         console.log(error)
       })
-    this.sendPushNotification()
-    this.fetchByFloor(this.state.floor)
+    this.sendPushNotification() // this is not necessary here
+    this.fetchByFloor(this.state.floor) // this line refreshes the state of the app
   }
 
   openPanel(yPos) {
@@ -719,7 +719,6 @@ const styles = StyleSheet.create({
 
 
 const mapStateToProps = state => {
-  // console.log('line 299 - mapstatetoprops home:', state)
   return {
     authenticated: state.auth.authenticated,
     username: state.auth.username,
@@ -729,7 +728,7 @@ const mapStateToProps = state => {
     backFavData: state.rooms.backFavData,
     phoneRoomsAvailable: state.rooms.phoneRoomsAvailable,
     phoneRoomsUnavailable: state.rooms.phoneRoomsUnavailable,
-    favRooms: state.rooms.favRooms,
+    favRooms: state.rooms.favRooms
   }
 }
 

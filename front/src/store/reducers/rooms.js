@@ -187,6 +187,19 @@ const reducer = (state = initialState, action) => {
                     return item
                 }),
             }
+        case CHANGE_NOTIFICATION_FAV_OBJ:
+            return {
+                ...state,
+                backFavData: state.backFavData.map((item, index) => {
+                    if (item.roomId === action.payload.item.roomId) {
+                        return {
+                            ...item,
+                            notifications: !item.notifications,
+                        }
+                    }
+                    return item
+                }),
+            }
         case AVAILABILITY:
             return {
                 ...state,

@@ -1,7 +1,7 @@
 // suppose this is the data coming from the backend
 export const phoneRoomMockData = [
   {
-    "roomId": "4",
+    "roomId": 1,
     "favorite": false,
     "roomName": "Ed's Room",
     "floor": "1",
@@ -9,7 +9,7 @@ export const phoneRoomMockData = [
     "section": "green"
   },
   {
-    "roomId": "2",
+    "roomId": 2,
     "notifications": false,
     "favorite": false,
     "roomName": "Kairis' Room",
@@ -18,7 +18,7 @@ export const phoneRoomMockData = [
     "section": "blue"
   },
   {
-    "roomId": "3",
+    "roomId": 3,
     "notifications": false,
     "favorite": false,
     "roomName": "Luisana's Room",
@@ -27,7 +27,7 @@ export const phoneRoomMockData = [
     "section": "orange"
   },
   {
-    "roomId": "8",
+    "roomId": 4,
     "notifications": false,
     "favorite": false,
     "roomName": "Darlyn's Room",

@@ -10,11 +10,11 @@ module.exports.handler = async (event) => {
             TableName: process.env.PIR_TABLE,
             Item: {
                 'id': messageAttributes.id.stringValue,
-                'roomName': messageAttributes.roomName.stringValue,
+                // how is this going to relate to the other data
+                // there might be an answer in future stages
                 'roomId': messageAttributes.roomId.stringValue,
                 'timestamp': messageAttributes.timestamp.stringValue,
                 'ttl': messageAttributes.ttl.stringValue,
-                'floor': messageAttributes.floor.stringValue,
             }
         };
         const data = await ddb.put(params).promise()

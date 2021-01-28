@@ -13,6 +13,7 @@ Resources:
         WriteCapacityUnits: 5
       # ideally this would be dynamically done depending on the environment
       TableName: SensorTable
+      # TableName: SensorTable${stage}
       Tags:
         - Key: "Name"
           Value: SensorTable

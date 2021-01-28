@@ -12,6 +12,9 @@
       "region": "us-east-1",
       "versionFunctions": true,
       "remoteFunctionData": null,
+      "environment": {
+        "STAGE": "new"
+      },
       "compiledCloudFormationTemplate": {
         "AWSTemplateFormatVersion": "2010-09-09",
         "Description": "The AWS CloudFormation template for this Serverless application",
@@ -177,7 +180,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/smart-spaces/new/1611867608294-2021-01-28T21:00:08.294Z/smart-spaces.zip"
+                "S3Key": "serverless/smart-spaces/new/1611870120913-2021-01-28T21:42:00.913Z/smart-spaces.zip"
               },
               "FunctionName": "smart-spaces-new-roomData",
               "Handler": "room.handler",
@@ -189,20 +192,25 @@
                 ]
               },
               "Runtime": "nodejs12.x",
-              "Timeout": 6
+              "Timeout": 6,
+              "Environment": {
+                "Variables": {
+                  "STAGE": "new"
+                }
+              }
             },
             "DependsOn": [
               "RoomDataLogGroup"
             ]
           },
-          "RoomDataLambdaVersionPxheU1v1lwFCmjCJdcsgA1O0WIhjQm1cEOZkhKBfWM": {
+          "RoomDataLambdaVersionvjYi8s9tBIowfIuAqJCvDmf5JFR2aKUT2mipjwuwtA": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "RoomDataLambdaFunction"
               },
-              "CodeSha256": "OEL5h4Bm6I+oqDslmqu5gQseglgXQ/zkMKrPDeQRbyg="
+              "CodeSha256": "YmmR+LJjaxjfR6cQtcBUJbhnoUqKMAsNwD67yU3kKqY="
             }
           },
           "QueueHandlerLambdaFunction": {
@@ -212,7 +220,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/smart-spaces/new/1611867608294-2021-01-28T21:00:08.294Z/smart-spaces.zip"
+                "S3Key": "serverless/smart-spaces/new/1611870120913-2021-01-28T21:42:00.913Z/smart-spaces.zip"
               },
               "FunctionName": "smart-spaces-new-queueHandler",
               "Handler": "queue.handler",
@@ -224,20 +232,25 @@
                 ]
               },
               "Runtime": "nodejs12.x",
-              "Timeout": 6
+              "Timeout": 6,
+              "Environment": {
+                "Variables": {
+                  "STAGE": "new"
+                }
+              }
             },
             "DependsOn": [
               "QueueHandlerLogGroup"
             ]
           },
-          "QueueHandlerLambdaVersion00JQKb8JqWIDGnPP1RvHraXt0lsWG5EoJFCYcaQ64Wk": {
+          "QueueHandlerLambdaVersionTpAZAp6DAtSmAg1sokttCNvaPCVrI7VYILaph19rAM": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "QueueHandlerLambdaFunction"
               },
-              "CodeSha256": "OEL5h4Bm6I+oqDslmqu5gQseglgXQ/zkMKrPDeQRbyg="
+              "CodeSha256": "YmmR+LJjaxjfR6cQtcBUJbhnoUqKMAsNwD67yU3kKqY="
             }
           },
           "ApiGatewayRestApi": {
@@ -368,7 +381,7 @@
               "MethodResponses": []
             }
           },
-          "ApiGatewayDeployment1611867604767": {
+          "ApiGatewayDeployment1611870116901": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -443,13 +456,13 @@
           "RoomDataLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "RoomDataLambdaVersionPxheU1v1lwFCmjCJdcsgA1O0WIhjQm1cEOZkhKBfWM"
+              "Ref": "RoomDataLambdaVersionvjYi8s9tBIowfIuAqJCvDmf5JFR2aKUT2mipjwuwtA"
             }
           },
           "QueueHandlerLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "QueueHandlerLambdaVersion00JQKb8JqWIDGnPP1RvHraXt0lsWG5EoJFCYcaQ64Wk"
+              "Ref": "QueueHandlerLambdaVersionTpAZAp6DAtSmAg1sokttCNvaPCVrI7VYILaph19rAM"
             }
           },
           "ServiceEndpoint": {
@@ -553,7 +566,8 @@
       "queueName": "SensorQueue"
     },
     "plugins": [
-      "serverless-offline"
+      "serverless-offline",
+      "serverless-dotenv-plugin"
     ],
     "pluginsData": {},
     "functions": {
@@ -581,7 +595,7 @@
         "timeout": 6,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "RoomDataLambdaVersionPxheU1v1lwFCmjCJdcsgA1O0WIhjQm1cEOZkhKBfWM"
+        "versionLogicalId": "RoomDataLambdaVersionvjYi8s9tBIowfIuAqJCvDmf5JFR2aKUT2mipjwuwtA"
       },
       "queueHandler": {
         "handler": "queue.handler",
@@ -599,17 +613,16 @@
         "timeout": 6,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "QueueHandlerLambdaVersion00JQKb8JqWIDGnPP1RvHraXt0lsWG5EoJFCYcaQ64Wk"
+        "versionLogicalId": "QueueHandlerLambdaVersionTpAZAp6DAtSmAg1sokttCNvaPCVrI7VYILaph19rAM"
       }
     },
-    "resources": null,
     "serviceFilename": "serverless.yml",
     "layers": {},
     "isDashboardMonitoringPreconfigured": false,
     "artifact": "/Users/elchoco/development/native/smart_spaces/business_logic/.serverless/smart-spaces.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/smart-spaces/new/1611867608294-2021-01-28T21:00:08.294Z",
+    "artifactDirectoryName": "serverless/smart-spaces/new/1611870120913-2021-01-28T21:42:00.913Z",
     "artifact": "smart-spaces.zip"
   }
 }

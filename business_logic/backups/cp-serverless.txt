@@ -5,6 +5,13 @@ plugins:
 
 service: motion-detection-service
 
+custom:
+  pirTableName: "PIR-table"
+  userTableName: "User-table"
+  queueName: "PIR-queue"
+  cognitoName: "PIR-cognito"
+  application: "smart-spaces"
+
 provider:
   name: aws # gcloud, azure
   runtime: nodejs12.x

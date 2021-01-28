@@ -3,7 +3,7 @@
 plugins:
   - serverless-offline
 
-service: motion-detection-service
+service: smart-spaces
 
 custom:
   sensorTableName: "SensorTable"
@@ -16,23 +16,6 @@ provider:
   runtime: nodejs12.x
   stage: new
   region: us-east-1
-  iamRoleStatements:
-    - Effect: Allow
-      Action:
-        - dynamodb:Query
-        - dynamodb:Scan
-        - dynamodb:GetItem
-        - dynamodb:PutItem
-        - dynamodb:UpdateItem
-        - dynamodb:DeleteItem
-      Resource: 
-        - { "Fn::GetAtt": ["SensorTable", "Arn"] }
-        - { "Fn::GetAtt": ["RoomTable", "Arn"] }
-        - { "Fn::GetAtt": ["UserTable", "Arn"] }
-  environment:
-    SENSOR_TABLE: ${self:custom.sensorTableName}
-    ROOM_TABLE: ${self:custom.sensorTableName}
-    USER_TABLE: ${self:custom.userTableName}
 
 functions:
   roomData:
@@ -45,25 +28,10 @@ functions:
           path: "/postRooms"
           method: post
 
-  # sensor:
-  #   handler: sensor.handler
-  #   events:
-  #     - http:
-  #         path: "/sensor"
-  #         method: post
-
-  queueHandler:
+  queueSensor:
     handler: queue.handler
     events:
       - sqs:
           arn: arn:aws:sqs:us-east-1:130193131803:${self:custom.queueName}
           batchSize: 10
-
-resources:
-  # DDB
-  - ${file(resources/ddb_serverless.yml)}
-  # SQS
-  - ${file(resources/sqs_serverless.yml)}
-  # Cognito
-  - ${file(resources/cognito_serverless.yml)}
 

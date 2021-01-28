@@ -1,8 +1,8 @@
 {
   "service": {
-    "service": "motion-detection-service",
+    "service": "smart-spaces",
     "serviceObject": {
-      "name": "motion-detection-service"
+      "name": "smart-spaces"
     },
     "provider": {
       "stage": "new",
@@ -10,44 +10,6 @@
       "name": "aws",
       "runtime": "nodejs12.x",
       "region": "us-east-1",
-      "iamRoleStatements": [
-        {
-          "Effect": "Allow",
-          "Action": [
-            "dynamodb:Query",
-            "dynamodb:Scan",
-            "dynamodb:GetItem",
-            "dynamodb:PutItem",
-            "dynamodb:UpdateItem",
-            "dynamodb:DeleteItem"
-          ],
-          "Resource": [
-            {
-              "Fn::GetAtt": [
-                "SensorTable",
-                "Arn"
-              ]
-            },
-            {
-              "Fn::GetAtt": [
-                "RoomTable",
-                "Arn"
-              ]
-            },
-            {
-              "Fn::GetAtt": [
-                "UserTable",
-                "Arn"
-              ]
-            }
-          ]
-        }
-      ],
-      "environment": {
-        "SENSOR_TABLE": "SensorTable",
-        "ROOM_TABLE": "SensorTable",
-        "USER_TABLE": "UserTable"
-      },
       "versionFunctions": true,
       "remoteFunctionData": null,
       "compiledCloudFormationTemplate": {
@@ -111,13 +73,13 @@
           "RoomDataLogGroup": {
             "Type": "AWS::Logs::LogGroup",
             "Properties": {
-              "LogGroupName": "/aws/lambda/motion-detection-service-new-roomData"
+              "LogGroupName": "/aws/lambda/smart-spaces-new-roomData"
             }
           },
           "QueueHandlerLogGroup": {
             "Type": "AWS::Logs::LogGroup",
             "Properties": {
-              "LogGroupName": "/aws/lambda/motion-detection-service-new-queueHandler"
+              "LogGroupName": "/aws/lambda/smart-spaces-new-queueHandler"
             }
           },
           "IamRoleLambdaExecution": {
@@ -145,7 +107,7 @@
                     "Fn::Join": [
                       "-",
                       [
-                        "motion-detection-service",
+                        "smart-spaces",
                         "new",
                         "lambda"
                       ]
@@ -162,7 +124,7 @@
                         ],
                         "Resource": [
                           {
-                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/motion-detection-service-new*:*"
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/smart-spaces-new*:*"
                           }
                         ]
                       },
@@ -173,12 +135,9 @@
                         ],
                         "Resource": [
                           {
-                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/motion-detection-service-new*:*:*"
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/smart-spaces-new*:*:*"
                           }
                         ]
-                      },
-                      {
-                        "$ref": "$[\"service\"][\"provider\"][\"iamRoleStatements\"][0]"
                       },
                       {
                         "Effect": "Allow",
@@ -200,7 +159,7 @@
                 "Fn::Join": [
                   "-",
                   [
-                    "motion-detection-service",
+                    "smart-spaces",
                     "new",
                     {
                       "Ref": "AWS::Region"
@@ -218,10 +177,10 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/motion-detection-service/new/1611683350512-2021-01-26T17:49:10.512Z/motion-detection-service.zip"
+                "S3Key": "serverless/smart-spaces/new/1611867608294-2021-01-28T21:00:08.294Z/smart-spaces.zip"
               },
-              "FunctionName": "motion-detection-service-new-roomData",
-              "Handler": "motion.handler",
+              "FunctionName": "smart-spaces-new-roomData",
+              "Handler": "room.handler",
               "MemorySize": 1024,
               "Role": {
                 "Fn::GetAtt": [
@@ -230,27 +189,20 @@
                 ]
               },
               "Runtime": "nodejs12.x",
-              "Timeout": 6,
-              "Environment": {
-                "Variables": {
-                  "SENSOR_TABLE": "SensorTable",
-                  "ROOM_TABLE": "SensorTable",
-                  "USER_TABLE": "UserTable"
-                }
-              }
+              "Timeout": 6
             },
             "DependsOn": [
               "RoomDataLogGroup"
             ]
           },
-          "RoomDataLambdaVersiont0Zha6beuq0nOzZdtTlJIuDtK6QIwp2fp74OZbL9A": {
+          "RoomDataLambdaVersionPxheU1v1lwFCmjCJdcsgA1O0WIhjQm1cEOZkhKBfWM": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "RoomDataLambdaFunction"
               },
-              "CodeSha256": "5aPxQLbeoZ6FYZ0anCNB82/y1nHl93upUFtrW17f+Qg="
+              "CodeSha256": "OEL5h4Bm6I+oqDslmqu5gQseglgXQ/zkMKrPDeQRbyg="
             }
           },
           "QueueHandlerLambdaFunction": {
@@ -260,9 +212,9 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/motion-detection-service/new/1611683350512-2021-01-26T17:49:10.512Z/motion-detection-service.zip"
+                "S3Key": "serverless/smart-spaces/new/1611867608294-2021-01-28T21:00:08.294Z/smart-spaces.zip"
               },
-              "FunctionName": "motion-detection-service-new-queueHandler",
+              "FunctionName": "smart-spaces-new-queueHandler",
               "Handler": "queue.handler",
               "MemorySize": 1024,
               "Role": {
@@ -272,33 +224,26 @@
                 ]
               },
               "Runtime": "nodejs12.x",
-              "Timeout": 6,
-              "Environment": {
-                "Variables": {
-                  "SENSOR_TABLE": "SensorTable",
-                  "ROOM_TABLE": "SensorTable",
-                  "USER_TABLE": "UserTable"
-                }
-              }
+              "Timeout": 6
             },
             "DependsOn": [
               "QueueHandlerLogGroup"
             ]
           },
-          "QueueHandlerLambdaVersionISzrHUq9LieQF7fiSt0egMvDoqietjEt4mBULXk": {
+          "QueueHandlerLambdaVersion00JQKb8JqWIDGnPP1RvHraXt0lsWG5EoJFCYcaQ64Wk": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "QueueHandlerLambdaFunction"
               },
-              "CodeSha256": "5aPxQLbeoZ6FYZ0anCNB82/y1nHl93upUFtrW17f+Qg="
+              "CodeSha256": "OEL5h4Bm6I+oqDslmqu5gQseglgXQ/zkMKrPDeQRbyg="
             }
           },
           "ApiGatewayRestApi": {
             "Type": "AWS::ApiGateway::RestApi",
             "Properties": {
-              "Name": "new-motion-detection-service",
+              "Name": "new-smart-spaces",
               "EndpointConfiguration": {
                 "Types": [
                   "EDGE"
@@ -317,6 +262,21 @@
                 ]
               },
               "PathPart": "getRooms",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourcePostrooms": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayRestApi",
+                  "RootResourceId"
+                ]
+              },
+              "PathPart": "postRooms",
               "RestApiId": {
                 "Ref": "ApiGatewayRestApi"
               }
@@ -365,7 +325,50 @@
               "MethodResponses": []
             }
           },
-          "ApiGatewayDeployment1611683347180": {
+          "ApiGatewayMethodPostroomsPost": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "POST",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourcePostrooms"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "NONE",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "RoomDataLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            }
+          },
+          "ApiGatewayDeployment1611867604767": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -374,7 +377,8 @@
               "StageName": "new"
             },
             "DependsOn": [
-              "ApiGatewayMethodGetroomsGet"
+              "ApiGatewayMethodGetroomsGet",
+              "ApiGatewayMethodPostroomsPost"
             ]
           },
           "RoomDataLambdaPermissionApiGateway": {
@@ -428,330 +432,6 @@
               },
               "Enabled": true
             }
-          },
-          "SensorTable": {
-            "Type": "AWS::DynamoDB::Table",
-            "Properties": {
-              "AttributeDefinitions": [
-                {
-                  "AttributeName": "id",
-                  "AttributeType": "S"
-                }
-              ],
-              "KeySchema": [
-                {
-                  "AttributeName": "id",
-                  "KeyType": "HASH"
-                }
-              ],
-              "ProvisionedThroughput": {
-                "ReadCapacityUnits": 5,
-                "WriteCapacityUnits": 5
-              },
-              "TableName": "SensorTable",
-              "Tags": [
-                {
-                  "Key": "Name",
-                  "Value": "SensorTable"
-                },
-                {
-                  "Key": "Template",
-                  "Value": "smart_spaces"
-                },
-                {
-                  "Key": "Purpose",
-                  "Value": "PIR sensor table to hold data about sensor data on each phone room"
-                },
-                {
-                  "Key": "Creation_Date",
-                  "Value": "Tue_June_23_20"
-                }
-              ]
-            }
-          },
-          "RoomTable": {
-            "Type": "AWS::DynamoDB::Table",
-            "Properties": {
-              "AttributeDefinitions": [
-                {
-                  "AttributeName": "id",
-                  "AttributeType": "S"
-                }
-              ],
-              "KeySchema": [
-                {
-                  "AttributeName": "id",
-                  "KeyType": "HASH"
-                }
-              ],
-              "ProvisionedThroughput": {
-                "ReadCapacityUnits": 5,
-                "WriteCapacityUnits": 5
-              },
-              "TableName": "RoomTable",
-              "Tags": [
-                {
-                  "Key": "Name",
-                  "Value": "RoomTable"
-                },
-                {
-                  "Key": "Template",
-                  "Value": "smart_spaces"
-                },
-                {
-                  "Key": "Purpose",
-                  "Value": "Room table that would hold data about specific rooms"
-                },
-                {
-                  "Key": "Creation_Date",
-                  "Value": "Tue_Jan_26_21"
-                }
-              ]
-            }
-          },
-          "UserTable": {
-            "Type": "AWS::DynamoDB::Table",
-            "Properties": {
-              "AttributeDefinitions": [
-                {
-                  "AttributeName": "username",
-                  "AttributeType": "S"
-                }
-              ],
-              "KeySchema": [
-                {
-                  "AttributeName": "username",
-                  "KeyType": "HASH"
-                }
-              ],
-              "ProvisionedThroughput": {
-                "ReadCapacityUnits": 5,
-                "WriteCapacityUnits": 5
-              },
-              "TableName": "UserTable",
-              "Tags": [
-                {
-                  "Key": "Name",
-                  "Value": "UserTable"
-                },
-                {
-                  "Key": "Template",
-                  "Value": "smart_spaces"
-                },
-                {
-                  "Key": "Purpose",
-                  "Value": "User table that would hold the information for each user"
-                },
-                {
-                  "Key": "Creation_Date",
-                  "Value": "Tue_July_07_20"
-                }
-              ]
-            }
-          },
-          "SQSPIRSensor": {
-            "Type": "AWS::SQS::Queue",
-            "Properties": {
-              "QueueName": "SensorQueue",
-              "Tags": [
-                {
-                  "Key": "Name",
-                  "Value": "SensorQueue"
-                },
-                {
-                  "Key": "Template",
-                  "Value": "smart_spaces"
-                },
-                {
-                  "Key": "Purpose",
-                  "Value": "PIR queue to offload massive data injection to DynamoDB"
-                },
-                {
-                  "Key": "Creation_Date",
-                  "Value": "Tue_June_23_20"
-                }
-              ]
-            }
-          },
-          "CognitoUserPool": {
-            "Type": "AWS::Cognito::UserPool",
-            "Properties": {
-              "UserPoolName": "smart_spaces_user_pool",
-              "UsernameAttributes": [
-                "email"
-              ],
-              "AutoVerifiedAttributes": [
-                "email"
-              ],
-              "UserPoolTags": {
-                "Name": "PIR-cognito",
-                "Template": "smart_spaces",
-                "Purpose": "User pool for user authentication to the app",
-                "Creation_Date": "Wed_June_24_20"
-              }
-            }
-          },
-          "CognitoUserPoolClient": {
-            "Type": "AWS::Cognito::UserPoolClient",
-            "Properties": {
-              "ClientName": "PIR-cognito-client",
-              "UserPoolId": {
-                "Ref": "CognitoUserPool"
-              },
-              "ExplicitAuthFlows": [
-                "ADMIN_NO_SRP_AUTH"
-              ],
-              "GenerateSecret": false
-            }
-          },
-          "CognitoIdentityPool": {
-            "Type": "AWS::Cognito::IdentityPool",
-            "Properties": {
-              "IdentityPoolName": "PIR-cognito-identity",
-              "AllowUnauthenticatedIdentities": false,
-              "CognitoIdentityProviders": [
-                {
-                  "ClientId": {
-                    "Ref": "CognitoUserPoolClient"
-                  },
-                  "ProviderName": {
-                    "Fn::GetAtt": [
-                      "CognitoUserPool",
-                      "ProviderName"
-                    ]
-                  }
-                }
-              ]
-            }
-          },
-          "CognitoIdentityPoolRoles": {
-            "Type": "AWS::Cognito::IdentityPoolRoleAttachment",
-            "Properties": {
-              "IdentityPoolId": {
-                "Ref": "CognitoIdentityPool"
-              },
-              "Roles": {
-                "authenticated": {
-                  "Fn::GetAtt": [
-                    "CognitoAuthRole",
-                    "Arn"
-                  ]
-                },
-                "unauthenticated": {
-                  "Fn::GetAtt": [
-                    "CognitoUnauthRole",
-                    "Arn"
-                  ]
-                }
-              }
-            }
-          },
-          "CognitoAuthRole": {
-            "Type": "AWS::IAM::Role",
-            "Properties": {
-              "RoleName": "smart_spaces_auth_role",
-              "Path": "/",
-              "AssumeRolePolicyDocument": {
-                "Version": "2012-10-17",
-                "Statement": [
-                  {
-                    "Effect": "Allow",
-                    "Principal": {
-                      "Federated": "cognito-identity.amazonaws.com"
-                    },
-                    "Action": [
-                      "sts:AssumeRoleWithWebIdentity"
-                    ],
-                    "Condition": {
-                      "StringEquals": {
-                        "cognito-identity.amazonaws.com:aud": {
-                          "Ref": "CognitoIdentityPool"
-                        }
-                      },
-                      "ForAnyValue:StringLike": {
-                        "cognito-identity.amazonaws.com:amr": "authenticated"
-                      }
-                    }
-                  }
-                ]
-              },
-              "Policies": [
-                {
-                  "PolicyName": "CognitoAuthorizedPolicy",
-                  "PolicyDocument": {
-                    "Version": "2012-10-17",
-                    "Statement": [
-                      {
-                        "Effect": "Allow",
-                        "Action": [
-                          "mobileanalytics:PutEvents",
-                          "cognito-sync:*",
-                          "cognito-identity:*"
-                        ],
-                        "Resource": "*"
-                      },
-                      {
-                        "Effect": "Allow",
-                        "Action": [
-                          "execute-api:Invoke"
-                        ],
-                        "Resource": "*"
-                      }
-                    ]
-                  }
-                }
-              ]
-            }
-          },
-          "CognitoUnauthRole": {
-            "Type": "AWS::IAM::Role",
-            "Properties": {
-              "RoleName": "smart_spaces_unauth_role",
-              "Path": "/",
-              "AssumeRolePolicyDocument": {
-                "Version": "2012-10-17",
-                "Statement": [
-                  {
-                    "Effect": "Allow",
-                    "Principal": {
-                      "Federated": "cognito-identity.amazonaws.com"
-                    },
-                    "Action": [
-                      "sts:AssumeRoleWithWebIdentity"
-                    ],
-                    "Condition": {
-                      "StringEquals": {
-                        "cognito-identity.amazonaws.com:aud": {
-                          "Ref": "CognitoIdentityPool"
-                        }
-                      },
-                      "ForAnyValue:StringLike": {
-                        "cognito-identity.amazonaws.com:amr": "unauthenticated"
-                      }
-                    }
-                  }
-                ]
-              },
-              "Policies": [
-                {
-                  "PolicyName": "CognitoUnauthorizedPolicy",
-                  "PolicyDocument": {
-                    "Version": "2012-10-17",
-                    "Statement": [
-                      {
-                        "Effect": "Allow",
-                        "Action": [
-                          "mobileanalytics:PutEvents",
-                          "cognito-sync:*",
-                          "cognito-identity:*"
-                        ],
-                        "Resource": "*"
-                      }
-                    ]
-                  }
-                }
-              ]
-            }
           }
         },
         "Outputs": {
@@ -763,13 +443,13 @@
           "RoomDataLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "RoomDataLambdaVersiont0Zha6beuq0nOzZdtTlJIuDtK6QIwp2fp74OZbL9A"
+              "Ref": "RoomDataLambdaVersionPxheU1v1lwFCmjCJdcsgA1O0WIhjQm1cEOZkhKBfWM"
             }
           },
           "QueueHandlerLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "QueueHandlerLambdaVersionISzrHUq9LieQF7fiSt0egMvDoqietjEt4mBULXk"
+              "Ref": "QueueHandlerLambdaVersion00JQKb8JqWIDGnPP1RvHraXt0lsWG5EoJFCYcaQ64Wk"
             }
           },
           "ServiceEndpoint": {
@@ -793,16 +473,6 @@
                   "/new"
                 ]
               ]
-            }
-          },
-          "UserPoolId": {
-            "Value": {
-              "Ref": "CognitoUserPool"
-            }
-          },
-          "UserPoolClientId": {
-            "Value": {
-              "Ref": "CognitoUserPoolClient"
             }
           }
         }
@@ -888,7 +558,7 @@
     "pluginsData": {},
     "functions": {
       "roomData": {
-        "handler": "motion.handler",
+        "handler": "room.handler",
         "events": [
           {
             "http": {
@@ -896,15 +566,22 @@
               "method": "get",
               "integration": "AWS_PROXY"
             }
+          },
+          {
+            "http": {
+              "path": "postRooms",
+              "method": "post",
+              "integration": "AWS_PROXY"
+            }
           }
         ],
-        "name": "motion-detection-service-new-roomData",
+        "name": "smart-spaces-new-roomData",
         "package": {},
         "memory": 1024,
         "timeout": 6,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "RoomDataLambdaVersiont0Zha6beuq0nOzZdtTlJIuDtK6QIwp2fp74OZbL9A"
+        "versionLogicalId": "RoomDataLambdaVersionPxheU1v1lwFCmjCJdcsgA1O0WIhjQm1cEOZkhKBfWM"
       },
       "queueHandler": {
         "handler": "queue.handler",
@@ -916,362 +593,23 @@
             }
           }
         ],
-        "name": "motion-detection-service-new-queueHandler",
+        "name": "smart-spaces-new-queueHandler",
         "package": {},
         "memory": 1024,
         "timeout": 6,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "QueueHandlerLambdaVersionISzrHUq9LieQF7fiSt0egMvDoqietjEt4mBULXk"
+        "versionLogicalId": "QueueHandlerLambdaVersion00JQKb8JqWIDGnPP1RvHraXt0lsWG5EoJFCYcaQ64Wk"
       }
     },
-    "resources": {
-      "Resources": {
-        "SensorTable": {
-          "Type": "AWS::DynamoDB::Table",
-          "Properties": {
-            "AttributeDefinitions": [
-              {
-                "AttributeName": "id",
-                "AttributeType": "S"
-              }
-            ],
-            "KeySchema": [
-              {
-                "AttributeName": "id",
-                "KeyType": "HASH"
-              }
-            ],
-            "ProvisionedThroughput": {
-              "ReadCapacityUnits": 5,
-              "WriteCapacityUnits": 5
-            },
-            "TableName": "SensorTable",
-            "Tags": [
-              {
-                "Key": "Name",
-                "Value": "SensorTable"
-              },
-              {
-                "Key": "Template",
-                "Value": "smart_spaces"
-              },
-              {
-                "Key": "Purpose",
-                "Value": "PIR sensor table to hold data about sensor data on each phone room"
-              },
-              {
-                "Key": "Creation_Date",
-                "Value": "Tue_June_23_20"
-              }
-            ]
-          }
-        },
-        "RoomTable": {
-          "Type": "AWS::DynamoDB::Table",
-          "Properties": {
-            "AttributeDefinitions": [
-              {
-                "AttributeName": "id",
-                "AttributeType": "S"
-              }
-            ],
-            "KeySchema": [
-              {
-                "AttributeName": "id",
-                "KeyType": "HASH"
-              }
-            ],
-            "ProvisionedThroughput": {
-              "ReadCapacityUnits": 5,
-              "WriteCapacityUnits": 5
-            },
-            "TableName": "RoomTable",
-            "Tags": [
-              {
-                "Key": "Name",
-                "Value": "RoomTable"
-              },
-              {
-                "Key": "Template",
-                "Value": "smart_spaces"
-              },
-              {
-                "Key": "Purpose",
-                "Value": "Room table that would hold data about specific rooms"
-              },
-              {
-                "Key": "Creation_Date",
-                "Value": "Tue_Jan_26_21"
-              }
-            ]
-          }
-        },
-        "UserTable": {
-          "Type": "AWS::DynamoDB::Table",
-          "Properties": {
-            "AttributeDefinitions": [
-              {
-                "AttributeName": "username",
-                "AttributeType": "S"
-              }
-            ],
-            "KeySchema": [
-              {
-                "AttributeName": "username",
-                "KeyType": "HASH"
-              }
-            ],
-            "ProvisionedThroughput": {
-              "ReadCapacityUnits": 5,
-              "WriteCapacityUnits": 5
-            },
-            "TableName": "UserTable",
-            "Tags": [
-              {
-                "Key": "Name",
-                "Value": "UserTable"
-              },
-              {
-                "Key": "Template",
-                "Value": "smart_spaces"
-              },
-              {
-                "Key": "Purpose",
-                "Value": "User table that would hold the information for each user"
-              },
-              {
-                "Key": "Creation_Date",
-                "Value": "Tue_July_07_20"
-              }
-            ]
-          }
-        },
-        "SQSPIRSensor": {
-          "Type": "AWS::SQS::Queue",
-          "Properties": {
-            "QueueName": "SensorQueue",
-            "Tags": [
-              {
-                "Key": "Name",
-                "Value": "SensorQueue"
-              },
-              {
-                "Key": "Template",
-                "Value": "smart_spaces"
-              },
-              {
-                "Key": "Purpose",
-                "Value": "PIR queue to offload massive data injection to DynamoDB"
-              },
-              {
-                "Key": "Creation_Date",
-                "Value": "Tue_June_23_20"
-              }
-            ]
-          }
-        },
-        "CognitoUserPool": {
-          "Type": "AWS::Cognito::UserPool",
-          "Properties": {
-            "UserPoolName": "smart_spaces_user_pool",
-            "UsernameAttributes": [
-              "email"
-            ],
-            "AutoVerifiedAttributes": [
-              "email"
-            ],
-            "UserPoolTags": {
-              "Name": "PIR-cognito",
-              "Template": "smart_spaces",
-              "Purpose": "User pool for user authentication to the app",
-              "Creation_Date": "Wed_June_24_20"
-            }
-          }
-        },
-        "CognitoUserPoolClient": {
-          "Type": "AWS::Cognito::UserPoolClient",
-          "Properties": {
-            "ClientName": "PIR-cognito-client",
-            "UserPoolId": {
-              "Ref": "CognitoUserPool"
-            },
-            "ExplicitAuthFlows": [
-              "ADMIN_NO_SRP_AUTH"
-            ],
-            "GenerateSecret": false
-          }
-        },
-        "CognitoIdentityPool": {
-          "Type": "AWS::Cognito::IdentityPool",
-          "Properties": {
-            "IdentityPoolName": "PIR-cognito-identity",
-            "AllowUnauthenticatedIdentities": false,
-            "CognitoIdentityProviders": [
-              {
-                "ClientId": {
-                  "Ref": "CognitoUserPoolClient"
-                },
-                "ProviderName": {
-                  "Fn::GetAtt": [
-                    "CognitoUserPool",
-                    "ProviderName"
-                  ]
-                }
-              }
-            ]
-          }
-        },
-        "CognitoIdentityPoolRoles": {
-          "Type": "AWS::Cognito::IdentityPoolRoleAttachment",
-          "Properties": {
-            "IdentityPoolId": {
-              "Ref": "CognitoIdentityPool"
-            },
-            "Roles": {
-              "authenticated": {
-                "Fn::GetAtt": [
-                  "CognitoAuthRole",
-                  "Arn"
-                ]
-              },
-              "unauthenticated": {
-                "Fn::GetAtt": [
-                  "CognitoUnauthRole",
-                  "Arn"
-                ]
-              }
-            }
-          }
-        },
-        "CognitoAuthRole": {
-          "Type": "AWS::IAM::Role",
-          "Properties": {
-            "RoleName": "smart_spaces_auth_role",
-            "Path": "/",
-            "AssumeRolePolicyDocument": {
-              "Version": "2012-10-17",
-              "Statement": [
-                {
-                  "Effect": "Allow",
-                  "Principal": {
-                    "Federated": "cognito-identity.amazonaws.com"
-                  },
-                  "Action": [
-                    "sts:AssumeRoleWithWebIdentity"
-                  ],
-                  "Condition": {
-                    "StringEquals": {
-                      "cognito-identity.amazonaws.com:aud": {
-                        "Ref": "CognitoIdentityPool"
-                      }
-                    },
-                    "ForAnyValue:StringLike": {
-                      "cognito-identity.amazonaws.com:amr": "authenticated"
-                    }
-                  }
-                }
-              ]
-            },
-            "Policies": [
-              {
-                "PolicyName": "CognitoAuthorizedPolicy",
-                "PolicyDocument": {
-                  "Version": "2012-10-17",
-                  "Statement": [
-                    {
-                      "Effect": "Allow",
-                      "Action": [
-                        "mobileanalytics:PutEvents",
-                        "cognito-sync:*",
-                        "cognito-identity:*"
-                      ],
-                      "Resource": "*"
-                    },
-                    {
-                      "Effect": "Allow",
-                      "Action": [
-                        "execute-api:Invoke"
-                      ],
-                      "Resource": "*"
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        },
-        "CognitoUnauthRole": {
-          "Type": "AWS::IAM::Role",
-          "Properties": {
-            "RoleName": "smart_spaces_unauth_role",
-            "Path": "/",
-            "AssumeRolePolicyDocument": {
-              "Version": "2012-10-17",
-              "Statement": [
-                {
-                  "Effect": "Allow",
-                  "Principal": {
-                    "Federated": "cognito-identity.amazonaws.com"
-                  },
-                  "Action": [
-                    "sts:AssumeRoleWithWebIdentity"
-                  ],
-                  "Condition": {
-                    "StringEquals": {
-                      "cognito-identity.amazonaws.com:aud": {
-                        "Ref": "CognitoIdentityPool"
-                      }
-                    },
-                    "ForAnyValue:StringLike": {
-                      "cognito-identity.amazonaws.com:amr": "unauthenticated"
-                    }
-                  }
-                }
-              ]
-            },
-            "Policies": [
-              {
-                "PolicyName": "CognitoUnauthorizedPolicy",
-                "PolicyDocument": {
-                  "Version": "2012-10-17",
-                  "Statement": [
-                    {
-                      "Effect": "Allow",
-                      "Action": [
-                        "mobileanalytics:PutEvents",
-                        "cognito-sync:*",
-                        "cognito-identity:*"
-                      ],
-                      "Resource": "*"
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        }
-      },
-      "Outputs": {
-        "UserPoolId": {
-          "Value": {
-            "Ref": "CognitoUserPool"
-          }
-        },
-        "UserPoolClientId": {
-          "Value": {
-            "Ref": "CognitoUserPoolClient"
-          }
-        }
-      }
-    },
+    "resources": null,
     "serviceFilename": "serverless.yml",
     "layers": {},
     "isDashboardMonitoringPreconfigured": false,
-    "artifact": "/Users/elchoco/development/native/smart_spaces/business_logic/.serverless/motion-detection-service.zip"
+    "artifact": "/Users/elchoco/development/native/smart_spaces/business_logic/.serverless/smart-spaces.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/motion-detection-service/new/1611683350512-2021-01-26T17:49:10.512Z",
-    "artifact": "motion-detection-service.zip"
+    "artifactDirectoryName": "serverless/smart-spaces/new/1611867608294-2021-01-28T21:00:08.294Z",
+    "artifact": "smart-spaces.zip"
   }
 }

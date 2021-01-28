@@ -11,6 +11,7 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
+      # ideally this would be dynamically done depending on the environment
       TableName: SensorTable
       Tags:
         - Key: "Name"

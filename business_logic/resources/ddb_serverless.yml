@@ -12,11 +12,11 @@ Resources:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
       # ideally this would be dynamically done depending on the environment
-      TableName: SensorTable
-      # TableName: SensorTable${stage}
+      # TableName: SensorTable
+      TableName: SensorTable_${env:STAGE}
       Tags:
         - Key: "Name"
-          Value: SensorTable
+          Value: SensorTable_${env:STAGE}
         - Key: "Template"
           Value: smart_spaces
         - Key: "Purpose"
@@ -35,10 +35,10 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
-      TableName: RoomTable
+      TableName: RoomTable_${env:STAGE}
       Tags:
         - Key: "Name"
-          Value: RoomTable
+          Value: RoomTable_${env:STAGE}
         - Key: "Template"
           Value: smart_spaces
         - Key: "Purpose"
@@ -57,10 +57,10 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
-      TableName: UserTable
+      TableName: UserTable_${env:STAGE}
       Tags:
         - Key: "Name"
-          Value: UserTable
+          Value: UserTable_${env:STAGE}
         - Key: "Template"
           Value: smart_spaces
         - Key: "Purpose"

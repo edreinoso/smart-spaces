@@ -3,7 +3,7 @@ Resources:
     Type: AWS::Cognito::UserPool
     Properties:
       # Generate a name based on the stage
-      UserPoolName: smart_spaces_user_pool
+      UserPoolName: smart_spaces_user_pool_${env:STAGE}
       # UserPoolName: ${self:custom.cognitoName}-user-pool
       # Set email as an alias
       UsernameAttributes:
@@ -11,7 +11,7 @@ Resources:
       AutoVerifiedAttributes:
         - email
       UserPoolTags:
-        Name: "PIR-cognito"
+        Name: "smart_spaces_user_pool_${env:STAGE}"
         Template: "smart_spaces"
         Purpose: "User pool for user authentication to the app"
         Creation_Date: "Wed_June_24_20"
@@ -19,7 +19,7 @@ Resources:
     Type: AWS::Cognito::UserPoolClient
     Properties:
       # Generate an app client name based on the stage
-      ClientName: PIR-cognito-client
+      ClientName: smart_spaces_pool_client_${env:STAGE}
       UserPoolId:
         Ref: CognitoUserPool
       ExplicitAuthFlows:
@@ -28,7 +28,7 @@ Resources:
   CognitoIdentityPool:
     Type: AWS::Cognito::IdentityPool
     Properties:
-      IdentityPoolName: PIR-cognito-identity
+      IdentityPoolName: smart_spaces_identity_${env:STAGE}
       AllowUnauthenticatedIdentities: false
       CognitoIdentityProviders:
         - ClientId:
@@ -48,7 +48,7 @@ Resources:
   CognitoAuthRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: smart_spaces_auth_role
+      RoleName: smart_spaces_auth_role_${env:STAGE}
       Path: /
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
@@ -83,7 +83,7 @@ Resources:
   CognitoUnauthRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: smart_spaces_unauth_role
+      RoleName: smart_spaces_unauth_role_${env:STAGE}
       Path: /
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
@@ -116,7 +116,6 @@ Outputs:
   UserPoolId:
     Value:
       Ref: CognitoUserPool
-
   UserPoolClientId:
     Value:
       Ref: CognitoUserPoolClient

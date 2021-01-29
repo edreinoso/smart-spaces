@@ -7,7 +7,7 @@ module.exports.handler = async (event) => {
     for (const { messageAttributes } of event.Records) {
         console.log('messageAttributes:', messageAttributes);
         var params = {
-            TableName: process.env.PIR_TABLE,
+            TableName: process.env.SENSOR_TABLE,
             Item: {
                 'id': messageAttributes.id.stringValue,
                 // how is this going to relate to the other data
@@ -17,7 +17,7 @@ module.exports.handler = async (event) => {
                 'ttl': messageAttributes.ttl.stringValue,
             }
         };
-        const data = await ddb.put(params).promise()
+        await ddb.put(params).promise()
     }
     // just as FYI for future references and debugging
     return `Successfully processed ${event.Records.length} messages.`;

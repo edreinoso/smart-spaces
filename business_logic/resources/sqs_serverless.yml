@@ -2,10 +2,10 @@ Resources:
   SQSPIRSensor:
     Type: AWS::SQS::Queue
     Properties:
-      QueueName: SensorQueue
+      QueueName: SensorQueue_${env:STAGE}
       Tags:
         - Key: "Name"
-          Value: SensorQueue
+          Value: SensorQueue_${env:STAGE}
         - Key: "Template"
           Value: smart_spaces
         - Key: "Purpose"

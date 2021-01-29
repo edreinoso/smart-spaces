@@ -6,33 +6,28 @@ plugins:
 
 service: smart-spaces
 
-custom:
-  sensorTableName: "SensorTable"
-  roomTableName: "RoomTable"
-  userTableName: "UserTable"
-  queueName: "SensorQueue"
-
 provider:
   name: aws
   runtime: nodejs12.x
   stage: ${env:STAGE}
   region: us-east-1
-  # iamRoleStatements:
-  #   - Effect: Allow
-  #     Action:
-  #       - dynamodb:Query
-  #       - dynamodb:Scan
-  #       - dynamodb:GetItem
-  #       - dynamodb:PutItem
-  #       - dynamodb:UpdateItem
-  #       - dynamodb:DeleteItem
-  #     Resource:
-  #       - { "Fn::GetAtt": ["SensorTable", "Arn"] }
-  #       - { "Fn::GetAtt": ["RoomTable", "Arn"] }
-  #       - { "Fn::GetAtt": ["UserTable", "Arn"] }
-  # environment:
-  #   PIR_TABLE: ${self:custom.pirTableName}
-  #   USER_TABLE: ${self:custom.userTableName}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource:
+        - { "Fn::GetAtt": ["SensorTable", "Arn"] }
+        - { "Fn::GetAtt": ["RoomTable", "Arn"] }
+        - { "Fn::GetAtt": ["UserTable", "Arn"] }
+  environment:
+    SENSOR_TABLE: ${env:DDBSENSOR}
+    ROOM_TABLE: ${env:DDBROOM}
+    USER_TABLE: ${env:DDBUSER}
 
 functions:
   roomData:
@@ -49,13 +44,13 @@ functions:
     handler: queue.handler
     events:
       - sqs:
-          arn: arn:aws:sqs:us-east-1:130193131803:${self:custom.queueName}
+          arn: arn:aws:sqs:us-east-1:130193131803:${env:QUEUE}
           batchSize: 10
 
-# resources:
-#   # DDB
-#   - ${file(resources/ddb_serverless.yml)}
-#   # SQS
-#   - ${file(resources/sqs_serverless.yml)}
-#   # Cognito
-#   - ${file(resources/cognito_serverless.yml)}
+resources:
+  # DDB
+  - ${file(resources/ddb_serverless.yml)}
+  # SQS
+  - ${file(resources/sqs_serverless.yml)}
+  # Cognito
+  - ${file(resources/cognito_serverless.yml)}

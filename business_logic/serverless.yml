@@ -30,6 +30,13 @@ provider:
     USER_TABLE: ${env:DDBUSER}
 
 functions:
+  userFunction:
+    handler: user.handler
+    events:
+      - http:
+          path: "/postUsers"
+          method: post
+
   roomData:
     handler: room.handler
     events:

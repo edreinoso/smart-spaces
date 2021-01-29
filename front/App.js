@@ -19,10 +19,15 @@ Amplify.configure({
   API: {
     endpoints: [
       {
-        name: 'motion',
+        name: 'user',
         endpoint: config.apiGateway.URL,
         region: config.apiGateway.REGION,
-      }
+      },
+      {
+        name: 'rooms',
+        endpoint: config.apiGateway.URL,
+        region: config.apiGateway.REGION,
+      },
     ]
   }
 })

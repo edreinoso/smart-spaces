@@ -14,8 +14,8 @@ class AuthScreen extends Component {
         confirmForgetPass: null,
     }
 
-    apiCall(item) {
-        return API.post('motion', '/users', item)
+    putUserInTable(item) {
+        return API.post('user', '/postUsers', item)
     }
 
     componentDidMount() {
@@ -26,9 +26,11 @@ class AuthScreen extends Component {
     // TEXT CHANGES //
     reset = () => {
         this.setState({
+            // input controls
             controls: {
                 email: {
-                    value: 'edgardo_16_@hotmail.com',
+                    // value: 'edgardo_16_@hotmail.com', // testing purposes
+                    value: '',
                     validity: true,
                     validationRules: {
                         isEmail: true
@@ -36,7 +38,8 @@ class AuthScreen extends Component {
                     touched: false
                 },
                 password: {
-                    value: 'Passw0rd!',
+                    // value: 'Passw0rd!', // testing purposes
+                    value: '',
                     validity: true,
                     validationRules: {
                         minLength: 6
@@ -104,14 +107,15 @@ class AuthScreen extends Component {
             this.setState({ showLogin: true, showSignUp: false, showLoginButton: true, showSignUpButton: false })
             // Executing auth if email and password are not empty
             if (this.state.controls.email.value != "" || this.state.controls.password.value != "") {
-                await this.props.auth(
+                await this.props.auth( // authenticating
                     this.state.controls.email.value,
                     this.state.controls.password.value,
                     'login'
                 ).then(() => {
+                    Alert.alert('User has been successfully authenticated!')
                     // console.log(data)
-                    this.props.getUser(this.state.controls.email.value, true)
-                    this.props.navigation.navigate('Home')
+                    // this.props.getUser(this.state.controls.email.value, true) // getting user data}
+                    // this.props.navigation.navigate('Home')
                     // this.reset() // this is affecting the way the screen goes
                 }).catch((err) => {
                     Alert.alert('Error found', err.message)
@@ -126,8 +130,16 @@ class AuthScreen extends Component {
         } else {
             this.setState({ showSignUp: true, showLogin: false, showSignUpButton: true, showLoginButton: false })
         }
-        // 
-        if (this.state.controls.email.value != "" || this.state.controls.password.value != "") {
+        // console.log(this.state.newUser === null && this.state.forgotPass === null && this.state.confirmForgetPass)
+        // console.log('evaluating', this.state.newUser === null && this.state.forgotPass === null && this.state.confirmForgetPass == null)
+        // console.log('this.state.newUser', this.state.newUser)
+        
+        // this is getting executed even though it should not
+        // would there be a difference between && and ||
+        // the button will not enable if one AND the other are not populated.
+        // so this is just another safeguard that's in place
+        if (this.state.controls.email.value != "" && this.state.controls.password.value != "") {
+            console.log(this.state.controls.email.value, this.state.controls.password.value)
             await this.props.auth(
                 this.state.controls.email.value,
                 this.state.controls.password.value,
@@ -142,6 +154,7 @@ class AuthScreen extends Component {
             }).catch((err) => {
                 Alert.alert('Error found', err.message)
             })
+
         }
     }
 
@@ -150,32 +163,37 @@ class AuthScreen extends Component {
             this.state.controls.email.value,
             this.state.controls.confirmCode.value
         )
+
+        // from this point onward, there should be an API call
+        // that would POST the user into the USER_TABLE
         var item = {
             body: {
                 username: this.state.controls.email.value,
-                rooms: phoneRoomMockData,
-                favorites: [] // empty variable in the beginning
+                password: this.state.controls.password.value,
+                favoriteRooms: [] // empty variable in the beginning
             }
         }
-        // console.log('auth line 113: item', item)
-        await this.apiCall(item).then(response => {
-            // console.log('line 115 response:', response)
+        console.log('auth line 177: item', item)
+        
+        await this.putUserInTable(item).then(response => {
+            console.log('line 178 response:', response)
             // populate redux variable for rooms
             // this.props.addRooms(response.rooms)
+            Alert.alert('User has been confirmed and recorded in table')
         }).catch(error => {
             console.log(error)
         })
-        await this.props.auth(
-            this.state.controls.email.value,
-            this.state.controls.password.value,
-            'login'
-        ).then(() => {
-            this.props.getUser(this.state.controls.email.value, true)
-            this.props.navigation.navigate('Home')
-            this.reset()
-        }).catch((err) => {
-            Alert.alert('Error found', err.message)
-        })
+        // await this.props.auth(
+        //     this.state.controls.email.value,
+        //     this.state.controls.password.value,
+        //     'login'
+        // ).then(() => {
+        //     this.props.getUser(this.state.controls.email.value, true)
+        //     this.props.navigation.navigate('Home')
+        //     this.reset()
+        // }).catch((err) => {
+        //     Alert.alert('Error found', err.message)
+        // })
     }
 
     onSendEmailAgain = async () => {
@@ -324,6 +342,10 @@ class AuthScreen extends Component {
                 {this.state.newUser === null ? null : this.renderVerifyUser()}
                 {this.state.forgotPass === null ? null : this.renderForgotPass()}
                 {this.state.confirmForgetPass === null ? null : this.renderNewUser()}
+                {/* {this.state.newUser === null && this.state.forgotPass === null && this.state.confirmForgetPass === null ? <Text>renderNewUser</Text> : <Text>nothing</Text>} */}
+                {/* {this.state.newUser === null ? null : <Text>renderVerifyUser</Text>} */}
+                {/* {this.state.forgotPass === null ? <Text>nothingForgotPass</Text> : <Text>renderForgotPass</Text>}
+                {this.state.confirmForgetPass === null ? <Text>nothignConfirmForgotPass</Text> : <Text>renderNewUser</Text>} */}
             </Cards>
         )
     }
@@ -454,6 +476,7 @@ class AuthScreen extends Component {
                 {this.renderLoginButton()}
                 {this.renderSignUpButton()}
                 {this.state.newUser != null ? this.renderVerifyButton() : null}
+                {/* {this.state.newUser === null ? <Text>Hello</Text> : <Text>{this.state.newUser}</Text>} */}
                 {this.state.forgotPass != null ? this.renderConfirmButton() : null}
             </View>
         )

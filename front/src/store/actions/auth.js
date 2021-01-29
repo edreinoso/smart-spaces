@@ -13,24 +13,25 @@ export const confirmCodeSignUp = (username, code) => {
 
 export const auth = (username, password, pushToken, authMode) => {
     // export const auth = async (username, password, authMode) => {
-    // console.log(username, password, authMode)
+    console.log(username, password, pushToken, authMode)
     //actions are plain objects. use a middleware for async functions
     // const response
 
+    // I am not even reaching inside of this!
     return async dispatch => {
         if (authMode === 'signUp') {
             const response = await Auth.signUp({
                 username,
                 password,
-                pushToken
             })
-            // console.log('sign up response:', response)
-        } else if (authMode === 'login') {
+            console.log('sign up response:', response)
+        }
+        else {
             const response = await Auth.signIn({
                 username,
                 password,
             })
-            // console.log('login response:', response)
+            console.log('login response:', response)
         }
     }
 }

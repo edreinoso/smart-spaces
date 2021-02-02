@@ -18,8 +18,10 @@ class AuthScreen extends Component {
         return API.post('user', '/postUsers', item)
     }
 
-    changePassInTable(username, pass) {
-        return API.put('user', `/changeUserPass/${username}`, pass)
+    changePassInTable(item) {
+    // changePassInTable(username, pass) {
+        // return API.put('user', `/changeUserPass/${username}`, pass)
+        return API.put('user', '/changeUserPass', item)
     }
 
     componentDidMount() {
@@ -211,9 +213,16 @@ class AuthScreen extends Component {
                 await this.props.confirmForgotPass(this.state.controls.email.value, this.state.controls.confirmCode.value, this.state.controls.password.value)
                     .catch((err) => Alert.alert('Error found', err.message))
 
+                var item = {
+                    body: {
+                        username: this.state.controls.email.value,
+                        password: this.state.controls.password.value,
+                    }
+                }
                 // there should be password change in the dynamodb database
-                await this.changePassInTable(this.state.controls.email, this.state.controls.password).then(response => {
-                    console.log('line 178 response:', response)
+                // await this.changePassInTable(this.state.controls.email, this.state.controls.password).then(response => {
+                await this.changePassInTable(item).then(response => {
+                    console.log('line 225 response:', response)
                     // the user should be taken from confirm forgot pass back again to the login screen
                     this.setState({
                         showLogin: true, showSignUp: false, showLoginButton: true, showSignUpButton: false, confirmForgetPass: null, forgotPass: null

@@ -17,46 +17,42 @@ app.get('/getUserById/:username', function (req, res) {
   // this is to get the user by a specific email id
 })
 
-app.put('/changeUserPass/:username', function (req, res){
-  const params = {
-    TableName: USER_TABLE,
-    FilterExpression: 'username = :username',
-    ExpressionAttributeValues: { ':username': req.params.username }
-  }
-
+app.put('/changeUserPass', function (req, res){
+// app.put('/changeUserPass/:username', function (req, res){
+  console.log('/changeUserPass method')
+  const { username, password } = req.body
+  
   var params = {
-    TableName: table,
+    TableName: USER_TABLE,
     Key: {
-      "year": year,
-      "title": title
+      "username": username,
     },
-    UpdateExpression: "set info.rating = :r, info.plot=:p, info.actors=:a",
+    UpdateExpression: "set password = :p",
     ExpressionAttributeValues: {
-      ":r": 5.5,
-      ":p": "Everything happens all at once.",
-      ":a": ["Larry", "Moe", "Curly"]
+      ":p": password,
     },
     ReturnValues: "UPDATED_NEW"
   };
 
   console.log("Updating the item...");
-  docClient.update(params, function (err, data) {
+  dynamoDB.update(params, function (err, data) {
     if (err) {
       console.error("Unable to update item. Error JSON:", JSON.stringify(err, null, 2));
+      res.send(err)
     } else {
       console.log("UpdateItem succeeded:", JSON.stringify(data, null, 2));
       res.send(data)
-      // res.send(JSON.stringify(data, null, 2))
     }
   });
 
 })
 
 app.post('/postUsers', function (req, res) {
-  // favoriteRooms is going to be an array of strings
+  console.log('/postUsers method')
+  
   // const { username, firstName, lastName, mobileToken, favoriteRooms } = req.body
   const { username, password } = req.body
-  req.body.favoriteslRooms = []
+  req.body.favoriteRooms = []
   console.log(req.body)
 
   const params = {
@@ -64,10 +60,17 @@ app.post('/postUsers', function (req, res) {
     Item: {
       username: username,
       password: password,
-      // favoriteRooms: req.body.favoriteRooms, // maybe this is not properly rendering
+      favoriteRooms: req.body.favoriteRooms, 
+      // when the user actually has a token to send
+      // this might be particularly important when
+      // re-developing the notifiaction portion
+      // mobileToken: availability
+
+      // a very specific modification will have to
+      // be made in the application to add first
+      // and last names
       // firstName: floor,
       // lastName: section,
-      // mobileToken: availability
     }
   }
 

@@ -36,6 +36,9 @@ functions:
       - http:
           path: "/postUsers"
           method: post
+      - http:
+          path: "/changeUserPass"
+          method: put
 
   roomData:
     handler: room.handler

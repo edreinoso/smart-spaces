@@ -11,15 +11,14 @@ export const confirmCodeSignUp = (username, code) => {
     }
 }
 
-export const auth = (username, password, pushToken, authMode) => {
-    // export const auth = async (username, password, authMode) => {
-    console.log(username, password, pushToken, authMode)
-    //actions are plain objects. use a middleware for async functions
-    // const response
+// export const auth = (username, password, authMode) => {
+// Possible errors:
+    // actions are plain objects. use a middleware for async functions
+    // pushToken 
+export const auth = (username, password, authMode) => {
 
-    // I am not even reaching inside of this!
-    return async dispatch => {
-        if (authMode === 'signUp') {
+    return async dispatch => { // this line of code has caused me some issues
+        if (authMode == 'signUp') {
             const response = await Auth.signUp({
                 username,
                 password,

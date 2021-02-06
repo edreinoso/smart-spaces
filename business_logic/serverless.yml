@@ -44,7 +44,7 @@ functions:
     handler: room.handler
     events:
       - http:
-          path: "/getRooms"
+          path: "/getRooms/{proxy+}"
           method: get
       - http:
           path: "/postRooms"

@@ -6,7 +6,10 @@
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
 
 \f0\fs24 \cf0 backend js: var bcrypt = require('bcrypt');\
+\
+\
 frontend para hashear la password:\
+Ended up using crypto expo for hashing the password to be sent to the backend\
 import sjcl from 'sjcl';\
     hashPassword(password) \{\
         var out = sjcl.hash.sha256.hash(password);\

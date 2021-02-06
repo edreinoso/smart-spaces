@@ -6,12 +6,16 @@ import { Logo, Button, Cards, Input } from '../components/index'
 import { connect } from 'react-redux'
 import { auth, getUser, forgotPass, confirmForgotPass, confirmCodeSignUp, addRooms } from '../store/actions/index'
 import { API } from 'aws-amplify';
-import { phoneRoomMockData } from "../store/mockdata";
+import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
+// import * as Crypto from 'expo-crypto';
 
 class AuthScreen extends Component {
     state = {
         forgotPass: null,
         confirmForgetPass: null,
+        hasPassword: "",
+        expoPushToken: ""
     }
 
     putUserInTable(item) {
@@ -24,9 +28,28 @@ class AuthScreen extends Component {
         return API.put('user', '/changeUserPass', item)
     }
 
+    // componentDidMount = async () => {
     componentDidMount() {
         // console.log('do I enter auth?')
         this.reset()
+        // getting the token, this might be carried only over the phone
+        // if (Constants.isDevice) {
+        //     const { status: existingStatus } = await Notifications.getPermissionsAsync();
+        //     let finalStatus = existingStatus;
+        //     if (existingStatus !== 'granted') {
+        //         const { status } = await Notifications.requestPermissionsAsync();
+        //         finalStatus = status;
+        //     }
+        //     if (finalStatus !== 'granted') {
+        //         alert('Failed to get push token for push notification!');
+        //         return;
+        //     }
+        //     const token = (await Notifications.getExpoPushTokenAsync()).data;
+        //     console.log(token);
+        //     this.setState({ expoPushToken: token });
+        // } else {
+        //     alert('Must use physical device for Push Notifications');
+        // }
     }
 
     // TEXT CHANGES //
@@ -118,11 +141,11 @@ class AuthScreen extends Component {
                     this.state.controls.password.value,
                     'login'
                 ).then(() => {
-                    Alert.alert('User has been successfully authenticated!')
+                    // Alert.alert('User has been successfully authenticated!')
                     // console.log(data)
-                    // this.props.getUser(this.state.controls.email.value, true) // getting user data}
-                    // this.props.navigation.navigate('Home')
-                    // this.reset() // this is affecting the way the screen goes
+                    this.props.getUser(this.state.controls.email.value, true) // getting user data}
+                    this.props.navigation.navigate('Home')
+                    this.reset() // this is affecting the way the screen goes
                 }).catch((err) => {
                     Alert.alert('Error found', err.message)
                 })
@@ -131,6 +154,7 @@ class AuthScreen extends Component {
     }
 
     onSignUpPress = async (initialState) => {
+        console.log(initialState)
         if (!this.state.initialState) {
             this.setState({ initialState: initialState, showSignUp: true, showLogin: false, showSignUpButton: true, showLoginButton: false })
         } else {
@@ -141,9 +165,16 @@ class AuthScreen extends Component {
         // so this is just another safeguard that's in place
         if (this.state.controls.email.value != "" && this.state.controls.password.value != "") {
             console.log(this.state.controls.email.value, this.state.controls.password.value)
+            // const hashPass = await Crypto.digestStringAsync(
+            //     Crypto.CryptoDigestAlgorithm.SHA256,
+            //     this.state.controls.password.value
+            // );
+            // this.setState({ hashPassword: hashPass })
+            // console.log('hash pass: ', this.state.hashPassword);
             await this.props.auth(
                 this.state.controls.email.value,
                 this.state.controls.password.value,
+                // hashPass,
                 'signUp'
             ).then(() => {
                 this.setState({
@@ -169,9 +200,9 @@ class AuthScreen extends Component {
         var item = {
             body: {
                 username: this.state.controls.email.value,
-                password: this.state.controls.password.value,
-                // this variable is not getting recorded in the table
                 favoriteRooms: [] // empty variable in the beginning
+                // this variable is not getting recorded in the table
+                // expoPushToken: this.expoPushToken,
             }
         }
         console.log('auth line 177: item', item)
@@ -336,7 +367,7 @@ class AuthScreen extends Component {
             <Cards style={[container.authContainer, {
                 marginBottom: 20
             }]}>
-                {this.state.newUser === null && this.state.forgotPass === null && this.state.confirmForgetPass === null ? this.renderNewUser() : null}
+            {this.state.newUser === null && this.state.forgotPass === null && this.state.confirmForgetPass === null ? this.renderNewUser() : null}
                 {this.state.newUser === null ? null : this.renderVerifyUser()}
                 {this.state.forgotPass === null ? null : this.renderForgotPass()}
                 {this.state.confirmForgetPass === null ? null : this.renderNewUser()}

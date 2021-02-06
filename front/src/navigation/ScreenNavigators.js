@@ -11,12 +11,12 @@ const ScreenNavigators = createStackNavigator({
   //     gesturesEnabled: false
   //   }
   // },
-  // Main: {
-  //   screen: HomeNavigator,
-  //   navigationOptions: {
-  //     gesturesEnabled: false
-  //   }
-  // },
+  Main: {
+    screen: HomeNavigator,
+    navigationOptions: {
+      gesturesEnabled: false
+    }
+  },
   Auth: {
     screen: AuthScreen,
     navigationOptions: {

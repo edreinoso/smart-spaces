@@ -1,5 +1,24 @@
 import { ADD_ROOMS_U, ADD_ROOMS_A, ADD_FAV_ROOMS, FAV_ROOM, UNFAV_ROOM, ADD_ROOMS, CHANGE_NOTIFICATION_BACK_OBJ, CHANGE_NOTIFICATION_FAV_OBJ, AVAILABILITY } from './types';
 
+export const addARooms = (item) => {
+    // console.log('line 4 - room a action',item)
+    return {
+        type: ADD_ROOMS_A,
+        payload: {
+            item: item
+        }
+    }
+}
+export const addURooms = (item) => {
+    // console.log('line 13 - room u action', item)
+    return {
+        type: ADD_ROOMS_U,
+        payload: {
+            item: item
+        }
+    }
+}
+
 export const add = (item, type) => {
     // console.log('line 15 rooms action - item and type', item, type)
     if (type === "unavailable") { // if type is room unavailable, then call the corresponding reducer
@@ -33,6 +52,7 @@ export const add = (item, type) => {
             }
         }
     } else { // BACKEND from server
+        // console.log('backData', item)
         return {
             type: ADD_ROOMS,
             payload: {
@@ -59,7 +79,6 @@ export const favorite = (item, type) => {
         }
     }
 }
-
 
 export const notifications = (item, type) => {
     if (type === "favorite") {

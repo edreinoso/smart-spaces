@@ -10,7 +10,7 @@ import { container, text, colors, header, borders } from '../styles/index';
 import { Picture, HomeButton, PhoneRoom, ButtonFilters, Tags } from '../components/index';
 import { connect } from 'react-redux';
 import { API } from 'aws-amplify';
-import { stars, add, favorite, notifications, availability } from '../store/actions/index'
+import { stars, add, addARooms, addURooms, favorite, notifications, availability } from '../store/actions/index'
 
 var api_first_floor = '1'
 var api_second_floor = '2'
@@ -55,30 +55,31 @@ class HomeScreen extends Component {
     //   else if (this.state.floor2) this.fetchRoomsSensorData(api_second_floor)
     //   else if (this.state.floor3) this.fetchRoomsSensorData(api_third_floor)
     // }, 10000);
-    this.setState({
-      greenSection: false,
-      redSection: false,
-      blueSection: false,
-      orangeSection: false,
-      section: ''
-    })
-    if (this.props.authenticated) {
-      // Local
-      // this.fetchDataFromLocal()
-      // API
+    // this.setState({
+    //   greenSection: false,
+    //   redSection: false,
+    //   blueSection: false,
+    //   orangeSection: false,
+    //   section: ''
+    // })
+    // if (this.props.authenticated) {
+    //   // Local
+    //   // this.fetchDataFromLocal()
+    //   // API
+    console.log('new')
       this.fetchDataFromDDB(api_first_floor)
-    } else {
-      Alert.alert(
-        //title
-        'Sign In Required',
-        //body
-        '',
-        [
-          { text: 'Okay', onPress: () => { this.props.navigation.navigate('Auth') } },
-        ],
-        { cancelable: false }
-      );
-    }
+    // } else {
+    //   Alert.alert(
+    //     //title
+    //     'Sign In Required',
+    //     //body
+    //     '',
+    //     [
+    //       { text: 'Okay', onPress: () => { this.props.navigation.navigate('Auth') } },
+    //     ],
+    //     { cancelable: false }
+    //   );
+    // }
   }
 
   // this is done when making an api call every certain time
@@ -100,11 +101,11 @@ class HomeScreen extends Component {
         this.closePanel(-400)
       }
     })
-    this.fetchDataFromDDB(this.state.floor)
+    // this.fetchDataFromDDB(this.state.floor)
   }
 
-  apiGetCall() { // API Gateway caller
-    return API.get('motion', `/users/${this.props.username}`);
+  apiGetRooms(floor) { // API Gateway caller
+    return API.get('rooms', `/getRooms/${floor}`);
   }
 
   apiGetSection(section, floor) {
@@ -125,16 +126,27 @@ class HomeScreen extends Component {
   // this is happening before mounting
   fetchDataFromDDB = async (floor) => {
     // console.log(floor)
-    await this.apiGetCall() //fetch the whole data
+    await this.apiGetRooms(floor)
       .then(response => {
-        // console.log(response.returnRooms, response.favRooms)
-        this.props.add(response.favRooms, 'backFavorite') // store favRooms in backFav
-        this.props.add(response.returnRooms) // store returnRooms into backData
+        // console.log(floor, response)
+        this.props.addARooms(response.aRooms)
+        this.props.addURooms(response.uRooms)
+        // this.props.add(response) // backData
       })
-      .catch(error => {
-        console.log(error)
+      .catch(err => {
+        console.log(err)
       })
-    this.fetchByFloor(floor) // then call fetching by floor
+    // await this.apiGetCall() //fetch the whole data
+    //   .then(response => {
+    //     // console.log(response.returnRooms, response.favRooms)
+    //     this.props.add(response.favRooms, 'backFavorite') // store favRooms in backFav
+    //     this.props.add(response.returnRooms) // store returnRooms into backData
+    //   })
+    //   .catch(error => {
+    //     console.log(error)
+    //   })
+    // this.fetchByFloor(floor) // then call fetching by floor
+    this.setState({ refreshing: false })
   }
 
   fetchDataBySection = async (section, floor) => {
@@ -171,36 +183,38 @@ class HomeScreen extends Component {
 
   //====== HEART OF THE CLASS ======//
   fetchByFloor = (floor) => { // this function will be responsible to fetch by floors
-    var favRoom = []
-    var roomAvailable = []
-    var roomNotAvailable = []
+    console.log(floor, this.props.backData)
+    
+    // var favRoom = []
+    // var roomAvailable = []
+    // var roomNotAvailable = []
     // console.log('line 186: ', this.state.section)  
     // it is being done locally, no API call required
-    this.props.backData.map((item, index) => {
-      // logic for handling rooms available and not available
-      if (item.floor === floor && this.state.section != "") { // this is applied for filtering
-        // console.log('homescreen line 199 - selecting rooms by filter', item.roomName)
-        if (item.availability && item.section == this.state.section) roomAvailable.push(item) // roomAvailable are going to be pushed with section included
-        else if (!item.availability && item.section == this.state.section) roomNotAvailable.push(item) // roomNotAvailable are going to be pushed with section included
-      } else if (item.floor === floor) { // this is applied per floor
-        // console.log('line 203 - not selecting rooms by filter', item.roomName)
-        if (item.availability) roomAvailable.push(item) // roomAvailable are going to be pushed
-        else roomNotAvailable.push(item) // roomNotAvailable are going to be pushed
-      }
-    })
+    // this.props.backData.map((item, index) => {
+    //   // logic for handling rooms available and not available
+    //   if (item.floor === floor && this.state.section != "") { // this is applied for filtering
+    //     // console.log('homescreen line 199 - selecting rooms by filter', item.roomName)
+    //     if (item.availability && item.section == this.state.section) roomAvailable.push(item) // roomAvailable are going to be pushed with section included
+    //     else if (!item.availability && item.section == this.state.section) roomNotAvailable.push(item) // roomNotAvailable are going to be pushed with section included
+    //   } else if (item.floor === floor) { // this is applied per floor
+    //     // console.log('line 203 - not selecting rooms by filter', item.roomName)
+    //     if (item.availability) roomAvailable.push(item) // roomAvailable are going to be pushed
+    //     else roomNotAvailable.push(item) // roomNotAvailable are going to be pushed
+    //   }
+    // })
     // if I'm carrying individual items by the floor on the availability,
     // then I should do the same for the favorite
-    this.props.backFavData.map((item, index) => {
-      if (item.floor === floor && this.state.section != "") {
-        if (item.floor === floor && item.section === this.state.section) favRoom.push(item) // favRooms are going to be pushed
-      }
-      else if (item.floor === floor) favRoom.push(item) // favRooms are going to be pushed
+    // this.props.backFavData.map((item, index) => {
+    //   if (item.floor === floor && this.state.section != "") {
+    //     if (item.floor === floor && item.section === this.state.section) favRoom.push(item) // favRooms are going to be pushed
+    //   }
+    //   else if (item.floor === floor) favRoom.push(item) // favRooms are going to be pushed
 
-    })
+    // })
     // console.log('line 198 - backData, backFavData', this.props.backData, this.props.backFavData)
-    this.props.add(favRoom, 'favorite') // this is where favorites is getting used
-    this.props.add(roomAvailable, 'available')
-    this.props.add(roomNotAvailable, 'unavailable')
+    // this.props.add(favRoom, 'favorite') // this is where favorites is getting used
+    // this.props.add(roomAvailable, 'available')
+    // this.props.add(roomNotAvailable, 'unavailable')
   }
   //====== HEART OF THE CLASS ======//
 
@@ -261,31 +275,34 @@ class HomeScreen extends Component {
   onFloorChange(key) {
     if (key === 'floor1') {
       this.setState({
+        floor: '1',
         floor1: true,
         floor2: false,
         floor3: false,
-        floor: '1'
       })
       // Call api for floor1
-      this.fetchByFloor(api_first_floor) // fetching data locally
+      this.fetchDataFromDDB(api_first_floor) // fetching data locally
+      // this.fetchByFloor(this.state.floor) // fetching data locally
     } else if (key === 'floor2') {
       this.setState({
+        floor: '2',
         floor1: false,
         floor2: true,
         floor3: false,
-        floor: '2'
       })
       // Call api for floor2
-      this.fetchByFloor(api_second_floor) // fetching data locally
+      this.fetchDataFromDDB(api_second_floor) // fetching data locally
+      // this.fetchByFloor(this.state.floor) // fetching data locally
     } else if (key === 'floor3') {
       this.setState({
+        floor: '3',
         floor1: false,
         floor2: false,
         floor3: true,
-        floor: '3'
       })
       // Call api for floor3
-      this.fetchByFloor(api_third_floor) // fetching data locally
+      this.fetchDataFromDDB(api_third_floor) // fetching data locally
+      // this.fetchByFloor(this.state.floor) // fetching data locally
     }
   }
 
@@ -513,6 +530,9 @@ class HomeScreen extends Component {
   };
 
   renderPhoneRooms = ({ item }) => {
+    // console.log('navigating to the render phone rooms')
+    // console.log(item)
+    
     return (
       <PhoneRoom
         item={item}
@@ -530,9 +550,12 @@ class HomeScreen extends Component {
     }, () => {
       // refreshing according to the floor
       // console.log(this.state.floor1, this.state.floor2, this.state.floor3)
-      if (this.state.floor1) this.fetchRoomsSensorData(api_first_floor)
-      else if (this.state.floor2) this.fetchRoomsSensorData(api_second_floor)
-      else if (this.state.floor3) this.fetchRoomsSensorData(api_third_floor)
+      if (this.state.floor1) this.fetchDataFromDDB(api_first_floor)
+      else if (this.state.floor2) this.fetchDataFromDDB(api_second_floor)
+      else if (this.state.floor3) this.fetchDataFromDDB(api_third_floor)
+      // if (this.state.floor1) this.fetchRoomsSensorData(api_first_floor)
+      // else if (this.state.floor2) this.fetchRoomsSensorData(api_second_floor)
+      // else if (this.state.floor3) this.fetchRoomsSensorData(api_third_floor)
       // this.fetchDataFromLocal()
     })
   }
@@ -736,6 +759,8 @@ const mapDispatchToProps = dispatch => {
   return {
     stars: (starring) => dispatch(stars(starring)),
     add: (item, type) => dispatch(add(item, type)),
+    addARooms: (item) => dispatch(addARooms(item)),
+    addURooms: (item) => dispatch(addURooms(item)),
     favorite: (item, type) => dispatch(favorite(item, type)),
     notifications: (item, type) => dispatch(notifications(item, type)),
     availability: (item) => dispatch(availability(item))

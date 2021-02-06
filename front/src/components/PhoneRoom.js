@@ -26,14 +26,14 @@ class PhoneRoom extends Component {
               <View style={[{ paddingHorizontal: 10, justifyContent: 'center' }]}>
                 <View
                   style={[
-                    (item.section === "green" ? { width: 13, height: 13, borderRadius: 100, backgroundColor: "#6DD400" } : null) || (item.section === "blue" ? { width: 13, height: 13, borderRadius: 100, backgroundColor: "#0091FF" } : null) || (item.section === "red" ? { width: 13, height: 13, borderRadius: 100, backgroundColor: "#E02020" } : null) || (item.section === "orange" ? { width: 13, height: 13, borderRadius: 100, backgroundColor: "#FA6400" } : null)
+                    (item.section === "Green" ? { width: 13, height: 13, borderRadius: 100, backgroundColor: "#6DD400" } : null) || (item.section === "Blue" ? { width: 13, height: 13, borderRadius: 100, backgroundColor: "#0091FF" } : null) || (item.section === "Red" ? { width: 13, height: 13, borderRadius: 100, backgroundColor: "#E02020" } : null) || (item.section === "Orange" ? { width: 13, height: 13, borderRadius: 100, backgroundColor: "#FA6400" } : null)
 
                   ]}
                 // style={[{ width: 13, height: 13, borderRadius: 100, backgroundColor: item.section }]}
                 />
               </View>
               <Text style={[item.availability ? styles.avRoomText : styles.ocRoomText]}>
-                {item.roomName}
+                {item.name}
               </Text>
             </View>
             <View style={[{ flexDirection: 'row', marginVertical: 15, marginLeft: 15, paddingHorizontal: 6 }]}>

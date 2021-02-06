@@ -50,8 +50,9 @@ app.put('/changeUserPass', function (req, res){
 app.post('/postUsers', function (req, res) {
   console.log('/postUsers method')
   
-  // const { username, firstName, lastName, mobileToken, favoriteRooms } = req.body
-  const { username, password } = req.body
+  // const { username, firstName, lastName, favoriteRooms } = req.body
+  // const { username, expoPushToken } = req.body
+  const { username } = req.body
   req.body.favoriteRooms = []
   console.log(req.body)
 
@@ -59,12 +60,11 @@ app.post('/postUsers', function (req, res) {
     TableName: USER_TABLE,
     Item: {
       username: username,
-      password: password,
+      // expoPushToken: expoPushToken,
       favoriteRooms: req.body.favoriteRooms, 
       // when the user actually has a token to send
       // this might be particularly important when
       // re-developing the notifiaction portion
-      // mobileToken: availability
 
       // a very specific modification will have to
       // be made in the application to add first
@@ -79,7 +79,7 @@ app.post('/postUsers', function (req, res) {
       console.log(error)
       res.status(400).json({ error: `Could not post data into the ${USER_TABLE}` })
     } else {
-      res.send({ username, password })
+      res.send({ username })
       // res.send({ id, name, floor, section, availability })
     }
   })

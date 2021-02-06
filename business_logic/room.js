@@ -9,8 +9,42 @@ const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
 app.use(bodyParser.json({ strict: false }))
 
-app.get('/getRooms', function (req, res) {
+app.get('/getRooms/:floor', function (req, res) { // for now
+// app.get('/getRooms, function (req, res) {
   // this is where the code to get rooms will be
+  
+  console.log('hello world', req.params.floor)
+
+  // would probably get rooms on by flooring
+  // there are advantages and disadvantages with this approach
+  // advantage would be to have recent data
+  // disadvantage would be networking computation
+  const params = {
+    TableName: ROOM_TABLE,
+    FilterExpression: 'floor = :floor',
+    ExpressionAttributeValues: { ':floor': req.params.floor }
+  }
+
+  var aRooms = []
+  var uRooms = []
+
+  dynamoDB.scan(params, (error, result) => {
+    if (error) {
+      console.log(error)
+      res.status(400).json({ error: `Could not get rooms from ${floor} in the ${ROOM_TABLE}`})
+    } else {
+      console.log(result)
+
+      //creating 
+      result.Items.map((item, index) => {
+        console.log(item, item.availability)
+        if (item.availability) aRooms.push(item)
+        else uRooms.push(item)
+      })
+      console.log('final result:',aRooms, uRooms)
+      res.send({ aRooms, uRooms })
+    }
+  })
 })
 
 app.post('/postRooms', function (req, res) {

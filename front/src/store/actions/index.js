@@ -8,6 +8,8 @@ export {
 
 export { 
     add, 
+    addARooms,
+    addURooms,
     favorite, 
     notifications, 
     availability 

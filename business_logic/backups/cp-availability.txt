@@ -1,0 +1,78 @@
+// Load the AWS SDK for Node.js
+const AWS = require('aws-sdk');
+
+module.exports.handler = async (event) => {
+// module.exports.handler = async (event)function (event, context, callback) {
+    const ddb = new AWS.DynamoDB.DocumentClient({ region: "us-east-1" });
+    console.log(JSON.stringify(event, null, 2));
+    event.Records.forEach(function (record) {
+        console.log(record.eventID);
+        console.log(record.eventName);
+        if(record.eventName === "INSERT") {
+            console.log('inserting')
+            console.log('new image:', record.dynamodb.NewImage.roomId);
+            const put_params = {
+                TableName: ROOM_TABLE,
+                Key: {
+                    "id": record.dynamodb.NewImage.roomId
+                },
+                UpdateExpression: "set availability=:a",
+                ExpressionAttributeValues: {
+                    ":a": false
+                },
+                ReturnValues: "UPDATED_NEW"
+            }
+            console.log(put_params)
+            dynamoDB.update(put_params, (err, data) => { // updating
+                if (err) {
+                    console.error("Unable to update item. Error JSON:", JSON.stringify(err, null, 2));
+                } else {
+                    console.log("UpdateItem succeeded:", data);
+                }
+            });
+        } else if (record.eventName === "REMOVE") {
+            console.log('removing')
+            console.log('old image:', record.dynamodb.OldImage.roomId);
+            // const put_params = {
+            //     TableName: ROOM_TABLE,
+            //     Key: {
+            //         "id": record.dynamodb.NewImage.roomId
+            //     },
+            //     UpdateExpression: "set availability=:a",
+            //     ExpressionAttributeValues: {
+            //         ":a": true
+            //     },
+            //     ReturnValues: "UPDATED_NEW"
+            // }
+            // console.log(put_params)
+            // dynamoDB.update(put_params, (err, data) => { // updating
+            //     if (err) {
+            //         console.error("Unable to update item. Error JSON:", JSON.stringify(err, null, 2));
+            //     } else {
+            //         console.log("UpdateItem succeeded:", data);
+            //     }
+            // });
+        }
+        console.log('DynamoDB Record: %j', record.dynamodb);
+    });
+    return `Successfully processed Stream`;
+};
+
+
+// module.exports.handler = async (event) => {
+//     // helloWorld = async (event) => {
+//     const ddb = new AWS.DynamoDB.DocumentClient({ region: "us-east-1" });
+//     exports.lambda_handler = function (event, context, callback) {
+//         console.log(JSON.stringify(event, null, 2));
+//         event.Records.forEach(function (record) {
+//             console.log(record.eventID);
+//             console.log(record.eventName);
+//             console.log('DynamoDB Record: %j', record.dynamodb);
+//         });
+//         callback(null, "message");
+//     };
+//     // just as FYI for future references and debugging
+//     return `Successfully processed ${event.Records.length} messages.`;
+// };
+
+// module.exports.handler = helloWorld()

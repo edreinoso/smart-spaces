@@ -11,9 +11,9 @@ const dynamoDB = new AWS.DynamoDB.DocumentClient();
 app.use(bodyParser.json({ strict: false }))
 
 app.get('/getRoomsv1/:floor', function (req, res) { // for now
-// app.get('/getRooms, function (req, res) {
+  // app.get('/getRooms, function (req, res) {
   // this is where the code to get rooms will be
-  
+
   console.log('hello world', req.params.floor)
 
   // would probably get rooms on by flooring
@@ -32,7 +32,7 @@ app.get('/getRoomsv1/:floor', function (req, res) { // for now
   dynamoDB.scan(params, (error, result) => {
     if (error) {
       console.log(error)
-      res.status(400).json({ error: `Could not get rooms from ${floor} in the ${ROOM_TABLE}`})
+      res.status(400).json({ error: `Could not get rooms from ${floor} in the ${ROOM_TABLE}` })
     } else {
       console.log(result)
 
@@ -42,7 +42,7 @@ app.get('/getRoomsv1/:floor', function (req, res) { // for now
         if (item.availability) aRooms.push(item)
         else uRooms.push(item)
       })
-      console.log('final result:',aRooms, uRooms)
+      console.log('final result:', aRooms, uRooms)
       res.send({ aRooms, uRooms })
     }
   })
@@ -57,6 +57,7 @@ app.get('/getRoomsv2/:floor', function (req, res) { // for now
   var uRooms = []
   var hello = []
   var response = []
+  const newDDB = new AWS.DynamoDB.DocumentClient();
 
   console.log('hello world', req.params.floor)
   const get_params = {
@@ -68,31 +69,71 @@ app.get('/getRoomsv2/:floor', function (req, res) { // for now
   dynamoDB.scan(get_params, (error, result) => { // scanning
     if (error) {
       console.log(error)
-      res.status(400).json({ error: `Could not get data from ${floor} in the ${SENSOR_TABLE}`})
+      res.status(400).json({ error: `Could not get data from ${floor} in the ${SENSOR_TABLE}` })
     } else {
-      console.log('today minus 5 minutes time: ',todayMinus5)
-      result.Items.map((item,index) => {
+      console.log('today minus 5 minutes time: ', todayMinus5)
+      result.Items.map(async (item, index) => {
         let sensorTime = new Date(item.timestamp)
-        console.log('iterating through the Item:',item.roomId, item.timestamp, todayMinus5)
+        console.log('iterating through the Item:', item.roomId, item.timestamp, todayMinus5)
         console.log('comparing:', sensorTime > todayMinus5)
         // if(sensorTime > todayMinus5) console.log('room is not available')// room is available
-        if(sensorTime > todayMinus5) {// room is available
+        if (sensorTime > todayMinus5) {// room is available
           // put.item.roomId == availability = true
-          console.log('not available')
-          var room = {
-            "roomId": item.roomId,
-            "available": false
+          const put_params = {
+            TableName: ROOM_TABLE,
+            Key: {
+              "id": item.roomId
+            },
+            UpdateExpression: "set availability=:a",
+            ExpressionAttributeValues: {
+              ":a": false
+            },
+            ReturnValues: "UPDATED_NEW"
           }
-          hello.push(room)
+          console.log(put_params)
+          // await newDDB.update(put_params, (err, data) => { // updating
+          //   console.log('test1')
+          //   if (err) {
+          //     console.log('test2')
+          //     console.error("Unable to update item. Error JSON:", JSON.stringify(err, null, 2));
+          //   } else {
+          //     console.log('test3')
+          //     console.log("UpdateItem succeeded:", data);
+          //   }
+          // });
+
+          let _result = "";
+          try {
+            _result = await newDDB.update(put_params).promise();
+            console.log('success',_result)
+          } catch (ex) {
+            _result = ex;
+            console.log('error',_result)
+          }
         }
         // else console.log('room is available')
         else {
-          console.log('available')
-          var room = {
-            "roomId": item.roomId,
-            "available": true
+          const newDDB = new AWS.DynamoDB.DocumentClient();
+          const put_params = {
+            TableName: ROOM_TABLE,
+            Key: {
+              "id": item.roomId
+            },
+            UpdateExpression: "set availability=:a",
+            ExpressionAttributeValues: {
+              ":a": true
+            },
+            ReturnValues: "UPDATED_NEW"
           }
-          hello.push(room)
+          console.log(put_params)
+          let _result = "";
+          try {
+            _result = await newDDB.update(put_params).promise();
+            console.log('success',_result)
+          } catch (ex) {
+            _result = ex;
+            console.log('error',_result)
+          }
         }
       })
       console.log(hello)
@@ -100,11 +141,11 @@ app.get('/getRoomsv2/:floor', function (req, res) { // for now
       res.send(result.Items);
     }
   })
-  // console.log(hello)
-  // res.send('data');
+
+  res.send('data')
 })
 
-app.put('/updateRoom/:id', function(req, res) {
+app.put('/updateRoom/:id', function (req, res) {
   const put_params = {
     TableName: ROOM_TABLE,
     Key: {

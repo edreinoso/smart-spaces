@@ -55,8 +55,6 @@ app.get('/getRoomsv2/:floor', function (req, res) { // for now
 
   var aRooms = []
   var uRooms = []
-  var hello = []
-  var response = []
 
   console.log('hello world', req.params.floor)
   const get_params = {
@@ -79,29 +77,59 @@ app.get('/getRoomsv2/:floor', function (req, res) { // for now
         if(sensorTime > todayMinus5) {// room is available
           // put.item.roomId == availability = true
           console.log('not available')
-          var room = {
-            "roomId": item.roomId,
-            "available": false
+          const put_params = {
+            TableName: ROOM_TABLE,
+            Key: { 
+              "id": item.roomId
+            },
+            UpdateExpression: "set availability=:a",
+            ExpressionAttributeValues: {
+              ":a": false
+            },
+            ReturnValues: "UPDATED_NEW"
           }
-          hello.push(room)
+          console.log(put_params)
+          dynamoDB.update(put_params, function (err, data) { // updating
+            console.log('test1')
+            if (err) {
+              console.log('test2')
+              console.error("Unable to update item. Error JSON:", JSON.stringify(err, null, 2));
+            } else {
+              console.log('test3')
+              console.log("UpdateItem succeeded:", data);
+            }
+          });
         }
         // else console.log('room is available')
         else {
           console.log('available')
-          var room = {
-            "roomId": item.roomId,
-            "available": true
+          const put_params = {
+            TableName: ROOM_TABLE,
+            Key: { 
+              "id": item.roomId
+            },
+            UpdateExpression: "set availability=:a",
+            ExpressionAttributeValues: {
+              ":a": true
+            },
+            ReturnValues: "UPDATED_NEW"
           }
-          hello.push(room)
+          console.log(put_params)
+          dynamoDB.update(put_params, (err, data) => { // updating
+            console.log('test1')
+            if (err) {
+              console.log('test2')
+              console.error("Unable to update item. Error JSON:", JSON.stringify(err, null, 2));
+            } else {
+              console.log('test3')
+              console.log("UpdateItem succeeded:", data);
+            }
+          });
         }
       })
-      console.log(hello)
-      response = result.Items;
       res.send(result.Items);
     }
   })
-  // console.log(hello)
-  // res.send('data');
 })
 
 app.put('/updateRoom/:id', function(req, res) {

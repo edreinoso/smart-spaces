@@ -12,8 +12,10 @@ module.exports.handler = async (event) => {
                 'id': messageAttributes.id.stringValue,
                 // how is this going to relate to the other data
                 // there might be an answer in future stages
+                // 'sensorId': messageAttributes.sensorId.stringValue,
                 'roomId': messageAttributes.roomId.stringValue,
                 'timestamp': messageAttributes.timestamp.stringValue,
+                'floor': messageAttributes.floor.stringValue,
                 'ttl': messageAttributes.ttl.stringValue,
             }
         };

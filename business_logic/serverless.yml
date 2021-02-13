@@ -44,12 +44,24 @@ functions:
     handler: room.handler
     events:
       - http:
-          path: "/getRooms/{proxy+}"
+          path: "/getRoomsv1/{proxy+}"
           method: get
+      - http:
+          path: "/getRoomsv2/{proxy+}"
+          method: get
+      - http:
+          path: "/updateRoom/{proxy+}"
+          method: put
       - http:
           path: "/postRooms"
           method: post
 
+  availability:
+    handler: availability.handler
+    events:
+      - stream: arn:aws:dynamodb:us-east-1:130193131803:table/SensorTable_new/stream/2021-02-13T19:52:05.477
+
+  
   queueHandler:
     handler: queue.handler
     events:

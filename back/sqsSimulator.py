@@ -35,10 +35,9 @@ for x in range(10):  # this is going to run only 10 times
     randomId = ''.join(
         [random.choice(string.ascii_letters + string.digits) for n in range(10)])
     currentTime = datetime.utcnow()
-    now = datetime.utcnow()
     expire = datetime.now(tzutc()) + timedelta(minutes=5)
     ttl_number = int(expire.strftime('%s'))
-    print('sensor_id: ' + str(room[randomNum]['sensor_id']) + ' roomId: ' + str(room[randomNum]['roomId']) + ' floor: ' + str(room[randomNum]['floor']) + ' time: ' + str(currentTime))
+    print('sensor_id: ' + str(room[randomNum]['sensor_id']) + ' roomId: ' + str(room[randomNum]['roomId']) + ' floor: ' + str(room[randomNum]['floor']) + ' time: ' + str(currentTime) + ' epoch time: ' + str(ttl_number))
 
     # print(type(room[randomNum]['roomId']))
     # print(type(room[randomNum]['floor']))

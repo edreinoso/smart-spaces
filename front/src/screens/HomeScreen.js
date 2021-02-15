@@ -680,7 +680,7 @@ class HomeScreen extends Component {
                         data={this.props.phoneRoomsAvailable} // this would be this.props.phoneRoomsAvailable
                         // data={this.state.phoneRoom}
                         // data={phoneRoomMockData}
-                        keyExtractor={item => item.roomId}
+                        keyExtractor={item => item.id}
                         renderItem={this.renderPhoneRooms}
                       />
                     </View>
@@ -698,7 +698,7 @@ class HomeScreen extends Component {
                         // data={this.state.phoneRoomsUnavailable}  // this would be this.props.phoneRoomsAvailable
                         data={this.props.phoneRoomsUnavailable}  // this would be this.props.phoneRoomsAvailable
                         // data={phoneRoomMockData}
-                        keyExtractor={item => item.roomId}
+                        keyExtractor={item => item.id}
                         renderItem={this.renderPhoneRooms}
                       />
                     </View>

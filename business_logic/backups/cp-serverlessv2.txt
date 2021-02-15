@@ -34,14 +34,29 @@ functions:
       - http:
           path: "/postUsers"
           method: post
-  
+      - http:
+          path: "/changeUserPass"
+          method: put
+
   roomData:
     handler: room.handler
     events:
       - http:
-          path: "/getRooms/{proxy+}"
+          path: "/getRoomsv1/{proxy+}"
           method: get
+      - http:
+          path: "/getRoomsv2/{proxy+}"
+          method: get
+      - http:
+          path: "/updateRoom/{proxy+}"
+          method: put
+      - http:
+          path: "/postRooms"
+          method: post
 
+  availability:
+    handler: availability.handler
+  
   queueHandler:
     handler: queue.handler
     events:

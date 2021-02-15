@@ -33,7 +33,7 @@ class PhoneRoom extends Component {
                 />
               </View>
               <Text style={[item.availability ? styles.avRoomText : styles.ocRoomText]}>
-                {item.name}
+                {item.roomName}
               </Text>
             </View>
             <View style={[{ flexDirection: 'row', marginVertical: 15, marginLeft: 15, paddingHorizontal: 6 }]}>

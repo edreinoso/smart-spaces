@@ -1,9 +1,38 @@
 Resources:
+  SensorTable:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      # ideally this would be dynamically done depending on the environment
+      # TableName: SensorTable
+      TableName: SensorTable_${env:STAGE}
+      TimeToLiveSpecification:
+        AttributeName: expiryTime
+        Enabled: true
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+      Tags:
+        - Key: "Name"
+          Value: SensorTable_${env:STAGE}
+        - Key: "Template"
+          Value: smart_spaces
+        - Key: "Purpose"
+          Value: "PIR sensor table to hold data about sensor data on each phone room"
+        - Key: "Creation_Date"
+          Value: "Tue_June_23_20"
   RoomTable:
     Type: "AWS::DynamoDB::Table"
     Properties:
       AttributeDefinitions:
-        - AttributeName: roomId
+        - AttributeName: id
           AttributeType: S
       KeySchema:
         - AttributeName: id

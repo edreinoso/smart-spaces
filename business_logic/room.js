@@ -14,18 +14,31 @@ app.get('/getRooms/:floor', function (req, res) { // for now
   const todayMinus5 = new Date()
   todayMinus5.setMinutes(today.getMinutes() - 5)
 
-  const params = {
+  // const params = {
+  //   TableName: ROOM_TABLE,
+  //   FilterExpression: 'floor = :floor',
+  //   ExpressionAttributeValues: { ':floor': req.params.floor }
+  // }
+
+  var params = {
     TableName: ROOM_TABLE,
-    FilterExpression: 'floor = :floor',
-    ExpressionAttributeValues: { ':floor': req.params.floor }
-  }
+    KeyConditionExpression: "#floor = :floor",
+    // ScanIndexForward: false,
+    ExpressionAttributeNames: {
+      "#floor": "floor"
+    },
+    ExpressionAttributeValues: {
+      ":floor": req.params.floor
+    }
+  };
 
   var aRooms = []
   var uRooms = []
 
   console.log('current time: ', today, ' today minus 5 minutes: ', todayMinus5)
 
-  dynamoDB.scan(params, (error, result) => {
+  dynamoDB.query(params, (error, result) => {
+  // dynamoDB.scan(params, (error, result) => {
     if (error) {
       console.log(error)
       res.status(400).json({ error: `Could not get rooms from ${floor} in the ${ROOM_TABLE}` })
@@ -47,6 +60,7 @@ app.get('/getRooms/:floor', function (req, res) { // for now
       })
       console.log('final result:', aRooms, uRooms)
       res.send({ aRooms, uRooms })
+      // res.send(result.Items)
     }
   })
 })

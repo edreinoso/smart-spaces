@@ -10,7 +10,7 @@ module.exports.handler = async (event) => {
         var params = {
             TableName: process.env.ROOM_TABLE,
             Item: {
-                'id': messageAttributes.roomId.stringValue,
+                'roomId': messageAttributes.roomId.stringValue,
                 // how is this going to relate to the other data
                 // there might be an answer in future stages
                 'sensorId': messageAttributes.sensorId.stringValue,

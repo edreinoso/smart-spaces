@@ -3,11 +3,15 @@ Resources:
     Type: "AWS::DynamoDB::Table"
     Properties:
       AttributeDefinitions:
-        - AttributeName: roomId
+        - AttributeName: floor
+          AttributeType: S
+        - AttributeName: section
           AttributeType: S
       KeySchema:
-        - AttributeName: id
+        - AttributeName: floor
           KeyType: HASH
+        - AttributeName: section
+          KeyType: RANGE
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5

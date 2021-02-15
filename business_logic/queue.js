@@ -19,9 +19,10 @@ module.exports.handler = async (event) => {
                 // 'sensorId': messageAttributes.sensorId.stringValue,
                 'roomId': messageAttributes.roomId.stringValue,
                 'timestamp': messageAttributes.timestamp.stringValue,
+                'creationTime': messageAttributes.creationTime.stringValue,
                 'floor': messageAttributes.floor.stringValue,
-                // 'ttl': parseInt(messageAttributes.ttl.stringValue), // here is the problem, it's not supposed to be a string value
-                'ttl': messageAttributes.ttl.stringValue, // here is the problem, it's not supposed to be a string value
+                'ttl': parseInt(messageAttributes.ttl.stringValue), // it is expiring the items before they get written
+                // 'ttl': messageAttributes.ttl.stringValue, // here is the problem, it's not supposed to be a string value
             }
         };
         await ddb.put(params).promise()

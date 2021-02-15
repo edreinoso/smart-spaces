@@ -34,10 +34,14 @@ for x in range(10):  # this is going to run only 10 times
     randomNum = random.randrange(5)
     randomId = ''.join(
         [random.choice(string.ascii_letters + string.digits) for n in range(10)])
-    currentTime = datetime.utcnow()
-    expire = datetime.now(tzutc()) + timedelta(minutes=5)
+    currentTime = datetime.now()
+    expire = datetime.now()
+    # expire = datetime.now() + timedelta(minutes=1)
+    # expire = datetime.now(tzutc()) + timedelta(minutes=18)
     ttl_number = int(expire.strftime('%s'))
-    print('sensor_id: ' + str(room[randomNum]['sensor_id']) + ' roomId: ' + str(room[randomNum]['roomId']) + ' floor: ' + str(room[randomNum]['floor']) + ' time: ' + str(currentTime) + ' epoch time: ' + str(ttl_number))
+
+    print('sensor_id: ' + str(room[randomNum]['sensor_id']) + ' roomId: ' + str(room[randomNum]['roomId']) + ' floor: ' + str(room[randomNum]['floor']) + ' time: ' + str(
+        currentTime.strftime("%Y-%m-%dT%H:%M:%SZ")) + ' expire: ' + str(expire.strftime("%Y-%m-%dT%H:%M:%SZ")) + ' epoch created time: ' + str(int(currentTime.strftime('%s'))) + ' epoch expire: ' + str(ttl_number))
 
     # print(type(room[randomNum]['roomId']))
     # print(type(room[randomNum]['floor']))
@@ -59,6 +63,10 @@ for x in range(10):  # this is going to run only 10 times
             'timestamp':  {
                 'StringValue': str(currentTime.strftime("%Y-%m-%dT%H:%M:%SZ")),
                 'DataType': 'String'
+            },
+            'creationTime': {
+                'StringValue': str(int(currentTime.strftime('%s'))),
+                'DataType': 'Number'
             },
             'roomId': {
                 'StringValue': str(room[randomNum]["roomId"]),

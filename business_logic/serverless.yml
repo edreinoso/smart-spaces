@@ -41,6 +41,15 @@ functions:
       - http:
           path: "/getRooms/{proxy+}"
           method: get
+      - http:
+          path: "/getRoomsBySection/{proxy+}"
+          method: get
+          request:
+            template:
+              application/json: >
+               {
+                 "section": "$input.params('section')",
+               }
 
   queueHandler:
     handler: queue.handler

@@ -10,10 +10,10 @@ class Tags extends Component {
             <View style=
                 {
                     [
-                        ((section === 'green') ? styles.greenBackgroundFilter : null) ||
-                        ((section === 'red') ? styles.redBackgroundFilter : null) ||
-                        ((section === 'blue') ? styles.blueBackgroundFilter : null) ||
-                        ((section === 'orange') ? styles.orangeBackgroundFilter : null),
+                        ((section === 'Green') ? styles.greenBackgroundFilter : null) ||
+                        ((section === 'Red') ? styles.redBackgroundFilter : null) ||
+                        ((section === 'Blue') ? styles.blueBackgroundFilter : null) ||
+                        ((section === 'Orange') ? styles.orangeBackgroundFilter : null),
                         { padding: 7, flexDirection: "row", justifyContent: 'space-evenly', alignItems: "center", borderRadius: 10, width: 80 }
                     ]
                 }

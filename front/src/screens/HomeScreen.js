@@ -23,8 +23,10 @@ class HomeScreen extends Component {
     floor3: false,
     floor: '1', // this floor is used by the filtering capability
     emptyFilteredData: false, // this variable will be in place in case no phone rooms has been found filtered
+    greenSection: false,
     showTagSection: "",
-    section: "",
+    // section: "",
+    section: [],
     initialStarState: false,
     posY: new Animated.Value(-400),  //This is the initial position of the preferenceView
     animatedValue: new Animated.Value(0),
@@ -66,8 +68,7 @@ class HomeScreen extends Component {
     //   // Local
     //   // this.fetchDataFromLocal()
     //   // API
-    console.log('new')
-      this.fetchDataFromDDB(api_first_floor)
+    this.fetchDataFromDDB(api_first_floor)
     // } else {
     //   Alert.alert(
     //     //title
@@ -111,7 +112,7 @@ class HomeScreen extends Component {
   apiGetSection(section, floor) {
     // item would come to be the section
     // console.log('line 91 -', section, floor)
-    return API.get('motion', `/sections/${this.props.username}?section=${section}&floor=${floor}`)
+    return API.get('rooms', `/getRoomsBySection/${floor}?section=${section}`)
     // return API.get('motion', `/sections/${this.props.username}?section=${section}?floor=${floor}`)
   }
 
@@ -154,31 +155,44 @@ class HomeScreen extends Component {
     var favRoom = []
     var roomAvailable = []
     var roomNotAvailable = []
-    await this.apiGetSection(section, floor) // is it really necessary to do an API call for this? 
-      .then(response => {
-        if (response.returnRooms.length == 0 && response.favRooms.length == 0) {
-          this.setState({
-            emptyFilteredData: true
-          })
-        } else {
-          this.setState({
-            emptyFilteredData: false
-          })
-        }
-        response.returnRooms.map((returnRoomsItem, index) => {
-          if (returnRoomsItem.availability) roomAvailable.push(returnRoomsItem)
-          else roomNotAvailable.push(returnRoomsItem)
-        })
-        response.favRooms.map((favRoomsItem, index) => {
-          favRoom.push(favRoomsItem)
-        })
-        this.props.add(favRoom, 'favorite')
-        this.props.add(roomAvailable, 'available')
-        this.props.add(roomNotAvailable, 'unavailable')
-      })
-      .catch(error => {
-        console.log(error)
-      })
+    // is it really necessary to do an API call for this?  -- old
+    // 6-3: would it still be okay to make an api call for this?
+    // can I query the document directly and get the exact data
+    // instead of traversing through the array value to get the
+    // exact data?
+    this.props.phoneRoomsAvailable.map((item, index) => {
+      // console.log(item)
+      if(item.section === section) {
+        this.state.filteredData.push(item)
+      }
+    })
+    // console.log('line 168', this.state.filteredData.length, this.state.section)
+    // await this.apiGetSection(section, floor)
+    //   .then(response => {
+    //     console.log(response)
+      //   if (response.length == 0) {
+      //     this.setState({
+      //       emptyFilteredData: true
+      //     })
+      //   } else {
+      //     this.setState({
+      //       emptyFilteredData: false
+      //     })
+      //   }
+      //   response.returnRooms.map((returnRoomsItem, index) => {
+      //     if (returnRoomsItem.availability) roomAvailable.push(returnRoomsItem)
+      //     else roomNotAvailable.push(returnRoomsItem)
+      //   })
+      //   response.favRooms.map((favRoomsItem, index) => {
+      //     favRoom.push(favRoomsItem)
+      //   })
+        // this.props.addARooms(response.aRooms)
+        // this.props.addURooms(response.uRooms)
+      //   this.props.add(favRoom, 'favorite')
+      //   this.props.add(roomAvailable, 'available')
+      //   this.props.add(roomNotAvailable, 'unavailable')
+      // })
+      // }).catch(error => {console.log(error)})
   }
 
   //====== HEART OF THE CLASS ======//
@@ -307,37 +321,54 @@ class HomeScreen extends Component {
   }
 
   onSectionChange(key) {
-    if (key === 'green') {
+
+    // if you touch the button once, then a value gets assigned
+    // blue - 0 is off | 1 is on
+    if (key === 'Green') {
+      
       this.setState({
-        greenSection: true,
-        redSection: false,
-        blueSection: false,
-        orangeSection: false,
-        section: 'green'
+        greenSection: !this.state.greenSection,
+      }, () => {
+          if (this.state.greenSection) {
+            this.state.section.push('Green')
+            console.log('hello', this.state.greenSection)
+            console.log('line 334 ', this.state.section)
+          }
+          else {
+            this.state.section.splice(this.state.section.indexOf(key), 1)
+            // this.state.section.filter(item => {
+            //   // console.log(item, key)
+            //   return item == key
+            // })
+            console.log('world', this.state.greenSection)
+            console.log('line 338 ', this.state.section)
+          }
+        this.fetchDataBySection(this.state.section, this.state.floor)
       })
-    } else if (key === 'red') {
+    } else if (key === 'Red') {
+      if (this.state.redSection) this.state.section.add('Red')
+      else this.state.section.concat('Red')
       this.setState({
-        greenSection: false,
-        redSection: true,
-        blueSection: false,
-        orangeSection: false,
-        section: 'red'
+        redSection: !this.state.redSection,
+      }, () => {
+        this.fetchDataBySection(this.state.section, this.state.floor)
       })
-    } else if (key === 'blue') {
+    } else if (key === 'Blue') {
+      if (this.state.blueSection) this.state.section.add('Blue')
+      else this.state.section.concat('Blue')
       this.setState({
-        greenSection: false,
-        redSection: false,
-        blueSection: true,
-        orangeSection: false,
-        section: 'blue'
+        blueSection: !this.state.blueSection,
+      }, () => {
+        this.fetchDataBySection(this.state.section, this.state.floor)
       })
-    } else if (key === 'orange') {
+    } else if (key === 'Orange') {
+      if (this.state.orangeSection) this.state.section.add('Orange')
+      else this.state.section.concat('Orange')      
       this.setState({
-        greenSection: false,
-        redSection: false,
-        blueSection: false,
-        orangeSection: true,
-        section: 'orange'
+        orangeSection: !this.state.orangeSection,
+        section: 'Orange'
+      }, () => {
+        this.fetchDataBySection(this.state.section, this.state.floor)
       })
     }
   }
@@ -490,22 +521,22 @@ class HomeScreen extends Component {
             {/* <View style={[borders.red, { flex: .6, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20 }]}> */}
             <View style={[borders.darkGrey, { flexDirection: 'row', borderRadius: 5 }]}>
               <ButtonFilters
-                onButtonPress={() => this.onSectionChange('green')}
+                onButtonPress={() => this.onSectionChange('Green')}
                 text={'Green'}
                 value={this.state.greenSection}
               />
               <ButtonFilters
-                onButtonPress={() => this.onSectionChange('red')}
+                onButtonPress={() => this.onSectionChange('Red')}
                 text={'Red'}
                 value={this.state.redSection}
               />
               <ButtonFilters
-                onButtonPress={() => this.onSectionChange('blue')}
+                onButtonPress={() => this.onSectionChange('Blue')}
                 text={'Blue'}
                 value={this.state.blueSection}
               />
               <ButtonFilters
-                onButtonPress={() => this.onSectionChange('orange')}
+                onButtonPress={() => this.onSectionChange('Orange')}
                 text={'Orange'}
                 value={this.state.orangeSection}
               />
@@ -628,26 +659,31 @@ class HomeScreen extends Component {
               {/* title available */}
               <View style={container.contentContainer}>
                 {/* {this.state.showTagSection != "" ? */}
-                {this.state.section != "" ?
+                
+                {/* this section part should be an array instead of a string */}
+                {this.state.section.length > 0 ?
                   <View style={{ marginBottom: 5 }}>
-                    <Tags
+                    {/* <Tags
                       section={this.state.section}
                       onButtonPress={() => this.resetState(false)}
                     />
+                    <Text>{this.state.section}</Text> */}
+                    <Text>Tag is supposed ot show</Text>
                   </View>
-                  :
-                  // <View style={[borders.black]}><Text>Hello</Text></View>
-                  null
+                  : null
                 }
                 {this.state.emptyFilteredData ?
                   <View style={[{ justifyContent: 'center', alignItems: 'center', marginBottom: 5 }]}>
                     <Image source={require('../../assets/message_in_bottle.png')} />
                     <Text>No rooms found with this filter </Text>
                   </View>
-                  :
-                  null
+                  : null
                 }
-                {this.props.favRooms.length > 0 ?
+                {/* {this.state.filteredData.length > 0 ?
+                  <View><Text>This is where the filtered data will go!</Text></View>
+                  : null
+                } */}
+                {this.props.favRooms.length > 0 && this.state.filteredData.length < 0 ?
                   <View>
                     <View style={{ paddingLeft: 5, paddingTop: 20 }}>
                       <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>

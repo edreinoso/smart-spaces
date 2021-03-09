@@ -148,7 +148,7 @@ class HomeScreen extends Component {
     // exact data?
     this.props.phoneRoomsAvailable.map((item, index) => {
       // console.log(item)
-      if(item.section === section) {
+      if (item.section === section) {
         this.state.filteredData.push(item)
       }
     })
@@ -156,35 +156,35 @@ class HomeScreen extends Component {
     // await this.apiGetSection(section, floor)
     //   .then(response => {
     //     console.log(response)
-      //   if (response.length == 0) {
-      //     this.setState({
-      //       emptyFilteredData: true
-      //     })
-      //   } else {
-      //     this.setState({
-      //       emptyFilteredData: false
-      //     })
-      //   }
-      //   response.returnRooms.map((returnRoomsItem, index) => {
-      //     if (returnRoomsItem.availability) roomAvailable.push(returnRoomsItem)
-      //     else roomNotAvailable.push(returnRoomsItem)
-      //   })
-      //   response.favRooms.map((favRoomsItem, index) => {
-      //     favRoom.push(favRoomsItem)
-      //   })
-        // this.props.addARooms(response.aRooms)
-        // this.props.addURooms(response.uRooms)
-      //   this.props.add(favRoom, 'favorite')
-      //   this.props.add(roomAvailable, 'available')
-      //   this.props.add(roomNotAvailable, 'unavailable')
-      // })
-      // }).catch(error => {console.log(error)})
+    //   if (response.length == 0) {
+    //     this.setState({
+    //       emptyFilteredData: true
+    //     })
+    //   } else {
+    //     this.setState({
+    //       emptyFilteredData: false
+    //     })
+    //   }
+    //   response.returnRooms.map((returnRoomsItem, index) => {
+    //     if (returnRoomsItem.availability) roomAvailable.push(returnRoomsItem)
+    //     else roomNotAvailable.push(returnRoomsItem)
+    //   })
+    //   response.favRooms.map((favRoomsItem, index) => {
+    //     favRoom.push(favRoomsItem)
+    //   })
+    // this.props.addARooms(response.aRooms)
+    // this.props.addURooms(response.uRooms)
+    //   this.props.add(favRoom, 'favorite')
+    //   this.props.add(roomAvailable, 'available')
+    //   this.props.add(roomNotAvailable, 'unavailable')
+    // })
+    // }).catch(error => {console.log(error)})
   }
 
   //====== HEART OF THE CLASS ======//
   fetchByFloor = (floor) => { // this function will be responsible to fetch by floors
     console.log(floor, this.props.backData)
-    
+
     // var favRoom = []
     // var roomAvailable = []
     // var roomNotAvailable = []
@@ -314,17 +314,17 @@ class HomeScreen extends Component {
       this.setState({
         greenSection: !this.state.greenSection,
       }, () => {
-          if (this.state.greenSection) {
-            this.setState(prevState => ({
-              section: [...prevState.section, 'Green']
-            }))
+        if (this.state.greenSection) {
+          this.setState(prevState => ({
+            section: [...prevState.section, 'Green']
+          }))
+        }
+        else {
+          if (index !== -1) {
+            array.splice(index, 1);
+            this.setState({ section: array });
           }
-          else {
-            if (index !== -1) {
-              array.splice(index, 1);
-              this.setState({ section: array });
-            }
-          }
+        }
         this.fetchDataBySection(this.state.section, this.state.floor)
       })
     } else if (key === 'Red') {
@@ -365,17 +365,17 @@ class HomeScreen extends Component {
       this.setState({
         orangeSection: !this.state.orangeSection,
       }, () => {
-          if (this.state.orangeSection) {
-            this.setState(prevState => ({
-              section: [...prevState.section, 'Orange']
-            }))
+        if (this.state.orangeSection) {
+          this.setState(prevState => ({
+            section: [...prevState.section, 'Orange']
+          }))
+        }
+        else {
+          if (index !== -1) {
+            array.splice(index, 1);
+            this.setState({ section: array });
           }
-          else {
-            if (index !== -1) {
-              array.splice(index, 1);
-              this.setState({ section: array });
-            }
-          }
+        }
         this.fetchDataBySection(this.state.section, this.state.floor)
       })
     }
@@ -420,8 +420,8 @@ class HomeScreen extends Component {
       // console.log('testing tokens',token);
       // this part should be dealt with DynamoDB, there should be a
       // column to store the token obtained
-       // have to engineer this part
-       // Oct 9 - what do I mean by engineer this part?
+      // have to engineer this part
+      // Oct 9 - what do I mean by engineer this part?
       this.setState({ expoPushToken: token.data });
     } else {
       alert('Must use physical device for Push Notifications');
@@ -571,7 +571,7 @@ class HomeScreen extends Component {
   renderPhoneRooms = ({ item }) => {
     // console.log('navigating to the render phone rooms')
     // console.log(item)
-    
+
     return (
       <PhoneRoom
         item={item}
@@ -667,9 +667,9 @@ class HomeScreen extends Component {
               {/* title available */}
               <View style={container.contentContainer}>
                 {/* {this.state.showTagSection != "" ? */}
-                
+
                 {/* this section part should be an array instead of a string */}
-                {this.state.section.length != null ?
+                {this.state.section.length > 0 ?
                   <View style={{ marginBottom: 5 }}>
                     {/* <Tags
                       section={this.state.section}
@@ -677,20 +677,32 @@ class HomeScreen extends Component {
                     />
                     <Text>{this.state.section}</Text> */}
                     {/* Is flatlist the only way to display elements */}
-                    {/* <FlatList
-                      data={this.state.section} // this would be this.props.favoriteRooms
-                      keyExtractor={item => item}
-                      renderItem={(item) => {
-                        <Tags
-                          section={item}
-                          onButtonPress={() => this.resetState(false)}
-                        />
+                    <FlatList
+                      data={this.state.section}
+                      renderItem={({ item, index }) => {
+                        return (
+                          <Tags
+                            section={item}
+                            onButtonPress={() => this.resetState(false)}
+                          />
+                          // <View style={{ flexDirection: "row" }}>
+                          //   <Text>{item}</Text>
+                          // </View>
+                        )
                       }}
-                    /> */}
+                      keyExtractor={item => item.id}
+                    />
                     {/* {this.state.section.map((el, index) => { <Text key={index}>hello {el}</Text> })} */}
                     {/* {this.state.section.map((el, index) => { <Tags key={index} section={el} onButtonPress={() => this.resetState(false)}></Tags> })} */}
-                    <Text>Tag is supposed ot show {this.state.section.length}</Text>
-                    <Text>{this.state.section}</Text>
+                    {/* <Text>Tag is supposed ot show {this.state.section.length}</Text>
+                    <Text>{this.state.section}</Text> */}
+                    {/* {this.state.section.map((item, key) => {
+                      return (
+                        <View>
+                          <Text>{item}</Text>
+                        </View>
+                      )
+                    })} */}
                   </View>
                   : null
                 }

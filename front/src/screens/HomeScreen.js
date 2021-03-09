@@ -25,7 +25,6 @@ class HomeScreen extends Component {
     emptyFilteredData: false, // this variable will be in place in case no phone rooms has been found filtered
     greenSection: false,
     showTagSection: "",
-    // section: "",
     section: [],
     initialStarState: false,
     posY: new Animated.Value(-400),  //This is the initial position of the preferenceView
@@ -96,7 +95,7 @@ class HomeScreen extends Component {
       orangeSection: false,
       emptyFilteredData: false,
       showTagSection: "", // this variable will be responsible to show and hide tag sections
-      section: '',
+      section: [],
     }, () => {
       if (closeIsDoneByAnimation) { // if the close function is done by animation, then close the panel
         this.closePanel(-400)
@@ -126,27 +125,14 @@ class HomeScreen extends Component {
 
   // this is happening before mounting
   fetchDataFromDDB = async (floor) => {
-    // console.log(floor)
     await this.apiGetRooms(floor)
       .then(response => {
-        // console.log(floor, response)
         this.props.addARooms(response.aRooms)
         this.props.addURooms(response.uRooms)
-        // this.props.add(response) // backData
       })
       .catch(err => {
         console.log(err)
       })
-    // await this.apiGetCall() //fetch the whole data
-    //   .then(response => {
-    //     // console.log(response.returnRooms, response.favRooms)
-    //     this.props.add(response.favRooms, 'backFavorite') // store favRooms in backFav
-    //     this.props.add(response.returnRooms) // store returnRooms into backData
-    //   })
-    //   .catch(error => {
-    //     console.log(error)
-    //   })
-    // this.fetchByFloor(floor) // then call fetching by floor
     this.setState({ refreshing: false })
   }
 
@@ -321,53 +307,75 @@ class HomeScreen extends Component {
   }
 
   onSectionChange(key) {
+    var array = [...this.state.section]
+    var index = array.indexOf(key)
 
-    // if you touch the button once, then a value gets assigned
-    // blue - 0 is off | 1 is on
     if (key === 'Green') {
-      
       this.setState({
         greenSection: !this.state.greenSection,
       }, () => {
           if (this.state.greenSection) {
-            this.state.section.push('Green')
-            console.log('hello', this.state.greenSection)
-            console.log('line 334 ', this.state.section)
+            this.setState(prevState => ({
+              section: [...prevState.section, 'Green']
+            }))
           }
           else {
-            this.state.section.splice(this.state.section.indexOf(key), 1)
-            // this.state.section.filter(item => {
-            //   // console.log(item, key)
-            //   return item == key
-            // })
-            console.log('world', this.state.greenSection)
-            console.log('line 338 ', this.state.section)
+            if (index !== -1) {
+              array.splice(index, 1);
+              this.setState({ section: array });
+            }
           }
         this.fetchDataBySection(this.state.section, this.state.floor)
       })
     } else if (key === 'Red') {
-      if (this.state.redSection) this.state.section.add('Red')
-      else this.state.section.concat('Red')
       this.setState({
         redSection: !this.state.redSection,
       }, () => {
+        if (this.state.redSection) {
+          this.setState(prevState => ({
+            section: [...prevState.section, 'Red']
+          }))
+        }
+        else {
+          if (index !== -1) {
+            array.splice(index, 1);
+            this.setState({ section: array });
+          }
+        }
         this.fetchDataBySection(this.state.section, this.state.floor)
       })
     } else if (key === 'Blue') {
-      if (this.state.blueSection) this.state.section.add('Blue')
-      else this.state.section.concat('Blue')
       this.setState({
         blueSection: !this.state.blueSection,
       }, () => {
+        if (this.state.blueSection) {
+          this.setState(prevState => ({
+            section: [...prevState.section, 'Blue']
+          }))
+        }
+        else {
+          if (index !== -1) {
+            array.splice(index, 1);
+            this.setState({ section: array });
+          }
+        }
         this.fetchDataBySection(this.state.section, this.state.floor)
       })
     } else if (key === 'Orange') {
-      if (this.state.orangeSection) this.state.section.add('Orange')
-      else this.state.section.concat('Orange')      
       this.setState({
         orangeSection: !this.state.orangeSection,
-        section: 'Orange'
       }, () => {
+          if (this.state.orangeSection) {
+            this.setState(prevState => ({
+              section: [...prevState.section, 'Orange']
+            }))
+          }
+          else {
+            if (index !== -1) {
+              array.splice(index, 1);
+              this.setState({ section: array });
+            }
+          }
         this.fetchDataBySection(this.state.section, this.state.floor)
       })
     }
@@ -661,14 +669,28 @@ class HomeScreen extends Component {
                 {/* {this.state.showTagSection != "" ? */}
                 
                 {/* this section part should be an array instead of a string */}
-                {this.state.section.length > 0 ?
+                {this.state.section.length != null ?
                   <View style={{ marginBottom: 5 }}>
                     {/* <Tags
                       section={this.state.section}
                       onButtonPress={() => this.resetState(false)}
                     />
                     <Text>{this.state.section}</Text> */}
-                    <Text>Tag is supposed ot show</Text>
+                    {/* Is flatlist the only way to display elements */}
+                    {/* <FlatList
+                      data={this.state.section} // this would be this.props.favoriteRooms
+                      keyExtractor={item => item}
+                      renderItem={(item) => {
+                        <Tags
+                          section={item}
+                          onButtonPress={() => this.resetState(false)}
+                        />
+                      }}
+                    /> */}
+                    {/* {this.state.section.map((el, index) => { <Text key={index}>hello {el}</Text> })} */}
+                    {/* {this.state.section.map((el, index) => { <Tags key={index} section={el} onButtonPress={() => this.resetState(false)}></Tags> })} */}
+                    <Text>Tag is supposed ot show {this.state.section.length}</Text>
+                    <Text>{this.state.section}</Text>
                   </View>
                   : null
                 }
@@ -688,7 +710,7 @@ class HomeScreen extends Component {
                     <View style={{ paddingLeft: 5, paddingTop: 20 }}>
                       <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>
                         Favorites
-                  </Text>
+                      </Text>
                     </View>
                     <View>
                       {/* not showing with this.props.favoriteRooms */}

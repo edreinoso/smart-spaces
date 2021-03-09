@@ -26,6 +26,7 @@ class HomeScreen extends Component {
     greenSection: false,
     showTagSection: "",
     section: [],
+    filter_aRooms: [],
     initialStarState: false,
     posY: new Animated.Value(-400),  //This is the initial position of the preferenceView
     animatedValue: new Animated.Value(0),
@@ -95,7 +96,8 @@ class HomeScreen extends Component {
       orangeSection: false,
       emptyFilteredData: false,
       showTagSection: "", // this variable will be responsible to show and hide tag sections
-      section: [],
+      section: [], // this should reset the state
+      filter_aRooms: []
     }, () => {
       if (closeIsDoneByAnimation) { // if the close function is done by animation, then close the panel
         this.closePanel(-400)
@@ -306,7 +308,10 @@ class HomeScreen extends Component {
     }
   }
 
+  // Key Filterin Method
+
   onSectionChange(key) {
+    // works perfect in single dimension arrays
     var array = [...this.state.section]
     var index = array.indexOf(key)
 
@@ -318,12 +323,23 @@ class HomeScreen extends Component {
           this.setState(prevState => ({
             section: [...prevState.section, 'Green']
           }))
+          this.props.phoneRoomsAvailable.map((item, index) => {
+            if (item.section == key) this.setState(prevState => ({ filter_aRooms: [...prevState.filter_aRooms, item ] }))
+          })
         }
         else {
-          if (index !== -1) {
+          if (index !== -1) { // section array
             array.splice(index, 1);
             this.setState({ section: array });
           }
+          this.props.phoneRoomsAvailable.map((item, index) => {
+            if (item.section == key) {
+              this.setState(prevState => {
+                const filter_aRooms = prevState.filter_aRooms.filter(item => item.section !== key);
+                return { filter_aRooms };
+              });
+            }
+          })
         }
         this.fetchDataBySection(this.state.section, this.state.floor)
       })
@@ -335,12 +351,23 @@ class HomeScreen extends Component {
           this.setState(prevState => ({
             section: [...prevState.section, 'Red']
           }))
+          this.props.phoneRoomsAvailable.map((item, index) => {
+            if (item.section == key) this.setState(prevState => ({ filter_aRooms: [...prevState.filter_aRooms, item] }))
+          })
         }
         else {
-          if (index !== -1) {
+          if (index !== -1) { // section array
             array.splice(index, 1);
             this.setState({ section: array });
           }
+          this.props.phoneRoomsAvailable.map((item, index) => {
+            if (item.section == key) {
+              this.setState(prevState => {
+                const filter_aRooms = prevState.filter_aRooms.filter(item => item.section !== key);
+                return { filter_aRooms };
+              });
+            }
+          })
         }
         this.fetchDataBySection(this.state.section, this.state.floor)
       })
@@ -352,12 +379,23 @@ class HomeScreen extends Component {
           this.setState(prevState => ({
             section: [...prevState.section, 'Blue']
           }))
+          this.props.phoneRoomsAvailable.map((item, index) => {
+            if (item.section == key) this.setState(prevState => ({ filter_aRooms: [...prevState.filter_aRooms, item] }))
+          })
         }
         else {
           if (index !== -1) {
             array.splice(index, 1);
             this.setState({ section: array });
           }
+          this.props.phoneRoomsAvailable.map((item, index) => {
+            if (item.section == key) {
+              this.setState(prevState => {
+                const filter_aRooms = prevState.filter_aRooms.filter(item => item.section !== key);
+                return { filter_aRooms };
+              });
+            }
+          })
         }
         this.fetchDataBySection(this.state.section, this.state.floor)
       })
@@ -369,12 +407,24 @@ class HomeScreen extends Component {
           this.setState(prevState => ({
             section: [...prevState.section, 'Orange']
           }))
+          this.props.phoneRoomsAvailable.map((item, index) => {
+            if (item.section == key) this.setState(prevState => ({ filter_aRooms: [...prevState.filter_aRooms, item] }))
+          })
+          console.log('line 419 - adding orange section', this.state.filter_aRooms)
         }
         else {
           if (index !== -1) {
             array.splice(index, 1);
             this.setState({ section: array });
           }
+          this.props.phoneRoomsAvailable.map((item, index) => {
+            if (item.section == key) {
+              this.setState(prevState => {
+                const filter_aRooms = prevState.filter_aRooms.filter(item => item.section !== key);
+                return { filter_aRooms };
+              });
+            }
+          })
         }
         this.fetchDataBySection(this.state.section, this.state.floor)
       })
@@ -700,7 +750,7 @@ class HomeScreen extends Component {
                   <View><Text>This is where the filtered data will go!</Text></View>
                   : null
                 } */}
-                {this.props.favRooms.length > 0 && this.state.filteredData.length < 0 ?
+                {this.props.favRooms.length > 0 && this.state.section.length <= 0 ?
                   <View>
                     <View style={{ paddingLeft: 5, paddingTop: 20 }}>
                       <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>
@@ -727,19 +777,22 @@ class HomeScreen extends Component {
                   </Text>
                     </View>
                     <View>
-                      <FlatList
-                        // data={this.props.mockData}
-                        // data={this.state.phoneRoomsAvailable} // this would be this.props.phoneRoomsAvailable
-                        data={this.props.phoneRoomsAvailable} // this would be this.props.phoneRoomsAvailable
-                        // data={this.state.phoneRoom}
-                        // data={phoneRoomMockData}
-                        keyExtractor={item => item.roomId}
-                        renderItem={this.renderPhoneRooms}
-                      />
+                      {this.state.section.length <= 0 ? 
+                        <FlatList
+                          data={this.props.phoneRoomsAvailable} // this would be this.props.phoneRoomsAvailable
+                          keyExtractor={item => item.roomId}
+                          renderItem={this.renderPhoneRooms}
+                        /> : 
+                        <FlatList
+                          data={this.state.filter_aRooms} // this would be this.props.phoneRoomsAvailable
+                          keyExtractor={item => item.roomId}
+                          renderItem={this.renderPhoneRooms}
+                        />
+                      }
                     </View>
                   </View>
                   : null}
-                {this.props.phoneRoomsUnavailable.length > 0 ?
+                {this.props.phoneRoomsUnavailable.length > 0 && this.state.section.length <= 0?
                   <View>
                     <View style={{ paddingLeft: 5, paddingTop: 20 }}>
                       <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>

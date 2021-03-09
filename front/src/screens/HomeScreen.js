@@ -671,38 +671,21 @@ class HomeScreen extends Component {
                 {/* this section part should be an array instead of a string */}
                 {this.state.section.length > 0 ?
                   <View style={{ marginBottom: 5 }}>
-                    {/* <Tags
-                      section={this.state.section}
-                      onButtonPress={() => this.resetState(false)}
-                    />
-                    <Text>{this.state.section}</Text> */}
-                    {/* Is flatlist the only way to display elements */}
                     <FlatList
+                      horizontal
                       data={this.state.section}
                       renderItem={({ item, index }) => {
                         return (
-                          <Tags
-                            section={item}
-                            onButtonPress={() => this.resetState(false)}
-                          />
-                          // <View style={{ flexDirection: "row" }}>
-                          //   <Text>{item}</Text>
-                          // </View>
+                          <View style={{ margin: 3 }}>
+                            <Tags
+                              section={item}
+                              // this should pass the item, and remove the each individual item
+                              onButtonPress={() => this.onSectionChange(item)}
+                            /></View>
                         )
                       }}
                       keyExtractor={item => item.id}
                     />
-                    {/* {this.state.section.map((el, index) => { <Text key={index}>hello {el}</Text> })} */}
-                    {/* {this.state.section.map((el, index) => { <Tags key={index} section={el} onButtonPress={() => this.resetState(false)}></Tags> })} */}
-                    {/* <Text>Tag is supposed ot show {this.state.section.length}</Text>
-                    <Text>{this.state.section}</Text> */}
-                    {/* {this.state.section.map((item, key) => {
-                      return (
-                        <View>
-                          <Text>{item}</Text>
-                        </View>
-                      )
-                    })} */}
                   </View>
                   : null
                 }

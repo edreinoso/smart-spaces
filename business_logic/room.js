@@ -35,7 +35,6 @@ app.get('/getRooms/:floor', function (req, res) { // for now
   var aRooms = []
   var uRooms = []
 
-  console.log('current time: ', today, ' today minus 5 minutes: ', todayMinus5)
 
   dynamoDB.query(params, (error, result) => {
     // dynamoDB.scan(params, (error, result) => {
@@ -48,6 +47,7 @@ app.get('/getRooms/:floor', function (req, res) { // for now
       //creating 
       result.Items.map((item, index) => {
         const sensorTime = new Date(item.timestamp)
+        console.log('current time: ', today, ' today minus 5 minutes: ', todayMinus5, ' sensor time: ', sensorTime)
         console.log('sensorTime > todayMinus5: ', sensorTime > todayMinus5)
         if (sensorTime > todayMinus5) {
           item.availability = false
@@ -69,7 +69,7 @@ app.get('/getRoomsBySection/:floor', function (req, res) {
   const today = new Date()
   const todayMinus5 = new Date()
   todayMinus5.setMinutes(today.getMinutes() - 5)
-  
+
   console.log(req.params.floor, req.query.section)
   var aRooms = []
   var uRooms = []
@@ -94,7 +94,7 @@ app.get('/getRoomsBySection/:floor', function (req, res) {
       res.status(400).json({ error: `Could not get rooms from ${floor} and section ${section} in the ${ROOM_TABLE}` })
     } else {
       console.log(result)
-      
+
       //creating 
       result.Items.map((item, index) => {
         const sensorTime = new Date(item.timestamp)

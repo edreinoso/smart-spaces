@@ -26,16 +26,17 @@ class HomeScreen extends Component {
     greenSection: false,
     showTagSection: "",
     section: [],
-    filter_aRooms: [],
     initialStarState: false,
     posY: new Animated.Value(-400),  //This is the initial position of the preferenceView
     animatedValue: new Animated.Value(0),
     opacity: false,
     expoPushToken: null,
-
+    
     favPhoneRoom: [],
     phoneRoomsAvailable: [],
     phoneRoomsUnavailable: [],
+    filter_aRooms: [],
+    filter_uRooms: [],
 
     refreshing: false,
 
@@ -97,7 +98,8 @@ class HomeScreen extends Component {
       emptyFilteredData: false,
       showTagSection: "", // this variable will be responsible to show and hide tag sections
       section: [], // this should reset the state
-      filter_aRooms: []
+      filter_aRooms: [],
+      filter_uRooms: []
     }, () => {
       if (closeIsDoneByAnimation) { // if the close function is done by animation, then close the panel
         this.closePanel(-400)
@@ -108,13 +110,6 @@ class HomeScreen extends Component {
 
   apiGetRooms(floor) { // API Gateway caller
     return API.get('rooms', `/getRooms/${floor}`);
-  }
-
-  apiGetSection(section, floor) {
-    // item would come to be the section
-    // console.log('line 91 -', section, floor)
-    return API.get('rooms', `/getRoomsBySection/${floor}?section=${section}`)
-    // return API.get('motion', `/sections/${this.props.username}?section=${section}?floor=${floor}`)
   }
 
   apiPutCall(item) {
@@ -326,6 +321,9 @@ class HomeScreen extends Component {
           this.props.phoneRoomsAvailable.map((item, index) => {
             if (item.section == key) this.setState(prevState => ({ filter_aRooms: [...prevState.filter_aRooms, item ] }))
           })
+          this.props.phoneRoomsUnavailable.map((item, index) => {
+            if (item.section == key) this.setState(prevState => ({ filter_uRooms: [...prevState.filter_uRooms, item] }))
+          })
         }
         else {
           if (index !== -1) { // section array
@@ -337,6 +335,14 @@ class HomeScreen extends Component {
               this.setState(prevState => {
                 const filter_aRooms = prevState.filter_aRooms.filter(item => item.section !== key);
                 return { filter_aRooms };
+              });
+            }
+          })
+          this.props.phoneRoomsUnavailable.map((item, index) => {
+            if (item.section == key) {
+              this.setState(prevState => {
+                const filter_uRooms = prevState.filter_uRooms.filter(item => item.section !== key);
+                return { filter_uRooms };
               });
             }
           })
@@ -354,6 +360,9 @@ class HomeScreen extends Component {
           this.props.phoneRoomsAvailable.map((item, index) => {
             if (item.section == key) this.setState(prevState => ({ filter_aRooms: [...prevState.filter_aRooms, item] }))
           })
+          this.props.phoneRoomsUnavailable.map((item, index) => {
+            if (item.section == key) this.setState(prevState => ({ filter_uRooms: [...prevState.filter_uRooms, item] }))
+          })
         }
         else {
           if (index !== -1) { // section array
@@ -365,6 +374,14 @@ class HomeScreen extends Component {
               this.setState(prevState => {
                 const filter_aRooms = prevState.filter_aRooms.filter(item => item.section !== key);
                 return { filter_aRooms };
+              });
+            }
+          })
+          this.props.phoneRoomsUnavailable.map((item, index) => {
+            if (item.section == key) {
+              this.setState(prevState => {
+                const filter_uRooms = prevState.filter_uRooms.filter(item => item.section !== key);
+                return { filter_uRooms };
               });
             }
           })
@@ -382,6 +399,9 @@ class HomeScreen extends Component {
           this.props.phoneRoomsAvailable.map((item, index) => {
             if (item.section == key) this.setState(prevState => ({ filter_aRooms: [...prevState.filter_aRooms, item] }))
           })
+          this.props.phoneRoomsUnavailable.map((item, index) => {
+            if (item.section == key) this.setState(prevState => ({ filter_uRooms: [...prevState.filter_uRooms, item] }))
+          })
         }
         else {
           if (index !== -1) {
@@ -393,6 +413,14 @@ class HomeScreen extends Component {
               this.setState(prevState => {
                 const filter_aRooms = prevState.filter_aRooms.filter(item => item.section !== key);
                 return { filter_aRooms };
+              });
+            }
+          })
+          this.props.phoneRoomsUnavailable.map((item, index) => {
+            if (item.section == key) {
+              this.setState(prevState => {
+                const filter_uRooms = prevState.filter_uRooms.filter(item => item.section !== key);
+                return { filter_uRooms };
               });
             }
           })
@@ -410,7 +438,9 @@ class HomeScreen extends Component {
           this.props.phoneRoomsAvailable.map((item, index) => {
             if (item.section == key) this.setState(prevState => ({ filter_aRooms: [...prevState.filter_aRooms, item] }))
           })
-          console.log('line 419 - adding orange section', this.state.filter_aRooms)
+          this.props.phoneRoomsUnavailable.map((item, index) => {
+            if (item.section == key) this.setState(prevState => ({ filter_uRooms: [...prevState.filter_uRooms, item] }))
+          })
         }
         else {
           if (index !== -1) {
@@ -422,6 +452,14 @@ class HomeScreen extends Component {
               this.setState(prevState => {
                 const filter_aRooms = prevState.filter_aRooms.filter(item => item.section !== key);
                 return { filter_aRooms };
+              });
+            }
+          })
+          this.props.phoneRoomsUnavailable.map((item, index) => {
+            if (item.section == key) {
+              this.setState(prevState => {
+                const filter_uRooms = prevState.filter_uRooms.filter(item => item.section !== key);
+                return { filter_uRooms };
               });
             }
           })
@@ -792,21 +830,26 @@ class HomeScreen extends Component {
                     </View>
                   </View>
                   : null}
-                {this.props.phoneRoomsUnavailable.length > 0 && this.state.section.length <= 0?
+                {this.props.phoneRoomsUnavailable.length > 0 ?
                   <View>
                     <View style={{ paddingLeft: 5, paddingTop: 20 }}>
                       <Text style={{ fontWeight: 'bold', fontSize: text.subheaderText }}>
                         Not Available
-                </Text>
+                      </Text>
                     </View>
                     <View>
-                      <FlatList
-                        // data={this.state.phoneRoomsUnavailable}  // this would be this.props.phoneRoomsAvailable
-                        data={this.props.phoneRoomsUnavailable}  // this would be this.props.phoneRoomsAvailable
-                        // data={phoneRoomMockData}
-                        keyExtractor={item => item.roomId}
-                        renderItem={this.renderPhoneRooms}
-                      />
+                      {this.state.section.length <= 0 ?
+                        <FlatList
+                          data={this.props.phoneRoomsUnavailable} // this would be this.props.phoneRoomsAvailable
+                          keyExtractor={item => item.roomId}
+                          renderItem={this.renderPhoneRooms}
+                        /> :
+                        <FlatList
+                          data={this.state.filter_uRooms} // this would be this.props.phoneRoomsAvailable
+                          keyExtractor={item => item.roomId}
+                          renderItem={this.renderPhoneRooms}
+                        />
+                      }
                     </View>
                   </View>
                   : null}
